@@ -1,0 +1,112 @@
+/* Stile del corpo */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5; /* Colore di sfondo leggero */
+    display: flex;
+    flex-direction: column; /* Impila gli elementi verticalmente */
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra orizzontalmente */
+    min-height: 100vh; /* Occupa tutta l'altezza dello schermo */
+    margin: 0;
+}
+
+/* Stile del contenitore principale */
+.auth-container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 8px; /* Angoli arrotondati */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Ombreggiatura elegante */
+    width: 100%;
+    max-width: 400px; /* Larghezza massima della scheda */
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* Stile del contenitore Guest */
+.Guest {
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Stile titoli */
+h1 {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: normal;
+}
+
+/* Stile del Form e Input */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Allinea etichette a sinistra */
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #555;
+    width: 100%;
+    text-align: left;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px; /* Spazio sotto ogni input */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Assicura che il padding non aumenti la larghezza */
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+/* Effetto quando clicchi sull'input */
+input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Stile dei Bottoni */
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Bottone Login (Primario) */
+.auth-form button {
+    background-color: #007bff;
+    color: white;
+    margin-top: 10px;
+}
+
+.auth-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Bottone Guest (Secondario) */
+.Guest button {
+    background-color: transparent;
+    color: #555;
+    border: 1px solid #ccc;
+}
+
+.Guest button:hover {
+    background-color: #e2e6ea;
+    color: #333;
+}

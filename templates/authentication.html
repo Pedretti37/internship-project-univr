@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authentication Page</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+
+</head>
+<body>
+    <div class="auth-container">
+        <h1>Welcome!</h1>
+
+        {% if error %}
+            <div style="background-color: #ffdddd; color: red; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form action="/login" method="POST" class="auth-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <div class="Guest">
+        <h2>Continue as a Guest</h2>
+        <button>Guest</button>
+    </div>
+</html>
