@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form, Request, status, Response
+from fastapi import FastAPI, Form, Request, status, Response, APIRouter
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -9,6 +9,7 @@ import crud
 from models import User, Organization
 
 app = FastAPI()
+# router = APIRouter()
 
 # Monta la cartella "static" per servire CSS e immagini
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -38,7 +39,7 @@ async def user_login(request: Request):
     return response
 
 @app.post("/user_login", response_class=HTMLResponse)
-async def login(request: Request, username: str = Form(...), password: str = Form(...)):
+async def user_login(request: Request, username: str = Form(...), password: str = Form(...)):
     user = crud.get_user(username)
 
     if not user or not pwd_context.verify(password, user.hashed_password):
@@ -56,19 +57,29 @@ async def login(request: Request, username: str = Form(...), password: str = For
 
 ### --- User Home --- ###
 @app.get("/user_home", response_class=HTMLResponse)
-async def home(request: Request):
-    cookie_username = request.cookies.get("session_token")
-    if not cookie_username:
+async def user_home(request: Request):
+    token = request.cookies.get("session_token")
+    
+    if not token:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    
-    current_user = crud.get_user(cookie_username)
+
+    current_user = crud.get_user(token)
+
     if not current_user:
-        response = RedirectResponse(url="/user_login", status_code=status.HTTP_303_SEE_OTHER)
-        response.set_cookie(key="session_token", value="", path="/", httponly=True, max_age=0)
+        response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+        response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
-    
-    # If logged in, show home page
-    response = templates.TemplateResponse("user/user_home.html", {"request": request, "user": current_user}) 
+
+    response = templates.TemplateResponse(
+        "user/user_home.html", 
+        {"request": request, "user": current_user}
+    )
+
+    # No cache storage
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    response.headers["Vary"] = "Cookie"
 
     return response
 
@@ -86,7 +97,7 @@ async def org_login(request: Request):
     return response
 
 @app.post("/org_login", response_class=HTMLResponse)
-async def login(request: Request, username: str = Form(...), password: str = Form(...)):
+async def org_login(request: Request, username: str = Form(...), password: str = Form(...)):
     org = crud.get_organization(username)
 
     if not org or not pwd_context.verify(password, org.hashed_password):
@@ -104,19 +115,29 @@ async def login(request: Request, username: str = Form(...), password: str = For
 
 ### --- Organization Home --- ###
 @app.get("/org_home", response_class=HTMLResponse)
-async def home(request: Request):
-    cookie_org = request.cookies.get("session_token")
-    if not cookie_org:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+async def org_home(request: Request):
+    token = request.cookies.get("session_token")
     
-    current_org = crud.get_organization(cookie_org)
+    if not token:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    current_org = crud.get_organization(token)
+
     if not current_org:
-        response = RedirectResponse(url="/org_login", status_code=status.HTTP_303_SEE_OTHER)
-        response.set_cookie(key="session_token", value="", path="/", httponly=True, max_age=0)
+        response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+        response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
 
-    # If logged in, show home page
-    response = templates.TemplateResponse("org/org_home.html", {"request": request, "org": current_org}) 
+    response = templates.TemplateResponse(
+        "org/org_home.html", 
+        {"request": request, "org": current_org}
+    )
+
+    # No cache storage
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    response.headers["Vary"] = "Cookie"
 
     return response
 
@@ -152,7 +173,7 @@ async def register_user(
     
 ### --- Organization Registration --- ###
 @app.get("/org_register", response_class=HTMLResponse)
-async def register(request: Request):
+async def org_register(request: Request):
     return templates.TemplateResponse("org/org_register.html", {"request": request})
 
 @app.post("/org_register", response_class=HTMLResponse)
@@ -185,16 +206,23 @@ async def logout(request: Request):
     response.set_cookie(key="session_token", value="", path="/", httponly=True, max_age=0)
     return response
 
-### --- Session Check --- ###
-@app.get("/check_session")
-async def check_session(request: Request):
-    token = request.cookies.get("session_token")
-    if not token:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+### --- Obtain skills from User Input --- ###
+@app.post("/extract_skills", response_class=HTMLResponse)
+async def extract_skills(request: Request, role1: str = Form(...), 
+                         role2: str = Form(...), role3: str = Form(...), 
+                         role4: str = Form(...), role5: str = Form(...)):
+    raw_roles = [role1, role2, role3, role4, role5]
+    roles = [role for role in raw_roles if role and role.strip() != ""]
+
+    extracted_skills = {}
+
+    for role in roles:
+        skills_list = crud.extract_skills(role)
+        if skills_list:
+            extracted_skills[role] = skills_list
     
-    is_user = crud.get_user(token)
-    is_org = crud.get_organization(token)
-    if not is_user and not is_org:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-    
-    return Response(status_code=status.HTTP_200_OK)
+    return templates.TemplateResponse("user/user_home.html", {
+        "request": request,
+        "user": crud.get_user(request.cookies.get("session_token")),
+        "results": extracted_skills
+    })

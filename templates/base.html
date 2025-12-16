@@ -4,11 +4,22 @@
     <meta charset="UTF-8">
     <title>Internship Project</title>
     
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- <link rel="stylesheet" href="/static/css/styles.css"> -->
 
     {% block css %}{% endblock %}
 </head>
 <body>
     {% block content %}{% endblock %}
+    <script>
+    window.addEventListener("pageshow", function(event) {
+        var historyTraversal = event.persisted || 
+                               (typeof window.performance != "undefined" && 
+                                window.performance.navigation.type === 2);
+
+        if (historyTraversal) {
+            window.location.reload();
+        }
+    });
+</script>
 </body>
 </html>

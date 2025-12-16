@@ -2,41 +2,63 @@
 
 {% block css %}
     <link rel="stylesheet" href="/static/css/user_home.css">
-    <style>
-        /* hiding page for non authorized users */
-        body { display: none; }
-    </style>
 {% endblock %}
 
 {% block content %}
-    <div class="welcome-box">
-        <h1>Hello, {{ user.name }}!</h1>
-        <p>This is your home page</p>
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="name">Hello, <strong>{{ user.name }}</strong></span>
+        </div>
 
-        <a href="/logout" class="logout-link">Logout</a>
+        <div class="nav-right">
+            <a href="/user_profile" class="nav-link">Profile</a>
+            <a href="/logout" class="nav-link btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <h1>Insert 1 to 5 target roles</h1>
+        
+        <div class="role-input">
+            <form action="/extract_skills" method="post" class="skill-form" autocomplete="off">
+                <input type="text" name="role1" placeholder="Target Role 1" required>
+                <br>
+                <input type="text" name="role2" placeholder="Target Role 2">
+                <br>
+                <input type="text" name="role3" placeholder="Target Role 3">
+                <br>
+                <input type="text" name="role4" placeholder="Target Role 4">
+                <br>
+                <input type="text" name="role5" placeholder="Target Role 5">
+                <br>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div class="skill-container">
+            {% if results %}
+                <hr style="width:100%; margin: 20px 0;">
+                <h2>Extracted Skills</h2>
+                <div class="skills-list">
+                    {% for role, skills in results.items() %}
+                        <div class="skill-card">
+                            <h3>{{ role }}</h3>
+                            <ul>
+                                {% for skill in skills %}
+                                    <li>{{ skill }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %} </div>
+
+        <hr style="width:100%; margin-top: 30px;">
+
+        <h2>Recent Events (new tech, law changes, ecc...)</h2>
+
+        <div class="events-container">
+            <p>No recent events available.</p>
+        </div>
     </div>
-
-    <script>
-        async function verifySession() {
-            try {
-                const response = await fetch('/check_session');
-
-                if (response.ok) {
-                    /* still in session */
-                    document.body.style.display = 'block';
-                } else {
-                    /* logged out */
-                    window.location.href = "/"; 
-                }
-            } catch (error) {
-                /* if error occurs: login page */
-                window.location.href = "/";
-            }
-        }
-
-        /* execute everytime the page is showed */
-        window.addEventListener('pageshow', function(event) {
-            verifySession();
-        });
-    </script>
 {% endblock %}

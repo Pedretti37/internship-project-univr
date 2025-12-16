@@ -2,10 +2,6 @@
 
 {% block css %}
     <link rel="stylesheet" href="/static/css/org_home.css">
-    <style>
-        /* hiding page for non authorized users */
-        body { display: none; }
-    </style>
 {% endblock %}
 
 {% block content %}
@@ -15,28 +11,4 @@
 
         <a href="/logout" class="logout-link">Logout</a>
     </div>
-
-    <script>
-        async function verifySession() {
-            try {
-                const response = await fetch('/check_session');
-
-                if (response.ok) {
-                    /* still in session */
-                    document.body.style.display = 'block';
-                } else {
-                    /* logged out */
-                    window.location.href = "/"; 
-                }
-            } catch (error) {
-                /* if error occurs: login page */
-                window.location.href = "/";
-            }
-        }
-
-        /* execute everytime the page is showed */
-        window.addEventListener('pageshow', function(event) {
-            verifySession();
-        });
-    </script>
 {% endblock %}

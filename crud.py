@@ -1,5 +1,6 @@
 import json
 import os
+import pandas as pd
 from models import User, Organization
 
 DATA_DIR_USERS = "data/users"
@@ -51,4 +52,21 @@ def create_organization(org: Organization):
     
     with open(path, "w") as f:
         json.dump(org.model_dump(), f, indent=4) # model_dump() transforms the Pydantic model to a dict for JSON file
-    
+
+### --- Extract skills by user input --- ###
+def extract_skills(target_role: str) -> list[str]:
+    # reading Excel file, only columns C (function title) and E (Required skills)
+    df = pd.read_excel("data/ISCO-08 EN Structure and definitions.xlsx", usecols="C,E")
+
+    col_C_name = df.columns[0]
+    col_E_name = df.columns[1]
+
+    # filtering rows, converting to string, case insensitive search
+    filter = df[col_C_name].astype(str).str.contains(target_role, case=False, na=False)
+    results = df[filter]
+
+    if not results.empty:
+        skills = results[col_E_name].values.tolist()
+        return skills
+    else:
+        return None
