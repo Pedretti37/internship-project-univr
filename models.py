@@ -8,6 +8,7 @@ class User(BaseModel):
     username: str
     email: EmailStr
     hashed_password: str
+    target_roles: Optional[list[str]] = None
 
 class Organization(BaseModel):
     name: str

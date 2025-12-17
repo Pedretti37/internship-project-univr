@@ -17,10 +17,31 @@
     </nav>
 
     <div class="main-container">
-        <h1>Insert 1 to 5 target roles</h1>
+        <div class="profile_info">
+            <h2>User information</h2>
+            <p><strong>Name</strong>: {{ user.name }}</p>
+            <p><strong>Surname</strong>: {{ user.surname }}</p>
+            <p><strong>Email</strong>: {{ user.email }}</p>
+            <!-- change password -->
+        </div>
+
+        <div class="show-target-roles">
+            {% if user.target_roles %}
+                <hr style="width:100%; margin-top: 30px;">
+                <h2>Current target roles</h2>
+
+                <ul>
+                    {% for target_role in user.target_roles %}
+                        <li>{{ target_role }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <h3>Update your target roles (min 1 - max 5)</h3>
         
         <div class="role-input">
-            <form action="/extract_skills" method="post" class="skill-form" autocomplete="off">
+            <form action="/set_target_roles" method="post" class="skill-form" autocomplete="off">
                 <input type="text" name="role1" placeholder="Target Role 1" required>
                 <br>
                 <input type="text" name="role2" placeholder="Target Role 2">
@@ -35,32 +56,14 @@
             </form>
         </div>
 
-        <div class="skill-container">
-            {% if results %}
-                <hr style="width:100%; margin: 20px 0;">
-                {% for input_role, skill_dict in results.items() %}
-                    <h2>Extracted Skill Models for <strong>{{input_role}}</strong></h2>
-                    <div class="skills-list">
-                        {% for specific_name, description in skill_dict.items() %}
-                            <div class="skill-card">
-                                <h3>{{ specific_name }}</h3>
-                                <div>
-                                    <p>{{ description }}</p>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <hr style="width:100%; margin: 30px 0;">
-                {% endfor %}
-            {% endif %}
-        </div>
-
         <hr style="width:100%; margin-top: 30px;">
 
-        <h2>Recent Events (new tech, law changes, ecc...)</h2>
+        <div>
+            <h2>Skill gap Assessment</h2>
 
-        <div class="events-container">
-            <p>No recent events available.</p>
+            <div class="skill-gap-container">
+                <p>Not available yet.</p>
+            </div>
         </div>
     </div>
 {% endblock %}

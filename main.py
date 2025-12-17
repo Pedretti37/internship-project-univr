@@ -208,22 +208,44 @@ async def logout(request: Request):
 
 ### --- Obtain skills from User Input --- ###
 @app.post("/extract_skill_models", response_class=HTMLResponse)
-async def extract_skills(request: Request, search: str = Form(...)):
+async def extract_skill_models(request: Request, search: str = Form(...)):
     role = search.title().strip()
 
-    extracted_roles = {}
+    extracted_models = {}
 
-    skill_models_list = crud.extracting_skills(role)
+    skill_models_list = crud.extracting_skill_models(role)
     if skill_models_list:
-        extracted_roles[role] = skill_models_list
+        extracted_models[role] = skill_models_list
     
     user = crud.get_user(request.cookies.get("session_token"))
 
     return templates.TemplateResponse("user/user_home.html", {
         "request": request,
         "user": user,
-        "results": extracted_roles,
+        "results": extracted_models,
         "last_search": search
+    })
+
+### --- Set Target Roles --- ###
+@app.post("/set_target_roles", response_class=HTMLResponse)
+async def set_target_roles(
+    request: Request, 
+    role1: str = Form(...),
+    role2: Optional[str] = Form(None),
+    role3: Optional[str] = Form(None),
+    role4: Optional[str] = Form(None),
+    role5: Optional[str] = Form(None)
+):
+    roles = [role1, role2, role3, role4, role5]
+    target_roles = [role.title().strip() for role in roles if role and role.strip() != ""]
+
+
+    user = crud.get_user(request.cookies.get("session_token"))
+    crud.set_target_roles_user(user, target_roles)
+    
+    return templates.TemplateResponse("user/user_profile.html", {
+        "request": request,
+        "user": user,
     })
 
 ### --- User Profile --- ###

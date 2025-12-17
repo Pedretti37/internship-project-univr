@@ -3,5 +3,14 @@
     "surname": "Lonardoni",
     "username": "vale",
     "email": "valeriolonardoni04@gmail.com",
-    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$YuwdA4BwrnVu7d07J0TovQ$iZBCWqlUp1a3zB+s4Jk0zgvO3huTyPdw0irhY7CVAew"
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$YuwdA4BwrnVu7d07J0TovQ$iZBCWqlUp1a3zB+s4Jk0zgvO3huTyPdw0irhY7CVAew",
+    "target_roles": [
+        "Chief Executives, Senior Officials and Legislators",
+        "Civil Engineering Labourers",
+        "Civil Engineering Technicians",
+        "Civil Engineers",
+        "Managing Directors and Chief Executives",
+        "Production Managers in Agriculture, Forestry and Fisheries",
+        "Traditional Chiefs and Heads of Villages"
+    ]
 }
