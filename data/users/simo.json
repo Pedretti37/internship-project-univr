@@ -2,6 +2,18 @@
     "name": "Simone",
     "surname": "Pedretti",
     "username": "simo",
-    "email": "simonepedretti04@gmail.com",
-    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$wNi7dy6ltNb6nxPiXGuttQ$3nQKJJb6EwqzPACXhgEy8G3ZRdDN3sUSSoCFXo88IfY"
+    "email": "simonepedretti@gmail.com",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$DaGU8j5nzHkvJYQwRshZSw$rQxOODb+e+COljs0zfFZ3UOdDD84NFaWFEScQO8KkxA",
+    "target_roles": [
+        "Agricultural and Forestry Production Managers",
+        "Agricultural, Forestry and Fishery Labourers",
+        "Farming, Forestry and Fisheries Advisers",
+        "Forestry Labourers",
+        "Forestry Technicians",
+        "Forestry and Related Workers",
+        "Market-Oriented Skilled Forestry, Fishery and Hunting Workers",
+        "Mobile Farm and Forestry Plant Operators",
+        "Production Managers in Agriculture, Forestry and Fisheries",
+        "Skilled Agricultural, Forestry and Fishery Workers"
+    ]
 }

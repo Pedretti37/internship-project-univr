@@ -6,11 +6,19 @@
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$YuwdA4BwrnVu7d07J0TovQ$iZBCWqlUp1a3zB+s4Jk0zgvO3huTyPdw0irhY7CVAew",
     "target_roles": [
         "Chief Executives, Senior Officials and Legislators",
-        "Civil Engineering Labourers",
-        "Civil Engineering Technicians",
-        "Civil Engineers",
+        "Child Care Workers and Teachers' Aides",
         "Managing Directors and Chief Executives",
-        "Production Managers in Agriculture, Forestry and Fisheries",
-        "Traditional Chiefs and Heads of Villages"
+        "Other Arts Teachers",
+        "Other Language Teachers",
+        "Other Music Teachers",
+        "Primary School Teachers",
+        "Primary School and Early Childhood Teachers",
+        "Secondary Education Teachers",
+        "Special Needs Teachers",
+        "Teachers' Aides",
+        "Traditional Chiefs and Heads of Villages",
+        "University and Higher Education Teachers",
+        "Vocational Education Teachers",
+        "Vocational education teachers"
     ]
 }
