@@ -6,7 +6,7 @@ from dependencies import get_current_user
 
 from config import templates, pwd_context
 import crud
-from models import User
+from models import User, Role
 
 router = APIRouter()
 
@@ -186,3 +186,26 @@ async def change_password(request: Request, user = Depends(get_current_user), ol
             "user": user,
             "failed": failed
         })
+    
+### --- Details for a selected Skill Model --- ###
+@router.get("/details/{role_id}")
+async def details_page(request: Request, role_id: str, user = Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    role_object = crud.get_role_by_id(role_id)
+
+    if not role_object:
+        error = "Skill Model not found"
+        return templates.TemplateResponse("user/user_home.html", {
+            "request": request,
+            "user": user,
+            "error": error
+        })
+    
+    return templates.TemplateResponse("user/details.html", {
+        "request": request,
+        "user": user,
+        "role": role_object
+    })
+    

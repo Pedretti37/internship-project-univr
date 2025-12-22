@@ -1,7 +1,7 @@
 import json
 import os
 import pandas as pd
-from models import User, Organization
+from models import User, Organization, Role
 
 DATA_DIR_USERS = "data/users"
 os.makedirs(DATA_DIR_USERS, exist_ok=True)
@@ -114,23 +114,34 @@ def change_password_org(org: Organization, new_pw: str) -> bool:
         return False
 
 ### --- Extract skill models by user input --- ###
-def extracting_skill_models(user_query: str) -> dict[str:str] | None:
-    # reading Excel file, only columns C (function title) and D (Description of function)
+def extracting_skill_models(user_query: str) -> list[Role] | None:
+    # reading Excel file, only columns B (id), C (title), D (definition), E (task)
     try: 
-        df = pd.read_excel("data/ISCO-08 EN Structure and definitions.xlsx", usecols="C,D")
+        df = pd.read_excel("data/ISCO-08 EN Structure and definitions.xlsx", usecols="B,C,D,E", dtype=str)
+        
+        df.columns = ["id", "title", "definition", "task"]
+        df = df.fillna("") # managing empty strings
 
-        col_title = df.columns[0]
-        col_definition = df.columns[1]
 
         # filtering rows, converting to string, case insensitive search
-        filter = df[col_title].astype(str).str.contains(user_query, case=False, na=False)
+        filter = df["title"].astype(str).str.contains(user_query, case=False, na=False)
         results = df[filter]
 
-        if not results.empty:
-            skill_models_dict = dict(zip(results[col_title], results[col_definition]))
-            return skill_models_dict
-        else:
+        if results.empty:
             return None
+        
+        roles_list = []
+
+        for _, row in results.iterrows():
+            new_role = Role(
+                id=row["id"],
+                title=row["title"],
+                definition=row["definition"],
+                task=row["task"]
+            )
+            roles_list.append(new_role)
+        return roles_list
+    
     except Exception as e:
         print(f"Error extracting skill models: {e}")
         return None
@@ -162,3 +173,32 @@ def extracting_target_roles(user_inputs: list[str]) -> list[str]:
     except Exception as e:
         print(f"Error extracting skills: {e}")
         return []
+    
+def get_role_by_id(target_id: str) -> Role | None:
+    try:
+        
+        df = pd.read_excel(
+            "data/ISCO-08 EN Structure and definitions.xlsx", 
+            usecols="B,C,D,E", 
+            dtype=str
+        )
+        df.columns = ["id", "title", "definition", "task"]
+        df = df.fillna("")
+
+        match = df[df["id"].astype(str) == str(target_id)]
+
+        if match.empty:
+            return None
+
+        row = match.iloc[0]
+
+        return Role(
+            id=row["id"],
+            title=row["title"],
+            definition=row["definition"],
+            task=row["task"]
+        )
+
+    except Exception as e:
+        print(f"Error getting role by ID: {e}")
+        return None

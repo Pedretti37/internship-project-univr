@@ -30,17 +30,19 @@
             {% if results %}
                 <hr style="width:100%; margin: 20px 0;">
 
-                {% for input_role, skill_dict in results.items() %}
+                {% for input_role, roles_list in results.items() %}
                     <h2>Skill Models for <strong>{{input_role}}</strong></h2>
 
                     <div class="skills-list">
                         <ul>
-                            {% for specific_name, description in skill_dict.items() %}
+                            {% for role in roles_list %}
                             <li>    
                                 <div class="skill-card">
-                                    <h3>{{ specific_name }}</h3>
+                                    <h3>
+                                        <a href="/details/{{ role.id }}">{{ role.title }}</a>
+                                    </h3>
                                     <div>
-                                        <p>{{ description }}</p>
+                                        <p>{{ role.definition }}</p>
                                     </div>
                                 </div>
                             </li>

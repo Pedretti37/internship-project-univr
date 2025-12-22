@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/details.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="/user_home">← Back to Search</a>
+    
+    <h1>{{ role.title }} <small>(ID: {{ role.id }})</small></h1>
+    
+    <div class="details-box">
+        <h3>Description</h3>
+        <p>{{ role.definition }}</p>
+    </div>
+
+    {% if role.task %}
+    <div class="details-box">
+        <h3>Tasks & Responsibilities</h3>
+        <ul>
+        {% for line in role.task.split('\n') %}
+            {% if line.strip() %}
+                <li>{{ line }}</li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

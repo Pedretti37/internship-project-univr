@@ -17,3 +17,9 @@ class Organization(BaseModel):
     email: EmailStr
     orgname: str
     hashed_password: str
+
+class Role(BaseModel):
+    id: int
+    title: str
+    definition: str
+    task: str
