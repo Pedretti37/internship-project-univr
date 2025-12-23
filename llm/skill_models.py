@@ -5,7 +5,7 @@ import json
 import time
 
 # --- SETTING ---
-API_KEY = "AIzaSyDcRMGwzpIZzeA1G_7s_dWvaT3NkYmDgj0" 
+API_KEY = "CURRENT_KEY" 
 
 FILE_INPUT = "data/ISCO-08 EN Structure and definitions.xlsx"
 FILE_OUTPUT = "skill_models.json"
