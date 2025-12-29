@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
-from typing import Optional
+from typing import Optional, List
 from dependencies import get_current_user
 
 from config import templates, pwd_context
 import crud
-from models import User, Role
+from models import User
 
 router = APIRouter()
 
@@ -135,7 +135,7 @@ async def extract_skill_models(request: Request, search: str = Form(...), user =
 async def set_target_roles(
     request: Request,
     user = Depends(get_current_user),
-    role1: str = Form(...),
+    role1: str = Form(...), # Usa ... se il campo è obbligatorio, o None se opzionale
     role2: Optional[str] = Form(None),
     role3: Optional[str] = Form(None),
     role4: Optional[str] = Form(None),
@@ -144,14 +144,28 @@ async def set_target_roles(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    roles = [role1, role2, role3, role4, role5]
-    target_roles = [role.title().strip() for role in roles if role and role.strip() != ""]
+    roles_input = [role1, role2, role3, role4, role5]
+    clean_inputs = [r.strip() for r in roles_input if r and r.strip() != ""]
 
-    crud.set_target_roles_user(user, target_roles)
+    found_roles_dict = crud.set_target_roles_user(user, clean_inputs)
     
+    msg = ""
+    msg_type = "success"
+
+    if not clean_inputs:
+        msg = "Hai rimosso tutti i ruoli target."
+        msg_type = "warning"
+    elif not found_roles_dict:
+        msg = "Nessun ruolo trovato nel database corrispondente alla tua ricerca. Riprova con termini diversi."
+        msg_type = "danger"
+    else:
+        msg = f"Profilo aggiornato! Trovati {len(found_roles_dict)} ruoli su {len(clean_inputs)} cercati."
+
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
         "user": user,
+        "message": msg,
+        "message_type": msg_type
     })
 
 ### --- Password Change --- ###
@@ -209,3 +223,30 @@ async def details_page(request: Request, role_id: str, user = Depends(get_curren
         "role": role_object
     })
     
+### --- Delete Target Role --- ###
+@router.post("/delete_target_role", response_class=HTMLResponse)
+async def delete_target_role(
+    user = Depends(get_current_user),
+    role_id: str = Form(...)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    crud.delete_role_from_user(user, role_id)
+
+    return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- Calculating Skill Gap --- ###
+@router.post("/calculate_skill_gap", response_class=HTMLResponse)
+async def calculate_skill_gap(request: Request, user = Depends(get_current_user), role_ids: List[str] = Form(...)):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    gap_analysis_result = crud.calculate_skill_gap_user(user, role_ids)
+
+    # 2. Mostriamo i risultati
+    return templates.TemplateResponse("user/user_profile.html", {
+        "request": request,
+        "user": user,
+        "gap_report": gap_analysis_result
+    })

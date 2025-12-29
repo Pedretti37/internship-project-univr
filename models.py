@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, Dict, List, Any
 
 # Questo modello definisce cosa ci aspettiamo di trovare nel JSON
 class User(BaseModel):
@@ -8,7 +8,9 @@ class User(BaseModel):
     username: str
     email: EmailStr
     hashed_password: str
-    target_roles: Optional[list[str]] = None
+    target_roles: Optional[Dict[str, str]] = None
+    current_skills: Optional[Dict[str, int]] = None
+    skill_gap: Optional[Dict[str, List[Any]]] = None
 
 class Organization(BaseModel):
     name: str

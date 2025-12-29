@@ -1,7 +1,0 @@
-{
-    "name": "Luca",
-    "surname": "Quaresima",
-    "username": "luca",
-    "email": "lucaquaresima@gmail.com",
-    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$FiJkTAkhBEDIubc25nzP2Q$z1nsWKXv4pcZsF813BLDBv+jxvVlvcXrvayORA+s+h8"
-}
