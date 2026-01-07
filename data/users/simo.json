@@ -5,51 +5,16 @@
     "email": "simonepedretti04@gmail.com",
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$9L5XCoEw5jwnJGRsrRWidA$pRJ4a4nVCraVVEv0thPJA4lD6JmjPhjQl1tUok+lMag",
     "target_roles": {
-        "11": "Chief Executives, Senior Officials and Legislators"
+        "11": "Chief Executives, Senior Officials and Legislators",
+        "24": "Business and Administration Professionals"
     },
-    "current_skills": null,
-    "skill_gap": {
-        "Chief Executives, Senior Officials and Legislators": [
-            {
-                "skill_name": "Strategic Leadership",
-                "required": 9,
-                "user_level": 0,
-                "gap": 9,
-                "status": "MISSING",
-                "reason": "The role involves establishing objectives, formulating and advising on policy, and monitoring organizational performance, requiring an expert ability to define strategy and lead at the highest level."
-            },
-            {
-                "skill_name": "Policy & Program Management",
-                "required": 8,
-                "user_level": 0,
-                "gap": 8,
-                "status": "MISSING",
-                "reason": "Tasks include formulating, approving, evaluating, and ensuring the implementation of complex programs and policies, demanding an expert capacity to define and oversee large-scale initiatives."
-            },
-            {
-                "skill_name": "Financial & Resource Stewardship",
-                "required": 8,
-                "user_level": 0,
-                "gap": 8,
-                "status": "MISSING",
-                "reason": "Responsibilities encompass advising on budgets, ensuring budgetary control, and authorizing significant material, human, and financial resources, necessitating an expert understanding and strategic oversight of financial health."
-            },
-            {
-                "skill_name": "Executive Communication & Diplomacy",
-                "required": 9,
-                "user_level": 0,
-                "gap": 9,
-                "status": "MISSING",
-                "reason": "The role requires presiding over legislative bodies, representing the organization at official occasions, leading negotiations, and engaging in public hearings, demanding an expert ability to influence, represent, and lead public discourse."
-            },
-            {
-                "skill_name": "Governance & High-Stakes Decision Making",
-                "required": 9,
-                "user_level": 0,
-                "gap": 9,
-                "status": "MISSING",
-                "reason": "This role involves participating in legislative bodies, approving critical programs and policies, authorizing major resources, and selecting senior staff, requiring expert judgment and strategic decision-making that defines the organization's future."
-            }
-        ]
-    }
+    "current_skills": {
+        "Python Programming": 9,
+        "Data Analysis": 9,
+        "Project Management": 8,
+        "Public Speaking": 7,
+        "Leadership": 8,
+        "Economic Policy": 7
+    },
+    "skill_gap": {}
 }

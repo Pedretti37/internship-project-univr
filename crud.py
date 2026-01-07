@@ -1,6 +1,7 @@
 import json
 import os
 import pandas as pd
+import time
 from models import User, Organization, Role
 from llm import gemini
 
@@ -240,59 +241,68 @@ def delete_role_from_user(user: User, role_id_to_delete: str):
         print(f"Errore durante l'eliminazione del ruolo: {e}")
 
 def calculate_skill_gap_user(user, role_ids: list[str]) -> dict:
-    """
-    Confronta le skill dell'utente con quelle richieste dai ruoli specificati.
-    """
     gap_report = {}
     
-    # Skill dell'utente (normalizzate in minuscolo per confronto facile)
-    # Esempio user_skills_norm = {'python': 3, 'english': 8}
-    user_skills_norm = {k.lower(): v for k, v in user.current_skills.items()} if user.current_skills else {}
-
     for rid in role_ids:
-        role_data = get_role_skills_data(rid)
+        # Recuperiamo i dati del ruolo (Titolo e lista skill richieste)
+        role_data = get_role_skills_data(rid) 
         
         if not role_data:
             continue
 
         role_title = role_data["info"]["title"]
-        gap_report[role_title] = [] # Lista dei gap per questo ruolo
+        required_skills_list = role_data["skills"] # Lista di dict
+        
+        gap_report[role_title] = []
 
-        # Calcolo matematico del GAP
-        for req in role_data["skills"]:
+        print(f"📊 Analisi gap per ruolo: {role_title} (Batch)...")
+
+        # CHIAMATA UNICA A GEMINI
+        batch_results = gemini.get_gap_gemini(user.current_skills, required_skills_list)
+        
+        # Creiamo una mappa per accesso rapido ai risultati: {"SkillName": {gap: 2, user_level: 5}}
+        results_map = {r["skill_name"]: r for r in batch_results}
+
+        # Ricostruiamo il report finale
+        for req in required_skills_list:
             req_name = req["Skill"]
             req_level = int(req["Required Level"])
+            reason = req["Reason"]
             
-            # Cerchiamo se l'utente ha questa skill (case insensitive match basico)
-            # Nota: qui stiamo facendo match esatto di stringa. 
-            # In futuro si potrebbe usare l'AI per capire che "Coding" == "Python".
-            user_level = user_skills_norm.get(req_name.lower(), 0)
+            # Recuperiamo i dati calcolati da Gemini
+            result = results_map.get(req_name)
             
-            gap_val = req_level - user_level
-            
-            status = ""
-            if user_level == 0:
-                status = "MISSING" # L'utente non ce l'ha proprio
-            elif gap_val > 0:
-                status = "GAP"     # L'utente ce l'ha ma livello troppo basso
-            elif gap_val == 0:
-                status = "MATCH"   # Perfetto
+            if result:
+                gap_val = result.get("gap", req_level) # Default gap totale se manca
+                user_val = result.get("user_level", 0)
             else:
-                status = "OVERSKILLED" # L'utente è più bravo del necessario
+                # Fallback se Gemini si è dimenticato una skill nel JSON
+                gap_val = req_level
+                user_val = 0
+
+            # Determina Status
+            if gap_val == 0:
+                status = "MATCH"
+            elif gap_val > 0:
+                status = "GAP"
+            else: # gap negativo
+                status = "OVERSKILLED"
 
             gap_report[role_title].append({
                 "skill_name": req_name,
                 "required": req_level,
-                "user_level": user_level,
+                "user_level": user_val,
                 "gap": gap_val,
                 "status": status,
-                "reason": req["Reason"]
+                "reason": reason
             })
 
+        # Pausa tra un RUOLO e l'altro
+        time.sleep(10) 
+
     user.skill_gap = gap_report
-    
     path = get_json_path(user.username)
-    
+
     if os.path.exists(path):
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -314,7 +324,7 @@ def get_role_skills_data(role_id: str):
     # Leggiamo Excel
     try:
         df = pd.read_excel(FILE_INPUT)
-        # Assumiamo Colonna B = ID (indice 1), Colonna C = Titolo, Colonna E = Task
+        # Colonna B = ID (indice 1), Colonna C = Titolo, Colonna E = Task
         # Filtriamo per ID (convertendo in stringa per sicurezza)
         row = df[df.iloc[:, 1].astype(str) == role_id]
         
