@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse
 from config import templates
-import crud
+import crud.crud_skill_models as crud_skill_models
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ async def extract_general_skill_models(request: Request, search: str = Form(...)
 
     extracted_models = {}
 
-    skill_models_list = crud.extracting_skill_models(role)
+    skill_models_list = crud_skill_models.extracting_skill_models(role)
     if skill_models_list:
         extracted_models[role] = skill_models_list
     

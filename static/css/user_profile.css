@@ -59,3 +59,110 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
+/* --- Skill Gap Container --- */
+.skill-gap-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* Spazio tra le diverse schede dei ruoli */
+    padding: 1rem 0;
+}
+
+/* --- Card del Ruolo --- */
+/* Aggiungeremo questa classe al div principale nel loop */
+.role-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Ombra leggera */
+    border: 1px solid #eef2f6;
+    overflow: hidden; /* Per contenere i bordi arrotondati */
+    transition: transform 0.2s ease;
+}
+
+.role-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* --- Header del Ruolo --- */
+.role-header {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    padding: 15px 20px;
+    border-bottom: 1px solid #eef2f6;
+}
+
+.role-header h5 {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Tabella --- */
+.table-responsive {
+    padding: 0;
+    margin: 0;
+}
+
+.skill-table {
+    margin-bottom: 0 !important; /* Rimuove margine default di bootstrap */
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.skill-table thead th {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-bottom: 2px solid #eef2f6;
+    padding: 12px 15px;
+}
+
+.skill-table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f1f1;
+    color: #495057;
+}
+
+/* --- Override Colori Righe (Colori Pastello più leggeri) --- */
+.table-danger {
+    background-color: #fff5f5 !important; /* Rosso molto chiaro */
+}
+.table-warning {
+    background-color: #fffbf0 !important; /* Giallo molto chiaro */
+}
+.table-success {
+    background-color: #f0fdf4 !important; /* Verde molto chiaro */
+}
+
+/* --- Testo Gap e Skill --- */
+.skill-name {
+    font-weight: 600;
+    color: #344767;
+}
+
+.gap-value {
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+/* --- Badge Status --- */
+.badge {
+    padding: 0.5em 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+}
+
+/* --- Empty State (Alert) --- */
+.empty-state {
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    color: #6c757d;
+}

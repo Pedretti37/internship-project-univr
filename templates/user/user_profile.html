@@ -156,16 +156,20 @@
             <div class="skill-gap-container">
                 {% if user.skill_gap %}
                     {% for role_title, skills in user.skill_gap.items() %}
-                        <div>
-                            <div >
-                                <h5 >{{ role_title }}</h5>
+                        <div class="role-card">
+                            
+                            <div class="role-header">
+                                <h5>
+                                    <i class="fas fa-briefcase me-2 text-primary"></i> {{ role_title }}
+                                </h5>
                             </div>
-                            <div>
-                                <div>
-                                    <table>
+
+                            <div class="p-0">
+                                <div class="table-responsive">
+                                    <table class="table skill-table mb-0">
                                         <thead>
                                             <tr>
-                                                <th scope="col" style="width: 30%;">Skill</th>
+                                                <th scope="col" style="width: 35%;">Skill</th>
                                                 <th scope="col" class="text-center">Required</th>
                                                 <th scope="col" class="text-center">You</th>
                                                 <th scope="col" class="text-center">Gap</th>
@@ -175,39 +179,42 @@
                                         <tbody>
                                             {% for item in skills %}
                                                 {% set row_class = '' %}
-                                                {% if item.status == 'MISSING' %}
-                                                    {% set row_class = 'table-danger' %}
+                                                {% if item.status == 'OVERSKILLED' %}
+                                                    {% set row_class = 'table-success' %}
                                                 {% elif item.status == 'GAP' %}
                                                     {% set row_class = 'table-warning' %}
                                                 {% elif item.status == 'MATCH' %}
                                                     {% set row_class = 'table-success' %}
+                                                {% elif item.status == 'MISSING' %}
+                                                    {% set row_class = 'table-danger' %}
                                                 {% endif %}
 
-                                                <tr>
+                                                <tr class="{{ row_class }}">
                                                     <td>
-                                                        <strong>{{ item.skill_name }}</strong>
-                                                        <br>
+                                                        <span class="skill-name">{{ item.skill_name }}</span>
                                                     </td>
-                                                    <td class="text-center align-middle">{{ item.required }}</td>
-                                                    <td class="text-center align-middle">{{ item.user_level }}</td>
-                                                    <td class="text-center align-middle font-weight-bold">
+                                                    <td class="text-center font-weight-bold">{{ item.required }}</td>
+                                                    <td class="text-center">{{ item.user_level }}</td>
+                                                    
+                                                    <td class="text-center gap-value">
                                                         {% if item.gap > 0 %}
                                                             <span class="text-danger">-{{ item.gap }}</span>
                                                         {% elif item.gap < 0 %}
                                                             <span class="text-success">+{{ item.gap|abs }}</span>
                                                         {% else %}
-                                                            <span class="text-success">✔</span>
+                                                            <span class="text-success"><i class="fas fa-check"></i></span>
                                                         {% endif %}
                                                     </td>
-                                                    <td class="text-center align-middle">
-                                                        {% if item.status == 'MISSING' %}
-                                                            <span class="badge bg-danger">MISSING</span>
-                                                        {% elif item.status == 'GAP' %}
-                                                            <span class="badge bg-warning text-dark">GAP</span>
+
+                                                    <td class="text-center">
+                                                        {% if item.status == 'GAP' %}
+                                                            <span class="badge bg-warning">GAP</span>
                                                         {% elif item.status == 'MATCH' %}
                                                             <span class="badge bg-success">MATCH</span>
                                                         {% elif item.status == 'OVERSKILLED' %}
-                                                            <span class="badge bg-info text-dark">OVER</span>
+                                                            <span class="badge bg-success">OVERSKILLED</span>
+                                                        {% elif item.status == 'MISSING' %}
+                                                            <span class="badge bg-danger">MISSING</span>
                                                         {% endif %}
                                                     </td>
                                                 </tr>
@@ -220,9 +227,10 @@
                     {% endfor %}
 
                 {% else %}
-                    <div class="alert alert-secondary text-center p-4" role="alert">
-                        <h4>Not available yet 🤷‍♂️</h4>
-                        <p>You haven't calculated your skill gap yet.</p>
+                    <div class="empty-state text-center p-5">
+                        <div class="mb-3" style="font-size: 3rem;">🤷‍♂️</div>
+                        <h4>Not available yet</h4>
+                        <p class="text-muted">You haven't calculated your skill gap yet.</p>
                         <p class="mb-0">Select your target roles above and click <strong>"Calculate Skill Gap"</strong>.</p>
                     </div>
                 {% endif %}

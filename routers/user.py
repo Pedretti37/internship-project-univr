@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Request, Form, Response, status, Depends
+from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
 from typing import Optional, List
+from crud import crud_user
 from dependencies import get_current_user
 
 from config import templates, pwd_context
-import crud
+import crud.crud_skill_models as crud_skill_models
 from models import User
 
 router = APIRouter()
@@ -25,7 +26,7 @@ async def user_login(request: Request):
 
 @router.post("/user_login", response_class=HTMLResponse)
 async def user_login(request: Request, username: str = Form(...), password: str = Form(...)):
-    user = crud.get_user(username)
+    user = crud_user.get_user(username)
 
     if not user or not pwd_context.verify(password, user.hashed_password):
         response = RedirectResponse(url="/user_login", status_code=status.HTTP_303_SEE_OTHER)
@@ -79,7 +80,7 @@ async def register_user(
     hashed_pw = pwd_context.hash(password)
     new_user = User(name=name, surname=surname, email=email, username=username, hashed_password=hashed_pw)
     try:
-        crud.create_user(new_user)
+        crud_user.create_user(new_user)
         return RedirectResponse(url="/user_login", status_code=status.HTTP_303_SEE_OTHER)
     except ValueError:
         return templates.TemplateResponse("user/user_register.html", {
@@ -116,7 +117,7 @@ async def extract_skill_models(request: Request, search: str = Form(...), user =
 
     extracted_models = {}
 
-    skill_models_list = crud.extracting_skill_models(role)
+    skill_models_list = crud_skill_models.extracting_skill_models(role)
     if skill_models_list:
         extracted_models[role] = skill_models_list
     
@@ -147,7 +148,7 @@ async def set_target_roles(
     roles_input = [role1, role2, role3, role4, role5]
     clean_inputs = [r.strip() for r in roles_input if r and r.strip() != ""]
 
-    found_roles_dict = crud.set_target_roles_user(user, clean_inputs)
+    found_roles_dict = crud_user.set_target_roles_user(user, clean_inputs)
     
     msg = ""
     msg_type = "success"
@@ -184,7 +185,7 @@ async def change_password(request: Request, user = Depends(get_current_user), ol
     
     new_pw_hashed = pwd_context.hash(new_pw)
 
-    success = crud.change_password_user(user, new_pw_hashed)
+    success = crud_user.change_password_user(user, new_pw_hashed)
 
     if success:
         msg = "Password updated successfully!"
@@ -207,7 +208,7 @@ async def details_page(request: Request, role_id: str, user = Depends(get_curren
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    role_object = crud.get_role_by_id(role_id)
+    role_object = crud_skill_models.get_role_by_id(role_id)
 
     if not role_object:
         error = "Skill Model not found"
@@ -232,7 +233,7 @@ async def delete_target_role(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    crud.delete_role_from_user(user, role_id)
+    crud_user.delete_role_from_user(user, role_id)
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
     # return Response(status_code=200)
@@ -251,7 +252,7 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
             "error": error
         })
 
-    gap_analysis_result = crud.calculate_skill_gap_user(user, role_ids)
+    gap_analysis_result = crud_skill_models.calculate_skill_gap_user(user, role_ids)
 
     # 2. Mostriamo i risultati
     return templates.TemplateResponse("user/user_profile.html", {

@@ -64,70 +64,78 @@ def analyse_with_gemini(title_role, tasks):
 
 def get_gap_gemini(user_skills, role_skills_list):
     """
-    Calcola il gap per TUTTE le skill di un ruolo in UNA sola chiamata API.
-    Risparmia tempo e token.
+    Identifica il livello dell'utente per ogni skill richiesta usando matching semantico.
+    NON calcola il gap matematico (lo fa Python).
     """
     
-    # Costruiamo un JSON stringa delle skill richieste per il prompt
-    # Esempio: [{"skill": "Python", "level": 4}, {"skill": "Leadership", "level": 7}]
+    # Costruiamo il JSON delle skill richieste
+    # Nota: Passiamo solo il nome della skill, il livello richiesto serve a poco a Gemini ora,
+    # ma possiamo lasciarlo per contesto.
     required_json = json.dumps([
-        {"skill": s["Skill"], "level": int(s["Required Level"])} 
+        {"skill": s["Skill"]} 
         for s in role_skills_list
     ])
 
     prompt = f"""
-    You are a Skill Gap Analyst.
+    You are an expert HR Skill Matcher.
     
     I will provide:
     1. A User's Current Skill Set (Dictionary: Skill Name -> Level).
-    2. A List of Required Skills for a specific Role.
+    2. A List of Required Skills for a target Role.
 
-    For EACH required skill, compare it with the user's skills.
-    - Find the best matching skill in the user's profile.
-    - Calculate the GAP = Required Level - User Level.
-    - If User Level > Required Level, Gap is negative (Overskilled).
-    - If User doesn't have the skill, assume User Level is 0 (Gap = Required Level).
+    YOUR TASK:
+    For EACH required skill, look at the User's Skills and find the best semantic match.
+    
+    RULES:
+    - If the user has the exact skill or a highly similar equivalent (e.g., "Ms Excel" matches "Excel"), return the User's Level.
+    - If the user has a related but broader/narrower skill, estimate the applicable level conservatively.
+    - If the user strictly DOES NOT have the skill or anything similar, return 0.
+    - Do NOT calculate the gap. I only need the User's current level.
 
     USER SKILLS:
     {json.dumps(user_skills)}
 
-    REQUIRED SKILLS TO ANALYZE:
+    REQUIRED SKILLS TO FIND:
     {required_json}
 
     OUTPUT FORMAT:
-    Return ONLY a valid JSON array of objects. Do NOT use markdown.
-    Structure:
+    Return ONLY a valid JSON array of objects.
     [
-        {{ "skill_name": "Requested Skill Name", "gap": integer_value, "user_level": integer_value }},
+        {{ "skill_name": "The Required Skill Name", "user_level": integer_value }},
         ...
     ]
     """
 
-    # Logica di Retry (fondamentale per i modelli Flash/Pro)
+    # Logica di Retry
     for attempt in range(3):
         try:
             response = client.models.generate_content(
-                model="gemini-2.5-flash-lite", # Usa 2.0 o 1.5 per stabilità
+                model="gemini-2.5-flash-lite", # O il modello che stai usando
                 contents=prompt,
-                config=types.GenerateContentConfig(temperature=0.1)
+                config=types.GenerateContentConfig(
+                    temperature=0.0, # Temperature a 0 per massima precisione
+                    response_mime_type="application/json" # Forza output JSON (se supportato dal modello)
+                )
             )
             
             if response.text:
+                # Pulizia standard del markdown
                 clean_text = response.text.replace("```json", "").replace("```", "").strip()
-                # A volte aggiunge testo prima o dopo, cerchiamo le quadre
+                
                 start = clean_text.find('[')
                 end = clean_text.rfind(']') + 1
+                
                 if start != -1 and end != -1:
                     json_str = clean_text[start:end]
                     return json.loads(json_str)
             
-            return [] # Risposta vuota
+            return [] # Risposta vuota o malformata
 
         except (ResourceExhausted, ServiceUnavailable):
-            print(f"API Overload. Attendo {3 * (attempt + 1)}s...")
-            time.sleep(3 * (attempt + 1))
+            print(f"⚠️ API Overload. Attendo {2 * (attempt + 1)}s...")
+            time.sleep(2 * (attempt + 1))
         except Exception as e:
-            print(f"Errore API Batch: {e}")
+            print(f"❌ Errore API Gemini: {e}")
             return []
     
     return [] # Fallito dopo i tentativi

@@ -4,7 +4,7 @@ from pydantic import EmailStr
 from dependencies import get_current_org
 
 from config import templates, pwd_context
-import crud
+import crud.crud_org as crud_org
 from models import Organization
 
 router = APIRouter()
@@ -24,7 +24,7 @@ async def org_login(request: Request):
 
 @router.post("/org_login", response_class=HTMLResponse)
 async def org_login(request: Request, orgname: str = Form(...), password: str = Form(...)):
-    org = crud.get_organization(orgname)
+    org = crud_org.get_organization(orgname)
 
     if not org or not pwd_context.verify(password, org.hashed_password):
         response = RedirectResponse(url="/org_login", status_code=status.HTTP_303_SEE_OTHER)
@@ -79,7 +79,7 @@ async def register_org(
     hashed_pw = pwd_context.hash(password)
     new_org = Organization(name=name, address=address, phone=phone, email=email, orgname=orgname, hashed_password=hashed_pw)
     try:
-        crud.create_organization(new_org)
+        crud_org.create_organization(new_org)
         return RedirectResponse(url="/org_login", status_code=status.HTTP_303_SEE_OTHER)
     except ValueError:
         return templates.TemplateResponse("org/org_register.html", {
@@ -124,7 +124,7 @@ async def change_password(request: Request, org = Depends(get_current_org), old_
     
     new_pw_hashed = pwd_context.hash(new_pw)
 
-    success = crud.change_password_org(org, new_pw_hashed)
+    success = crud_org.change_password_org(org, new_pw_hashed)
 
     if success:
         msg = "Password updated successfully!"
