@@ -36,7 +36,7 @@ The application is currently in the development phase. A basic Authentication Sy
 
 ## How to Run
 1.  Clone the repository.
-2.  **Configure Gemini API**
+2.  **Configure Gemini API**  
     To enable AI features, you need a valid Google API Key.
     * Get your free API Key here: [Google AI Studio](https://aistudio.google.com/app/apikey)
     * Open `llm/gemini.py`.
