@@ -47,7 +47,7 @@ The application is currently in the development phase. A basic Authentication Sy
     ```
     ```bash
     # Attiva env (Windows)
-    venv\Scripts\activate
+    .\venv\Scripts\activate
     ```
     ```bash
     # Attiva env (Mac/Linux)
