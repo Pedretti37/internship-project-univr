@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Form, status, Depends
+from fastapi import APIRouter, Request, Form, Response, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
 from typing import Optional, List
@@ -235,12 +235,21 @@ async def delete_target_role(
     crud.delete_role_from_user(user, role_id)
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
+    # return Response(status_code=200)
 
 ### --- Calculating Skill Gap --- ###
 @router.post("/calculate_skill_gap", response_class=HTMLResponse)
 async def calculate_skill_gap(request: Request, user = Depends(get_current_user), role_ids: List[str] = Form(...)):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    if len(role_ids) > 5:
+        error = "You can analyze up to 5 roles at a time."
+        return templates.TemplateResponse("user/user_profile.html", {
+            "request": request,
+            "user": user,
+            "error": error
+        })
 
     gap_analysis_result = crud.calculate_skill_gap_user(user, role_ids)
 

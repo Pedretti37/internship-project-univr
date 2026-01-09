@@ -124,10 +124,10 @@ def get_gap_gemini(user_skills, role_skills_list):
             return [] # Risposta vuota
 
         except (ResourceExhausted, ServiceUnavailable):
-            print(f"⚠️ API Overload. Attendo {3 * (attempt + 1)}s...")
+            print(f"API Overload. Attendo {3 * (attempt + 1)}s...")
             time.sleep(3 * (attempt + 1))
         except Exception as e:
-            print(f"❌ Errore API Batch: {e}")
+            print(f"Errore API Batch: {e}")
             return []
     
     return [] # Fallito dopo i tentativi

@@ -5,8 +5,11 @@
     "email": "simonepedretti04@gmail.com",
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$9L5XCoEw5jwnJGRsrRWidA$pRJ4a4nVCraVVEv0thPJA4lD6JmjPhjQl1tUok+lMag",
     "target_roles": {
-        "11": "Chief Executives, Senior Officials and Legislators",
-        "24": "Business and Administration Professionals"
+        "1113": "Traditional Chiefs and Heads of Villages",
+        "112": "Managing Directors and Chief Executives",
+        "33": "Business and Administration Associate Professionals",
+        "2142": "Civil Engineers",
+        "3112": "Civil Engineering Technicians"
     },
     "current_skills": {
         "Python Programming": 9,
@@ -16,5 +19,200 @@
         "Leadership": 8,
         "Economic Policy": 7
     },
-    "skill_gap": {}
+    "skill_gap": {
+        "Traditional Chiefs and Heads of Villages": [
+            {
+                "skill_name": "Resource Management",
+                "required": 7,
+                "user_level": 0,
+                "gap": 7,
+                "status": "GAP",
+                "reason": "Directly responsible for the allocation and distribution of communal land and surplus production, requiring strategic planning and equitable decision-making."
+            },
+            {
+                "skill_name": "Conflict Resolution & Mediation",
+                "required": 8,
+                "user_level": 0,
+                "gap": 0,
+                "status": "MATCH",
+                "reason": "Essential for settling disputes and disciplining members, demanding strong negotiation, impartiality, and understanding of community norms."
+            },
+            {
+                "skill_name": "Community Representation & Diplomacy",
+                "required": 7,
+                "user_level": 0,
+                "gap": 7,
+                "status": "GAP",
+                "reason": "Involves representing the community on councils and communicating government regulations, requiring effective communication, negotiation, and advocacy skills."
+            },
+            {
+                "skill_name": "Cultural & Ceremonial Leadership",
+                "required": 6,
+                "user_level": 0,
+                "gap": 6,
+                "status": "GAP",
+                "reason": "Performing ceremonial duties requires a deep understanding and embodiment of community traditions and customs, acting as a cultural anchor."
+            }
+        ],
+        "Managing Directors and Chief Executives": [
+            {
+                "skill_name": "Strategic Planning & Vision Setting",
+                "required": 8,
+                "user_level": 0,
+                "gap": 8,
+                "status": "GAP",
+                "reason": "Determining objectives, strategies, policies, and programmes for the entire enterprise requires a high level of foresight and the ability to define long-term direction."
+            },
+            {
+                "skill_name": "Financial Acumen & Budget Management",
+                "required": 7,
+                "user_level": 0,
+                "gap": 7,
+                "status": "GAP",
+                "reason": "Establishing and managing budgets, controlling expenditure, and ensuring efficient resource utilization are core responsibilities at this executive level."
+            },
+            {
+                "skill_name": "Leadership & People Management",
+                "required": 8,
+                "user_level": 8,
+                "gap": 0,
+                "status": "MATCH",
+                "reason": "Providing overall direction and management, selecting senior staff, and consulting with subordinate staff necessitates strong leadership and the ability to inspire and guide large teams."
+            },
+            {
+                "skill_name": "Organizational Governance & Compliance",
+                "required": 7,
+                "user_level": 0,
+                "gap": 7,
+                "status": "GAP",
+                "reason": "Ensuring compliance with legislation and regulations, and reporting to boards of directors and governing bodies requires a deep understanding of corporate governance and legal frameworks."
+            },
+            {
+                "skill_name": "Stakeholder Management & Representation",
+                "required": 7,
+                "user_level": 0,
+                "gap": 7,
+                "status": "GAP",
+                "reason": "Representing the organization at official occasions, in negotiations, and forums, and consulting with various stakeholders is crucial for external and internal relations."
+            }
+        ],
+        "Business and Administration Associate Professionals": [
+            {
+                "skill_name": "Financial Transaction Recording & Bookkeeping",
+                "required": 5,
+                "user_level": 0,
+                "gap": 5,
+                "status": "GAP",
+                "reason": "Requires maintaining complete records of financial transactions according to general bookkeeping principles, implying autonomous management of these records."
+            },
+            {
+                "skill_name": "Credit and Loan Application Processing",
+                "required": 6,
+                "user_level": 0,
+                "gap": 6,
+                "status": "GAP",
+                "reason": "Involves submitting applications with recommendations and approving/rejecting within authorized limits, requiring analytical judgment and decision-making."
+            },
+            {
+                "skill_name": "Financial Instrument Trading (Securities, Stocks, Bonds, FX)",
+                "required": 5,
+                "user_level": 0,
+                "gap": 5,
+                "status": "GAP",
+                "reason": "Directly involves executing buy and sell orders for various financial instruments, necessitating practical knowledge and execution capabilities."
+            },
+            {
+                "skill_name": "Mathematical and Statistical Calculation",
+                "required": 4,
+                "user_level": 9,
+                "gap": -5,
+                "status": "OVERSKILLED",
+                "reason": "Assisting in planning and performing calculations suggests a need for intermediate proficiency in applying these skills to financial contexts."
+            }
+        ],
+        "Civil Engineers": [
+            {
+                "skill_name": "Structural Analysis and Design",
+                "required": 8,
+                "user_level": 0,
+                "gap": 8,
+                "status": "GAP",
+                "reason": "Tasks (b), (f), and (g) directly involve designing complex structures, analyzing their stability, and understanding material behavior under pressure, requiring deep theoretical knowledge and practical application."
+            },
+            {
+                "skill_name": "Materials Science and Engineering",
+                "required": 7,
+                "user_level": 0,
+                "gap": 7,
+                "status": "GAP",
+                "reason": "Task (g) specifically mentions testing material behavior and durability, while task (c) requires specifying construction materials and quality standards. This necessitates a strong understanding of material properties and their suitability for various civil engineering applications."
+            },
+            {
+                "skill_name": "Geotechnical Engineering",
+                "required": 7,
+                "user_level": 0,
+                "gap": 7,
+                "status": "GAP",
+                "reason": "Task (f) focuses on analyzing soil and rock behavior under pressure and designing foundations, which is a core component of geotechnical engineering and critical for the stability of many civil structures."
+            },
+            {
+                "skill_name": "Research and Development",
+                "required": 6,
+                "user_level": 0,
+                "gap": 6,
+                "status": "GAP",
+                "reason": "Task (a) explicitly states conducting research and developing new theories and methods. While not always the primary focus for every civil engineer, it's a significant aspect of advancing the field and requires analytical and innovative thinking."
+            },
+            {
+                "skill_name": "Project Management and Construction Oversight",
+                "required": 5,
+                "user_level": 8,
+                "gap": -3,
+                "status": "OVERSKILLED",
+                "reason": "Tasks (c) and (e) involve directing construction work and organizing maintenance/repair. This requires the ability to plan, coordinate, and oversee complex projects, ensuring adherence to schedules, budgets, and quality standards."
+            }
+        ],
+        "Civil Engineering Technicians": [
+            {
+                "skill_name": "Materials Testing and Analysis",
+                "required": 5,
+                "user_level": 0,
+                "gap": 5,
+                "status": "GAP",
+                "reason": "Tasks (a) and (c) require hands-on performance and understanding of field and lab tests for soils and construction materials, ensuring compliance with standards."
+            },
+            {
+                "skill_name": "Construction Inspection and Compliance",
+                "required": 6,
+                "user_level": 0,
+                "gap": 6,
+                "status": "GAP",
+                "reason": "Tasks (c), (g), (h), and (i) involve detailed inspection of construction and existing structures against design specifications, legislation, safety laws, and fire hazard regulations, requiring a strong understanding of building codes and quality standards."
+            },
+            {
+                "skill_name": "Technical Problem-Solving (Civil Engineering)",
+                "required": 5,
+                "user_level": 0,
+                "gap": 5,
+                "status": "GAP",
+                "reason": "Task (d) explicitly states the need to apply technical knowledge of civil engineering principles to identify and solve problems arising during projects."
+            },
+            {
+                "skill_name": "Quantity Surveying and Cost Estimation",
+                "required": 4,
+                "user_level": 0,
+                "gap": 4,
+                "status": "GAP",
+                "reason": "Task (e) requires assisting in the preparation of detailed estimates of quantities and costs, necessitating an understanding of project components and their associated expenses."
+            },
+            {
+                "skill_name": "Building Codes and Regulations Knowledge",
+                "required": 6,
+                "user_level": 0,
+                "gap": 6,
+                "status": "GAP",
+                "reason": "Tasks (c), (g), (h), and (i) are heavily reliant on a thorough understanding and application of building, grading, zoning, safety laws, and fire safety regulations."
+            }
+        ]
+    }
 }

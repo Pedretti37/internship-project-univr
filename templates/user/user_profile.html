@@ -112,14 +112,13 @@
                             <span>
                                 {{ title }} <small>(ID: {{ id }})</small>
                             </span>
-
                             <form action="/delete_target_role" method="post" style="display:inline;">
                                 <input type="hidden" name="role_id" value="{{ id }}">
-                                
+
                                 <button type="submit" title="Elimina ruolo">
                                     🗑️
                                 </button>
-                            </form>
+                             </form>
                         </li>
                     {% endfor %}
                 </ul>
@@ -139,6 +138,14 @@
 
                 {% endif %}
             </form>
+        </div>
+
+        <div>
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
         </div>
 
         <hr style="width:100%; margin-top: 30px;">

@@ -255,7 +255,7 @@ def calculate_skill_gap_user(user, role_ids: list[str]) -> dict:
         
         gap_report[role_title] = []
 
-        print(f"📊 Analisi gap per ruolo: {role_title} (Batch)...")
+        # print(f"📊 Analisi gap per ruolo: {role_title} (Batch)...")
 
         # CHIAMATA UNICA A GEMINI
         batch_results = gemini.get_gap_gemini(user.current_skills, required_skills_list)
@@ -313,7 +313,7 @@ def calculate_skill_gap_user(user, role_ids: list[str]) -> dict:
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
                 
-            print(f"✅ Skill Gap salvato per l'utente {user.username}")
+            # print(f"✅ Skill Gap salvato per l'utente {user.username}")
             
         except Exception as e:
             print(f"❌ Errore salvataggio skill gap: {e}")
