@@ -35,25 +35,29 @@ The application is currently in the development phase. A basic Authentication Sy
 - `llm/`: Directory containing Gemini API and the possibility to search for AI models.
 
 ## How to Run
-1.  Clone the repository.
+1.  **Clone the repository.**
 2.  **Configure Gemini API**  
     To enable AI features, you need a valid Google API Key.
     * Get your free API Key here: [Google AI Studio](https://aistudio.google.com/app/apikey)
     * Open `llm/gemini.py`.
     * Find the line `API_KEY = "CURRENT_KEY"` and replace `"CURRENT_KEY"` with your actual API key.
-3.  Create & Activate venv (optional):
+3.  **Create & Activate venv (optional):**
     ```bash
     python -m venv venv
+    ```
+    ```bash
     # Attiva env (Windows)
     venv\Scripts\activate
+    ```
+    ```bash
     # Attiva env (Mac/Linux)
     source venv/bin/activate
     ```
-4.  Install requirements:
+4.  **Install requirements:**
     ```bash
     pip install -r requirements.txt
     ```
-5.  Start the server:
+5.  **Start the server:**
     ```bash
     uvicorn main:app --reload
     ```
