@@ -8,11 +8,25 @@
 <div class="container">
     <a href="/user_home">← Back to Search</a>
     
-    <h1>{{ role.title }} <small>(ID: {{ role.id }})</small></h1>
+    <h1>{{ role.title }}</h1>
+    
+    <div class="meta-badges">
+        <span class="badge" title="Used for CEDEFOP Forecasts">ISCO ID: {{ role.id }}</span>
+        <br>
+        <span class="badge" title="Specific ESCO Code">Full ID: {{ role.id_full }}</span>
+    </div>
     
     <div class="details-box">
         <h3>Description</h3>
-        <p>{{ role.definition }}</p>
+        <p>{{ role.description }}</p>
+        
+        {% if role.uri %}
+        <p style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+            <small>Official Source: 
+                <a href="{{ role.uri }}" target="_blank" class="source-link">View on ESCO Portal ↗</a>
+            </small>
+        </p>
+        {% endif %}
     </div>
 
     {% if role.task %}

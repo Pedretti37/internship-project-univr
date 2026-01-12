@@ -8,39 +8,6 @@ from llm import gemini
 
 FILE_INPUT = "data/ISCO-08 EN Structure and definitions.xlsx"
 
-### --- Extract skill models by user input --- ###
-def extracting_skill_models(user_query: str) -> list[Role] | None:
-    # reading Excel file, only columns B (id), C (title), D (definition), E (task)
-    try: 
-        df = pd.read_excel(FILE_INPUT, usecols="B,C,D,E", dtype=str)
-        
-        df.columns = ["id", "title", "definition", "task"]
-        df = df.fillna("") # managing empty strings
-
-
-        # filtering rows, converting to string, case insensitive search
-        filter = df["title"].astype(str).str.contains(user_query, case=False, na=False)
-        results = df[filter]
-
-        if results.empty:
-            return None
-        
-        roles_list = []
-
-        for _, row in results.iterrows():
-            new_role = Role(
-                id=row["id"],
-                title=row["title"],
-                definition=row["definition"],
-                task=row["task"]
-            )
-            roles_list.append(new_role)
-        return roles_list
-    
-    except Exception as e:
-        print(f"Error extracting skill models: {e}")
-        return None
-
 def get_role_by_id(target_id: str) -> Role | None:
     try:
         

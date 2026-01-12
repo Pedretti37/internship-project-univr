@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse
 from config import templates
 import crud.crud_skill_models as crud_skill_models
+from esco import escoAPI
 
 router = APIRouter()
 
@@ -10,20 +11,17 @@ router = APIRouter()
 async def gust_home(request: Request):
     return templates.TemplateResponse("guest_home.html", {"request": request})
 
-### --- Obtain skills from Guest Input --- ###
-@router.post("/extract_general_skill_models", response_class=HTMLResponse)
-async def extract_general_skill_models(request: Request, search: str = Form(...)):
+### --- Obtain roles from Guest Input --- ###
+@router.post("/role_list", response_class=HTMLResponse)
+async def role_list(request: Request, search: str = Form(...)):
     role = search.title().strip()
 
-    extracted_models = {}
 
-    skill_models_list = crud_skill_models.extracting_skill_models(role)
-    if skill_models_list:
-        extracted_models[role] = skill_models_list
+    role_list = escoAPI.get_esco_occupations_list(role, limit=10)
     
     
     return templates.TemplateResponse("guest_home.html", {
         "request": request,
-        "results": extracted_models,
+        "results": role_list,
         "last_search": search
     })

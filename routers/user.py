@@ -7,7 +7,8 @@ from dependencies import get_current_user
 
 from config import templates, pwd_context
 import crud.crud_skill_models as crud_skill_models
-from models import User
+from esco import escoAPI
+from models import Role, User
 
 router = APIRouter()
 
@@ -110,22 +111,18 @@ async def user_profile(request: Request, user = Depends(get_current_user)):
 
     return response
 
-### --- Obtain skills from User Input --- ###
-@router.post("/extract_skill_models", response_class=HTMLResponse)
-async def extract_skill_models(request: Request, search: str = Form(...), user = Depends(get_current_user)):
+### --- Obtain roles from User Input --- ###
+@router.post("/role_list", response_class=HTMLResponse)
+async def role_list(request: Request, search: str = Form(...), user = Depends(get_current_user)):
     role = search.title().strip()
 
-    extracted_models = {}
-
-    skill_models_list = crud_skill_models.extracting_skill_models(role)
-    if skill_models_list:
-        extracted_models[role] = skill_models_list
+    role_list = escoAPI.get_esco_occupations_list(role, limit=5)
     
     if user:
         return templates.TemplateResponse("user/user_home.html", {
             "request": request,
             "user": user,
-            "results": extracted_models,
+            "results": role_list,
             "last_search": search
         })
     else:
@@ -203,21 +200,29 @@ async def change_password(request: Request, user = Depends(get_current_user), ol
         })
     
 ### --- Details for a selected Skill Model --- ###
-@router.get("/details/{role_id}")
-async def details_page(request: Request, role_id: str, user = Depends(get_current_user)):
+@router.post("/details", response_class=HTMLResponse)
+async def details_page(
+    request: Request, 
+    role_id: str = Form(...),
+    title: str = Form(...),
+    description: str = Form(...),
+    task: str = Form(""), # Optional
+    id_full: str = Form(...),
+    uri: str = Form(...),
+    user = Depends(get_current_user)):
+
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    role_object = crud_skill_models.get_role_by_id(role_id)
+    role_object = Role(
+        id=role_id,
+        title=title,
+        description=description,
+        task=task,
+        id_full=id_full,
+        uri=uri
+    )
 
-    if not role_object:
-        error = "Skill Model not found"
-        return templates.TemplateResponse("user/user_home.html", {
-            "request": request,
-            "user": user,
-            "error": error
-        })
-    
     return templates.TemplateResponse("user/details.html", {
         "request": request,
         "user": user,

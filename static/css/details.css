@@ -1,0 +1,20 @@
+.meta-badges {
+    margin-bottom: 20px;
+}
+.badge {
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin-right: 10px;
+    font-weight: bold;
+}
+.source-link {
+    font-size: 0.9em;
+    color: #007bff;
+    text-decoration: none;
+}
+.source-link:hover {
+    text-decoration: underline;
+}

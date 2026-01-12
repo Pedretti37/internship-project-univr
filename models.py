@@ -21,7 +21,9 @@ class Organization(BaseModel):
     hashed_password: str
 
 class Role(BaseModel):
-    id: int
+    id: str
     title: str
-    definition: str
-    task: str
+    description: Optional[str] = None
+    task: Optional[str] = None
+    id_full: Optional[str] = None
+    uri: Optional[str] = None

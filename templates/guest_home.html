@@ -20,34 +20,34 @@
         <p>On this page you can take a general look at skill models required for certain functions.</p>
         
         <div class="browsing-input">
-            <form action="/extract_general_skill_models" method="post" class="skill-form" autocomplete="off">
-                <input type="text" name="search" placeholder="🔍 Skill model: e.g. Manager" value="{{ last_search }}" required>
+            <form action="/role_list" method="post" class="role-form" autocomplete="off">
+                <input type="text" name="search" placeholder="🔍 Role: e.g. Manager" value="{{ last_search }}" required>
                 <button type="submit">Submit</button>
             </form>
         </div>
 
-        <div class="skill-container">
+        <div class="role-container">
             {% if results %}
                 <hr style="width:100%; margin: 20px 0;">
 
-                {% for input_role, skill_dict in results.items() %}
-                    <h2>Skill Models for <strong>{{input_role}}</strong></h2>
+                <h2>Roles for <strong>{{input_role}}</strong></h2>
 
-                    <div class="skills-list">
-                        <ul>
-                            {% for specific_name, description in skill_dict.items() %}
-                            <li>    
-                                <div class="skill-card">
-                                    <h3>{{ specific_name }}</h3>
-                                    <div>
-                                        <p>{{ description }}</p>
-                                    </div>
+                <div class="roles-list">
+                    <ul>
+                        {% for role in results %}
+                        <li>    
+                            <div class="role-card">
+                                <h3>
+                                    <a href="/details/{{ role.id }}">{{ role.title }}</a>
+                                </h3>
+                                <div>
+                                    <p>{{ role.definition }}</p>
                                 </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endfor %}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             {% else %}
                 {% if last_search %}
                     <div class="no-results">
