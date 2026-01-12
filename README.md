@@ -26,7 +26,7 @@ The application is currently in the development phase. A basic Authentication Sy
 - `main.py`: Application entry point.
 - `routes/`: Route definitions.
 - `config.py`: Project main configuration file.
-- `crud.py`: Handles file I/O operations (JSON reading/writing and EXCEL).
+- `crud/`: Handles file I/O operations (JSON reading/writing and EXCEL).
 - `models.py`: Pydantic models for data validation and structure.
 - `data/`: Directory containing JSON and EXCEL files.
 - `static/`: CSS.
