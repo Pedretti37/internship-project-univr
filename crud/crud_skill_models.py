@@ -8,34 +8,6 @@ from llm import gemini
 
 FILE_INPUT = "data/ISCO-08 EN Structure and definitions.xlsx"
 
-def get_role_by_id(target_id: str) -> Role | None:
-    try:
-        
-        df = pd.read_excel(
-            FILE_INPUT, 
-            usecols="B,C,D,E", 
-            dtype=str
-        )
-        df.columns = ["id", "title", "definition", "task"]
-        df = df.fillna("")
-
-        match = df[df["id"].astype(str) == str(target_id)]
-
-        if match.empty:
-            return None
-
-        row = match.iloc[0]
-
-        return Role(
-            id=row["id"],
-            title=row["title"],
-            definition=row["definition"],
-            task=row["task"]
-        )
-
-    except Exception as e:
-        print(f"Error getting role by ID: {e}")
-        return None
 
 def calculate_skill_gap_user(user, role_ids: list[str]) -> dict:
     gap_report = {}

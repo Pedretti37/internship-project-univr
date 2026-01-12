@@ -10,6 +10,8 @@ import crud.crud_skill_models as crud_skill_models
 from esco import escoAPI
 from models import Role, User
 
+USER_ROLES_LIST = {}
+
 router = APIRouter()
 
 ### --- User Login --- ###
@@ -51,9 +53,17 @@ async def user_home(request: Request, user = Depends(get_current_user)):
         response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
 
+    context_results = None
+    context_search = ""
+
+    if user.username in USER_ROLES_LIST:
+        session_data = USER_ROLES_LIST[user.username]
+        context_results = session_data["results"]
+        context_search = session_data["last_search"]
+
     response = templates.TemplateResponse(
         "user/user_home.html", 
-        {"request": request, "user": user}
+        {"request": request, "user": user, "results": context_results, "last_search": context_search}
     )
 
     # No cache storage
@@ -119,6 +129,10 @@ async def role_list(request: Request, search: str = Form(...), user = Depends(ge
     role_list = escoAPI.get_esco_occupations_list(role, limit=5)
     
     if user:
+        USER_ROLES_LIST[user.username] = {
+            "last_search": search,
+            "results": role_list
+        }
         return templates.TemplateResponse("user/user_home.html", {
             "request": request,
             "user": user,

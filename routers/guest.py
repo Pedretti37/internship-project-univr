@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse
 from config import templates
-import crud.crud_skill_models as crud_skill_models
 from esco import escoAPI
 
 router = APIRouter()
@@ -17,7 +16,7 @@ async def role_list(request: Request, search: str = Form(...)):
     role = search.title().strip()
 
 
-    role_list = escoAPI.get_esco_occupations_list(role, limit=10)
+    role_list = escoAPI.get_esco_occupations_list(role, limit=5)
     
     
     return templates.TemplateResponse("guest_home.html", {

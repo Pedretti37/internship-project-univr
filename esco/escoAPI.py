@@ -10,7 +10,7 @@ def get_esco_occupations_list(keyword, limit):
         'Accept': 'application/json'
     }
     
-    # 1. CERCA I RUOLI
+    # Research occupations matching the keyword
     search_params = {'text': keyword, 'type': 'occupation', 'language': 'en', 'limit': limit}
     
     try:
@@ -26,24 +26,23 @@ def get_esco_occupations_list(keyword, limit):
 
     output_list = []
 
-    # 2. PER OGNI RUOLO, SCARICA I DETTAGLI (E I TASK/SKILL)
     for hit in results:
         title = hit['title']
         uri = hit['uri']
         
-        # Gestione Codice ISCO
+        # ISCO code
         raw_val = hit.get('code')
         
         if raw_val:
-            s_code = str(raw_val) # Forza stringa "2512.3"
-            isco_family = s_code.split('.')[0] # Diventa "2512"
-            isco_code_raw = s_code # Manteniamo l'originale come stringa
+            s_code = str(raw_val) 
+            isco_family = s_code.split('.')[0] 
+            isco_code_raw = s_code 
         else:
             isco_family = "N/A"
             isco_code_raw = "N/A"
 
         definition = "N/A"
-        tasks_string = "" # <--- Qui metteremo i tasks
+        tasks_string = ""
 
         try:
             details_params = {'uri': uri, 'language': 'en'}
@@ -52,25 +51,21 @@ def get_esco_occupations_list(keyword, limit):
             if details_resp.status_code == 200:
                 d_data = details_resp.json()
                 
-                # A. Estrazione Descrizione
+                # Description Extraction
                 desc_obj = d_data.get('description', {}) or d_data.get('definition', {})
                 definition = desc_obj.get('en', {}).get('literal', 'N/A')
 
-                # B. Estrazione TASKS (Essential Skills)
+                # Essential Skills Extraction
                 links = d_data.get('_links', {})
                 skills_list = links.get('hasEssentialSkill', [])
                 
-                # Prendiamo i titoli delle skill e li uniamo in una stringa
-                # Esempio: "write code, debug software, work in teams"
                 extracted_tasks = [skill['title'] for skill in skills_list]
                 
-                # Limitiamo a 10 task per non intasare il DB
-                tasks_string = ", ".join(extracted_tasks[:10]) 
+                tasks_string = ", ".join(extracted_tasks[:10]) # max of 10 tasks for now
 
         except Exception as e:
             print(f"Error fetching details for {title}: {e}")
 
-        # Creazione Oggetto Role
         role_data = Role(
             id=str(isco_family),
             title=title,
