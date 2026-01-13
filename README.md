@@ -13,7 +13,7 @@ The application is currently in the development phase. A basic Authentication Sy
 - **Login System:** Users/Orgs can log in to access their personal area.
 - **Guest Access:** A "Continue as Guest" mode allows limited access to the platform for non-registered users.
 - **Data Storage:** Currently using a lightweight JSON-based file system for user/orgs management. EXCEL file added for reading roles/function and their descriptions.
-- **LLM:** Use of Gemini AI with API to associate skill models to target roles set by users and elaborate skill gap.
+- **ESCO API:** Using ESCO API to obtain different skill models based on user input.
 
 ## Tech Stack
 - **Backend:** Python, FastAPI
@@ -32,7 +32,8 @@ The application is currently in the development phase. A basic Authentication Sy
 - `static/`: CSS.
 - `templates/`: HTML templates.
 - `dependencies.py`: File used for getting current User/Org.
-- `llm/`: Directory containing Gemini API and the possibility to search for AI models.
+- `llm/`: Directory containing Gemini API and the possibility to search for AI models. (temporary: it will be switched for CEDEFOP files)
+- `esco/`: Directory for ESCO API code
 
 ## How to Run
 1.  **Clone the repository.**
