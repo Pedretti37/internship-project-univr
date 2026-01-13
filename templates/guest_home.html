@@ -20,7 +20,7 @@
         <p>On this page you can take a general look at skill models required for certain functions.</p>
         
         <div class="browsing-input">
-            <form action="/role_list" method="post" class="role-form" autocomplete="off">
+            <form action="/role_list_guest" method="post" class="role-form" autocomplete="off">
                 <input type="text" name="search" placeholder="🔍 Role: e.g. Manager" value="{{ last_search }}" required>
                 <button type="submit">Submit</button>
             </form>
@@ -30,7 +30,7 @@
             {% if results %}
                 <hr style="width:100%; margin: 20px 0;">
 
-                <h2>Roles for <strong>{{input_role}}</strong></h2>
+                <h2>Results for <strong>{{ last_search }}</strong></h2>
 
                 <div class="roles-list">
                     <ul>
@@ -38,10 +38,10 @@
                         <li>    
                             <div class="role-card">
                                 <h3>
-                                    <a href="/details/{{ role.id }}">{{ role.title }}</a>
+                                    <p>{{ role.title }}</p>
                                 </h3>
                                 <div>
-                                    <p>{{ role.definition }}</p>
+                                    <p>{{ role.description }}</p>
                                 </div>
                             </div>
                         </li>

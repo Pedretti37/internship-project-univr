@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
-from typing import Optional, List
+from typing import List
 from crud import crud_user
 from dependencies import get_current_user
 
@@ -14,7 +14,7 @@ USER_ROLES_LIST = {}
 
 router = APIRouter()
 
-### --- User Login --- ###
+### --- User GET Login --- ###
 @router.get("/user_login", response_class=HTMLResponse)
 async def user_login(request: Request):
     error_message = request.cookies.get("flash_error")
@@ -27,6 +27,7 @@ async def user_login(request: Request):
     
     return response
 
+### --- User POST Login --- ###
 @router.post("/user_login", response_class=HTMLResponse)
 async def user_login(request: Request, username: str = Form(...), password: str = Form(...)):
     user = crud_user.get_user(username)
@@ -74,11 +75,12 @@ async def user_home(request: Request, user = Depends(get_current_user)):
 
     return response
 
-### --- User Registration --- ###
+### --- User GET Registration --- ###
 @router.get("/user_register", response_class=HTMLResponse)
 async def register(request: Request):
     return templates.TemplateResponse("user/user_register.html", {"request": request})
 
+### --- User POST Registration --- ###
 @router.post("/user_register", response_class=HTMLResponse)
 async def register_user(
     request: Request, 
@@ -190,6 +192,54 @@ async def add_to_user_target_roles(
         "message": message_text
     })
 
+### --- Add User Skills --- ###
+@router.post("/add_to_user_skills", response_class=HTMLResponse)
+async def add_to_user_skills(
+    request: Request,
+    user = Depends(get_current_user),
+    role_id: str = Form(...),
+    title: str = Form(...),
+    description: str = Form(...),
+    task: str = Form(...),
+    id_full: str = Form(...),
+    uri: str = Form(...),
+    level: int = Form(...)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    role_object = Role(
+        id=role_id,
+        title=title,
+        description=description,
+        task=task,
+        id_full=id_full,
+        uri=uri
+    )
+
+    message_text = "Error: No skills were added."
+    updated_skill = False
+
+    if task:
+        skills_list = task.split('\n') 
+        for skill in skills_list:
+            skill_clean = skill.strip()
+            if skill_clean and len(skill_clean) > 1:
+                user.current_skills[skill_clean] = level
+                updated_skill = True
+
+    if updated_skill:
+        crud_user.update_user(user)
+        message_text = "Skills updated successfully!"
+
+    return templates.TemplateResponse("user/details.html", {
+        "request": request,
+        "user": user,
+        "role": role_object,
+        "updated_skill": updated_skill,
+        "message": message_text
+    })
+
 ### --- Password Change --- ###
 @router.post("/change_password_user", response_class=HTMLResponse)
 async def change_password(request: Request, user = Depends(get_current_user), old_pw: str = Form(...), new_pw: str = Form(...)):
@@ -253,8 +303,8 @@ async def details_page(
         "role": role_object
     })
     
-### --- Delete Target Role --- ###
-@router.post("/delete_target_role", response_class=HTMLResponse)
+### --- Delete Target Role from User --- ###    
+@router.post("/delete_target_role", response_class=RedirectResponse)
 async def delete_target_role(
     user = Depends(get_current_user),
     role_id: str = Form(...)
@@ -262,10 +312,16 @@ async def delete_target_role(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    crud_user.delete_role_from_user(user, role_id)
+    new_target_list = [
+        role for role in user.target_roles 
+        if role.get('id') != role_id
+    ]
+    
+    user.target_roles = new_target_list
+
+    crud_user.update_user(user)
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
-    # return Response(status_code=200)
 
 ### --- Calculating Skill Gap --- ###
 @router.post("/calculate_skill_gap", response_class=HTMLResponse)
@@ -288,51 +344,4 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
         "request": request,
         "user": user,
         "gap_report": gap_analysis_result
-    })
-
-@router.post("/add_to_user_skills", response_class=HTMLResponse)
-async def add_to_user_skills(
-    request: Request,
-    user = Depends(get_current_user),
-    role_id: str = Form(...),
-    title: str = Form(...),
-    description: str = Form(...),
-    task: str = Form(...),
-    id_full: str = Form(...),
-    uri: str = Form(...),
-    level: int = Form(...)
-):
-    if not user:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    
-    role_object = Role(
-        id=role_id,
-        title=title,
-        description=description,
-        task=task,
-        id_full=id_full,
-        uri=uri
-    )
-
-    message_text = "Error: No skills were added."
-    updated_skill = False
-
-    if task:
-        skills_list = task.split('\n') 
-        for skill in skills_list:
-            skill_clean = skill.strip()
-            if skill_clean and len(skill_clean) > 1:
-                user.current_skills[skill_clean] = level
-                updated_skill = True
-
-    if updated_skill:
-        crud_user.update_user(user)
-        message_text = "Skills updated successfully!"
-
-    return templates.TemplateResponse("user/details.html", {
-        "request": request,
-        "user": user,
-        "role": role_object,
-        "updated_skill": updated_skill,
-        "message": message_text
     })

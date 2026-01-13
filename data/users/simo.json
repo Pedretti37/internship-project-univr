@@ -6,14 +6,6 @@
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$ca7VOidECGEMgVAqBSCkFA$Os30OXpK+7sIPDNMQywd86OS3oSE5KiF8C36FK+vr+k",
     "target_roles": [
         {
-            "id": "5223",
-            "title": "computer games, multimedia and software specialised seller",
-            "description": "Computer games, multimedia and software specialised sellers\u00a0sell software products in specialised shops.",
-            "task": "prevent shoplifting\r\ncarry out active selling\r\ndemonstrate functionality of video games\r\nsell software personal training\r\nprocess refunds\r\nsell software products\r\nguarantee customer satisfaction\r\nuse different communication channels\r\ndemonstrate functionality of software products\r\noperate cash register",
-            "id_full": "5223.7.10",
-            "uri": "http://data.europa.eu/esco/occupation/3ff2fdf4-af54-4517-873d-73e9353f112e"
-        },
-        {
             "id": "2512",
             "title": "software developer",
             "description": "Software developers implement or program all kinds of software systems based on specifications and designs by using programming languages, tools, and platforms.",

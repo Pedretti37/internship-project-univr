@@ -70,10 +70,15 @@
         <hr style="width:100%; margin-top: 30px;">
 
         <div class="user-skills">
-            <h2>Your Skill Models</h2>
+            <h2>Your current Skill Models</h2>
             <!-- target blank for new tab; rel noopener noreferrer to avoid slowing the main page down -->
             <a href="https://app.muchskills.com/dashboard" class="link-muchskills" target="_blank" rel="noopener noreferrer">Use MuchSkill to manage your skills!</a>
-            <p>Current Skill Models.</p>
+
+            <ul>
+                {% for skill, level in user.current_skills.items() %}
+                    <li>{{ skill }}: {{ level }}</li>
+                {% endfor %}
+            </ul>
         </div>
 
         <hr style="width:100%; margin-top: 30px;">
@@ -89,13 +94,13 @@
                 <h2>Current target roles</h2>
 
                 <ul>
-                    {% for id, title in user.target_roles.items() %}
+                    {% for role in user.target_roles %}
                         <li>
                             <span>
-                                {{ title }} <small>(ID: {{ id }})</small>
+                                {{ role.title }} <small>(ID: {{ role.id }})</small>
                             </span>
                             <form action="/delete_target_role" method="post" style="display:inline;">
-                                <input type="hidden" name="role_id" value="{{ id }}">
+                                <input type="hidden" name="role_id" value="{{ role.id }}">
 
                                 <button type="submit" title="Elimina ruolo">
                                     🗑️
@@ -105,7 +110,7 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <li>Nessun ruolo selezionato</li>
+                <p><strong>You don't have any target roles yet.</strong></p>
             {% endif %}
         </div>
 
@@ -113,8 +118,8 @@
             <form action="/calculate_skill_gap" method="post">
                 {% if user.target_roles %}
 
-                    {% for id, title in user.target_roles.items() %}
-                        <input type="hidden" name="role_ids" value="{{ id }}">
+                    {% for role in user.target_roles %}
+                        <input type="hidden" name="role_ids" value="{{ role.id }}">
                     {% endfor %}
                     <button type="submit">Calculate your skill gap</button>
 
