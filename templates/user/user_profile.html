@@ -78,24 +78,6 @@
 
         <hr style="width:100%; margin-top: 30px;">
 
-        <h3>Update your target roles (min 1 - max 5)</h3>
-        
-        <div class="role-input">
-            <form action="/set_target_roles" method="post" class="skill-form" autocomplete="off">
-                <input type="text" name="role1" placeholder="Target Role 1" required>
-                <br>
-                <input type="text" name="role2" placeholder="Target Role 2">
-                <br>
-                <input type="text" name="role3" placeholder="Target Role 3">
-                <br>
-                <input type="text" name="role4" placeholder="Target Role 4">
-                <br>
-                <input type="text" name="role5" placeholder="Target Role 5">
-                <br>
-                <button type="submit">Submit</button>
-            </form>
-        </div>
-
         <div class="show-target-roles">
             {% if message %}
                 <div class="alert alert-{{ message_type }}" role="alert">

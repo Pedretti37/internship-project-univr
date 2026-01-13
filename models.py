@@ -8,9 +8,9 @@ class User(BaseModel):
     username: str
     email: EmailStr
     hashed_password: str
-    target_roles: Optional[Dict[str, str]] = None
-    current_skills: Optional[Dict[str, int]] = None
-    skill_gap: Optional[Dict[str, List[Any]]] = None
+    target_roles: List[Dict[str, Any]] = []
+    current_skills: Dict[str, int] = {}
+    skill_gap: Dict[str, List[Any]] = {}
 
 class Organization(BaseModel):
     name: str
@@ -27,3 +27,10 @@ class Role(BaseModel):
     task: Optional[str] = None
     id_full: Optional[str] = None
     uri: Optional[str] = None
+
+class Course(BaseModel):
+    id: str
+    title: str
+    description: Optional[str] = None
+    learning_outcomes: Optional[str] = None
+    target_skills: List[str] = []

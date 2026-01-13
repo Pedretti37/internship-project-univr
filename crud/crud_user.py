@@ -30,32 +30,6 @@ def create_user(user: User):
     with open(path, "w") as f:
         json.dump(user.model_dump(), f, indent=4) # model_dump() transforms the Pydantic model to a dict for JSON file
 
-def set_target_roles_user(user: User, target_roles: list[str]) -> dict:
-    path = get_json_path(user.username)
-    if not os.path.exists(path):
-        return None
-    
-    matched_roles = extracting_target_roles(target_roles)
-    user.target_roles = matched_roles
-
-    with open(path, "r") as f:
-        try:
-            data = json.load(f)
-        except json.JSONDecodeError:
-            data = {} # Managing empty file
-
-    data["target_roles"] = matched_roles
-
-    try:
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
-            
-        return matched_roles
-        
-    except Exception as e:
-        print(f"Errore nel salvataggio: {e}")
-        return {}
-
 def change_password_user(user: User, new_pw: str) -> bool:
     path = get_json_path(user.username)
     
@@ -76,7 +50,19 @@ def change_password_user(user: User, new_pw: str) -> bool:
     except Exception as e:
         return False
 
-### --- Extract target roles for user profile --- ###
+### --- Update User Profile --- ###
+def update_user(user: User):
+    path = get_json_path(user.username)
+    
+    if not os.path.exists(path):
+        return
+
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(user.model_dump(), f, indent=4)
+    except Exception as e:
+        print(f"Error updating user: {e}")
+
 def extracting_target_roles(user_inputs: list[str]) -> dict[str, str]:
     if not user_inputs:
         return {}

@@ -3,139 +3,46 @@
     "surname": "Pedretti",
     "username": "simo",
     "email": "simonepedretti04@gmail.com",
-    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$9L5XCoEw5jwnJGRsrRWidA$pRJ4a4nVCraVVEv0thPJA4lD6JmjPhjQl1tUok+lMag",
-    "target_roles": {
-        "1113": "Traditional Chiefs and Heads of Villages",
-        "33": "Business and Administration Associate Professionals",
-        "2142": "Civil Engineers"
-    },
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$ca7VOidECGEMgVAqBSCkFA$Os30OXpK+7sIPDNMQywd86OS3oSE5KiF8C36FK+vr+k",
+    "target_roles": [
+        {
+            "id": "5223",
+            "title": "computer games, multimedia and software specialised seller",
+            "description": "Computer games, multimedia and software specialised sellers\u00a0sell software products in specialised shops.",
+            "task": "prevent shoplifting\r\ncarry out active selling\r\ndemonstrate functionality of video games\r\nsell software personal training\r\nprocess refunds\r\nsell software products\r\nguarantee customer satisfaction\r\nuse different communication channels\r\ndemonstrate functionality of software products\r\noperate cash register",
+            "id_full": "5223.7.10",
+            "uri": "http://data.europa.eu/esco/occupation/3ff2fdf4-af54-4517-873d-73e9353f112e"
+        },
+        {
+            "id": "2512",
+            "title": "software developer",
+            "description": "Software developers implement or program all kinds of software systems based on specifications and designs by using programming languages, tools, and platforms.",
+            "task": "technical drawings\r\ninterpret technical requirements\r\ndevelop automated migration methods\r\ndevelop software prototype\r\nproject management\r\nengineering processes\r\nuse technical drawing software\r\nengineering principles\r\ncreate flowchart diagram\r\ndebug software",
+            "id_full": "2512.3",
+            "uri": "http://data.europa.eu/esco/occupation/f2b15a0e-e65a-438a-affb-29b9d50b77d1"
+        }
+    ],
     "current_skills": {
-        "Python Programming": 9,
-        "Data Analysis": 9,
-        "Project Management": 8,
-        "Public Speaking": 7,
-        "Leadership": 8,
-        "Economic Policy": 7,
-        "Science": 5
+        "prevent shoplifting": 5,
+        "carry out active selling": 5,
+        "demonstrate functionality of video games": 5,
+        "sell software personal training": 5,
+        "process refunds": 5,
+        "sell software products": 5,
+        "guarantee customer satisfaction": 5,
+        "use different communication channels": 5,
+        "demonstrate functionality of software products": 5,
+        "operate cash register": 5,
+        "technical drawings": 9,
+        "interpret technical requirements": 9,
+        "develop automated migration methods": 9,
+        "develop software prototype": 9,
+        "project management": 9,
+        "engineering processes": 9,
+        "use technical drawing software": 9,
+        "engineering principles": 9,
+        "create flowchart diagram": 9,
+        "debug software": 9
     },
-    "skill_gap": {
-        "Traditional Chiefs and Heads of Villages": [
-            {
-                "skill_name": "Resource Management",
-                "required": 7,
-                "user_level": 8,
-                "gap": -1,
-                "status": "OVERSKILLED",
-                "reason": "Directly responsible for allocating communal land and resources, requiring strategic planning and equitable distribution."
-            },
-            {
-                "skill_name": "Conflict Resolution & Mediation",
-                "required": 8,
-                "user_level": 0,
-                "gap": 8,
-                "status": "MISSING",
-                "reason": "Essential for settling disputes and disciplining members, demanding strong negotiation, impartiality, and understanding of community norms."
-            },
-            {
-                "skill_name": "Community Representation & Diplomacy",
-                "required": 7,
-                "user_level": 0,
-                "gap": 7,
-                "status": "MISSING",
-                "reason": "Involves representing the community on councils and communicating government regulations, requiring effective communication and negotiation skills."
-            },
-            {
-                "skill_name": "Cultural & Ceremonial Leadership",
-                "required": 6,
-                "user_level": 0,
-                "gap": 6,
-                "status": "MISSING",
-                "reason": "Performing ceremonial duties requires deep knowledge of traditions and the ability to lead community events with gravitas."
-            },
-            {
-                "skill_name": "Communication & Information Dissemination",
-                "required": 5,
-                "user_level": 7,
-                "gap": -2,
-                "status": "OVERSKILLED",
-                "reason": "Crucial for informing the community about government rules and regulations, and for conveying decisions regarding resource allocation and disputes."
-            }
-        ],
-        "Business and Administration Associate Professionals": [
-            {
-                "skill_name": "Financial Transaction Recording & Bookkeeping",
-                "required": 5,
-                "user_level": 0,
-                "gap": 5,
-                "status": "MISSING",
-                "reason": "Requires maintaining complete records of financial transactions according to general bookkeeping principles, implying autonomous execution and problem-solving within established guidelines."
-            },
-            {
-                "skill_name": "Credit and Loan Application Processing",
-                "required": 6,
-                "user_level": 0,
-                "gap": 6,
-                "status": "MISSING",
-                "reason": "Involves submitting applications with recommendations, and approving/rejecting within authorized limits, requiring analysis, decision-making, and adherence to institutional standards."
-            },
-            {
-                "skill_name": "Financial Instrument Trading (Securities, Stocks, Bonds, FX)",
-                "required": 5,
-                "user_level": 0,
-                "gap": 5,
-                "status": "MISSING",
-                "reason": "Tasks include recording and transmitting buy/sell orders and actively selling/buying financial instruments, necessitating autonomous execution and understanding of market dynamics."
-            },
-            {
-                "skill_name": "Mathematical and Statistical Calculation",
-                "required": 4,
-                "user_level": 9,
-                "gap": -5,
-                "status": "OVERSKILLED",
-                "reason": "Assisting in planning and performing calculations suggests an intermediate ability to apply mathematical and statistical concepts to financial contexts."
-            }
-        ],
-        "Civil Engineers": [
-            {
-                "skill_name": "Structural Analysis and Design",
-                "required": 8,
-                "user_level": 0,
-                "gap": 8,
-                "status": "MISSING",
-                "reason": "Tasks (b), (f), and (g) directly involve designing complex structures, analyzing their stability, and understanding material behavior under pressure, requiring advanced theoretical knowledge and practical application."
-            },
-            {
-                "skill_name": "Materials Science and Engineering",
-                "required": 7,
-                "user_level": 5,
-                "gap": 2,
-                "status": "GAP",
-                "reason": "Task (g) specifically mentions testing material behavior and durability, while task (c) requires specifying construction materials and quality standards. This necessitates a deep understanding of material properties and their performance in civil engineering applications."
-            },
-            {
-                "skill_name": "Geotechnical Engineering",
-                "required": 7,
-                "user_level": 0,
-                "gap": 7,
-                "status": "MISSING",
-                "reason": "Task (f) focuses on analyzing soil and rock behavior under pressure and designing foundations, which is a core component of geotechnical engineering and critical for the stability of many civil structures."
-            },
-            {
-                "skill_name": "Research and Development",
-                "required": 6,
-                "user_level": 0,
-                "gap": 6,
-                "status": "MISSING",
-                "reason": "Task (a) explicitly states conducting research and developing new theories and methods. While not always the primary focus of every civil engineer, it's a significant aspect of advancing the field and requires strong analytical and problem-solving skills."
-            },
-            {
-                "skill_name": "Project Management and Construction Oversight",
-                "required": 5,
-                "user_level": 8,
-                "gap": -3,
-                "status": "OVERSKILLED",
-                "reason": "Tasks (c) and (d) involve directing construction work, establishing control systems, and ensuring efficient functioning. This requires the ability to manage projects, coordinate teams, and oversee the execution of designs."
-            }
-        ]
-    }
+    "skill_gap": {}
 }

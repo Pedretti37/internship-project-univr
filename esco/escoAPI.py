@@ -61,7 +61,7 @@ def get_esco_occupations_list(keyword, limit):
                 
                 extracted_tasks = [skill['title'] for skill in skills_list]
                 
-                tasks_string = ", ".join(extracted_tasks[:10]) # max of 10 tasks for now
+                tasks_string = "\n".join(extracted_tasks[:10]) # max of 10 tasks for now
 
         except Exception as e:
             print(f"Error fetching details for {title}: {e}")

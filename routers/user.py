@@ -142,42 +142,52 @@ async def role_list(request: Request, search: str = Form(...), user = Depends(ge
     else:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-### --- Set Target Roles --- ###
-@router.post("/set_target_roles", response_class=HTMLResponse)
-async def set_target_roles(
+### --- Set User Target Roles --- ###
+@router.post("/add_to_user_target_roles", response_class=HTMLResponse)
+async def add_to_user_target_roles(
     request: Request,
     user = Depends(get_current_user),
-    role1: str = Form(...), # Usa ... se il campo è obbligatorio, o None se opzionale
-    role2: Optional[str] = Form(None),
-    role3: Optional[str] = Form(None),
-    role4: Optional[str] = Form(None),
-    role5: Optional[str] = Form(None)
+    role_id: str = Form(...),
+    title: str = Form(...),
+    description: str = Form(...),
+    task: str = Form(...),
+    id_full: str = Form(...),
+    uri: str = Form(...)
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    roles_input = [role1, role2, role3, role4, role5]
-    clean_inputs = [r.strip() for r in roles_input if r and r.strip() != ""]
+    role_object = Role(
+        id=role_id,
+        title=title,
+        description=description,
+        task=task,
+        id_full=id_full,
+        uri=uri
+    )
 
-    found_roles_dict = crud_user.set_target_roles_user(user, clean_inputs)
-    
-    msg = ""
-    msg_type = "success"
+    message_text = "Error: target role not added."
+    updated_target_role = False
 
-    if not clean_inputs:
-        msg = "Hai rimosso tutti i ruoli target."
-        msg_type = "warning"
-    elif not found_roles_dict:
-        msg = "Nessun ruolo trovato nel database corrispondente alla tua ricerca. Riprova con termini diversi."
-        msg_type = "danger"
+    already_exists = any(r['id'] == role_id for r in user.target_roles)
+
+    if not already_exists:
+        user.target_roles.append(role_object.model_dump())
+        updated_target_role = True
+        message_text = "Target role added successfully!"
     else:
-        msg = f"Profilo aggiornato! Trovati {len(found_roles_dict)} ruoli su {len(clean_inputs)} cercati."
+        updated_target_role = True
+        message_text = "This role is already in your target list."
 
-    return templates.TemplateResponse("user/user_profile.html", {
+    if updated_target_role:
+        crud_user.update_user(user)
+
+    return templates.TemplateResponse("user/details.html", {
         "request": request,
         "user": user,
-        "message": msg,
-        "message_type": msg_type
+        "role": role_object,
+        "updated_target_role": updated_target_role,
+        "message": message_text
     })
 
 ### --- Password Change --- ###
@@ -278,4 +288,51 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
         "request": request,
         "user": user,
         "gap_report": gap_analysis_result
+    })
+
+@router.post("/add_to_user_skills", response_class=HTMLResponse)
+async def add_to_user_skills(
+    request: Request,
+    user = Depends(get_current_user),
+    role_id: str = Form(...),
+    title: str = Form(...),
+    description: str = Form(...),
+    task: str = Form(...),
+    id_full: str = Form(...),
+    uri: str = Form(...),
+    level: int = Form(...)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    role_object = Role(
+        id=role_id,
+        title=title,
+        description=description,
+        task=task,
+        id_full=id_full,
+        uri=uri
+    )
+
+    message_text = "Error: No skills were added."
+    updated_skill = False
+
+    if task:
+        skills_list = task.split('\n') 
+        for skill in skills_list:
+            skill_clean = skill.strip()
+            if skill_clean and len(skill_clean) > 1:
+                user.current_skills[skill_clean] = level
+                updated_skill = True
+
+    if updated_skill:
+        crud_user.update_user(user)
+        message_text = "Skills updated successfully!"
+
+    return templates.TemplateResponse("user/details.html", {
+        "request": request,
+        "user": user,
+        "role": role_object,
+        "updated_skill": updated_skill,
+        "message": message_text
     })
