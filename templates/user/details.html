@@ -29,16 +29,29 @@
         {% endif %}
     </div>
 
-    {% if role.task %}
+    {% if role.essential_skills or role.optional_skills %}
     <div class="details-box">
         <h3>Tasks & Responsibilities</h3>
-        <ul>
-        {% for line in role.task.split('\n') %}
-            {% if line.strip() %}
-                <li>{{ line }}</li>
-            {% endif %}
-        {% endfor %}
-        </ul>
+        {% if role.essential_skills %}
+            <h2>Essential Skills</h2>
+            <ul>
+            {% for line in role.essential_skills.split('\n') %}
+                {% if line.strip() %}
+                    <li>{{ line }}</li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% if role.optional_skills %}
+            <h2>Optional Skills</h2>
+            <ul>
+            {% for line in role.optional_skills.split('\n') %}
+                {% if line.strip() %}
+                    <li>{{ line }}</li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        {% endif %}
     </div>
     {% endif %}
 
@@ -51,7 +64,8 @@
             <input type="hidden" name="role_id" value="{{ role.id }}">
             <input type="hidden" name="title" value="{{ role.title }}">
             <input type="hidden" name="description" value="{{ role.description }}">
-            <input type="hidden" name="task" value="{{ role.task }}">
+            <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
+            <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
             <input type="hidden" name="id_full" value="{{ role.id_full }}">
             <input type="hidden" name="uri" value="{{ role.uri }}">
 
@@ -70,13 +84,14 @@
     <hr style="width:100%; margin: 30px 0;">
 
     <div>
-        <h2>Add This Role to Your Skills</h2>
+        <h2>Add the Essential Skills of this role to Your Skill Model</h2>
         <p>Select your proficiency level for this role and add it to your skill set.</p>
         <form action="/add_to_user_skills" method="post">
             <input type="hidden" name="role_id" value="{{ role.id }}">
             <input type="hidden" name="title" value="{{ role.title }}">
             <input type="hidden" name="description" value="{{ role.description }}">
-            <input type="hidden" name="task" value="{{ role.task }}">
+            <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
+            <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
             <input type="hidden" name="id_full" value="{{ role.id_full }}">
             <input type="hidden" name="uri" value="{{ role.uri }}">
 

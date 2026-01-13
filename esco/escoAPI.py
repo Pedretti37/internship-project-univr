@@ -18,10 +18,11 @@ def get_esco_occupations_list(keyword, limit):
         search_resp.raise_for_status()
         results = search_resp.json().get('_embedded', {}).get('results', [])
     except Exception as e:
-        print(f"Connection error: {e}")
+        print(f"Connection error during search: {e}")
         return []
 
     if not results:
+        print("No results found.")
         return []
 
     output_list = []
@@ -30,9 +31,8 @@ def get_esco_occupations_list(keyword, limit):
         title = hit['title']
         uri = hit['uri']
         
-        # ISCO code
+        # ISCO Code extraction
         raw_val = hit.get('code')
-        
         if raw_val:
             s_code = str(raw_val) 
             isco_family = s_code.split('.')[0] 
@@ -42,26 +42,42 @@ def get_esco_occupations_list(keyword, limit):
             isco_code_raw = "N/A"
 
         definition = "N/A"
-        tasks_string = ""
-
+        str_essential = ""
+        str_optional = ""
+        
         try:
-            details_params = {'uri': uri, 'language': 'en'}
+            details_params = {'uri': uri, 'language': 'en'} 
+            
             details_resp = requests.get(f"{base_url}/resource/occupation", params=details_params, headers=headers)
             
             if details_resp.status_code == 200:
                 d_data = details_resp.json()
                 
-                # Description Extraction
+                # Description extraction
                 desc_obj = d_data.get('description', {}) or d_data.get('definition', {})
                 definition = desc_obj.get('en', {}).get('literal', 'N/A')
 
-                # Essential Skills Extraction
+                # Hybrid extraction for skills
+                embedded = d_data.get('_embedded', {})
                 links = d_data.get('_links', {})
-                skills_list = links.get('hasEssentialSkill', [])
+
+                def extract_titles(key_name):
+                    # Try _embedded
+                    source = embedded.get(key_name, [])
+                    if not source:
+                        # Fallback on _links
+                        source = links.get(key_name, [])
+                    
+                    return [item.get('title', 'Unknown Skill') for item in source]
+
+                # Extract
+                essential_titles = extract_titles('hasEssentialSkill')
+                optional_titles = extract_titles('hasOptionalSkill')
                 
-                extracted_tasks = [skill['title'] for skill in skills_list]
+                # Max 20 skills for now
+                str_essential = "\n".join(essential_titles[:20])
+                str_optional = "\n".join(optional_titles[:20])
                 
-                tasks_string = "\n".join(extracted_tasks[:10]) # max of 10 tasks for now
 
         except Exception as e:
             print(f"Error fetching details for {title}: {e}")
@@ -70,12 +86,13 @@ def get_esco_occupations_list(keyword, limit):
             id=str(isco_family),
             title=title,
             description=definition,
-            task=tasks_string,
+            essential_skills=str_essential,
+            optional_skills=str_optional,
             id_full=str(isco_code_raw),
             uri=uri
         )
         
         output_list.append(role_data)
-        time.sleep(0.1) 
+        time.sleep(0.1)
 
     return output_list

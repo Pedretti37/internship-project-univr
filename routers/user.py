@@ -152,7 +152,8 @@ async def add_to_user_target_roles(
     role_id: str = Form(...),
     title: str = Form(...),
     description: str = Form(...),
-    task: str = Form(...),
+    essential_skills: str = Form(...),
+    optional_skills: str = Form(...),
     id_full: str = Form(...),
     uri: str = Form(...)
 ):
@@ -163,7 +164,8 @@ async def add_to_user_target_roles(
         id=role_id,
         title=title,
         description=description,
-        task=task,
+        essential_skills=essential_skills,
+        optional_skills=optional_skills,
         id_full=id_full,
         uri=uri
     )
@@ -200,7 +202,8 @@ async def add_to_user_skills(
     role_id: str = Form(...),
     title: str = Form(...),
     description: str = Form(...),
-    task: str = Form(...),
+    essential_skills: str = Form(...),
+    optional_skills: str = Form(...),
     id_full: str = Form(...),
     uri: str = Form(...),
     level: int = Form(...)
@@ -212,7 +215,8 @@ async def add_to_user_skills(
         id=role_id,
         title=title,
         description=description,
-        task=task,
+        essential_skills=essential_skills,
+        optional_skills=optional_skills,
         id_full=id_full,
         uri=uri
     )
@@ -220,8 +224,8 @@ async def add_to_user_skills(
     message_text = "Error: No skills were added."
     updated_skill = False
 
-    if task:
-        skills_list = task.split('\n') 
+    if essential_skills:
+        skills_list = essential_skills.split('\n') 
         for skill in skills_list:
             skill_clean = skill.strip()
             if skill_clean and len(skill_clean) > 1:
@@ -280,7 +284,8 @@ async def details_page(
     role_id: str = Form(...),
     title: str = Form(...),
     description: str = Form(...),
-    task: str = Form(""), # Optional
+    essential_skills: str = Form(...),
+    optional_skills: str = Form(...),
     id_full: str = Form(...),
     uri: str = Form(...),
     user = Depends(get_current_user)):
@@ -292,7 +297,8 @@ async def details_page(
         id=role_id,
         title=title,
         description=description,
-        task=task,
+        essential_skills=essential_skills,
+        optional_skills=optional_skills,
         id_full=id_full,
         uri=uri
     )
@@ -330,7 +336,7 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     if len(role_ids) > 5:
-        error = "You can analyze up to 5 roles at a time."
+        error = "You can analyze up to 5 target roles at a time."
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
             "user": user,

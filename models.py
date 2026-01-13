@@ -23,6 +23,8 @@ class Role(BaseModel):
     id: str
     title: str
     description: Optional[str] = None
+    essential_skills: Optional[str] = None
+    optional_skills: Optional[str] = None
     task: Optional[str] = None
     id_full: Optional[str] = None
     uri: Optional[str] = None

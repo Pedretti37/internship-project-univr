@@ -1,20 +1,14 @@
 import json
 import os
-import pandas as pd
 import time
 from crud import crud_user
-from models import Role
 from llm import gemini
-
-FILE_INPUT = "data/ISCO-08 EN Structure and definitions.xlsx"
-
 
 def calculate_skill_gap_user(user, role_ids: list[str]) -> dict:
     gap_report = {}
     
     for rid in role_ids:
-        # Recuperiamo i dati del ruolo (Titolo e lista skill richieste)
-        role_data = get_role_skills_data(rid) 
+        role_data = next((r for r in user.target_roles if r['id'] == rid), None) 
         
         if not role_data:
             continue
@@ -23,8 +17,6 @@ def calculate_skill_gap_user(user, role_ids: list[str]) -> dict:
         required_skills_list = role_data["skills"] # Lista di dict
         
         gap_report[role_title] = []
-
-        # print(f"📊 Analisi gap per ruolo: {role_title} (Batch)...")
 
         # CHIAMATA UNICA A GEMINI
         batch_results = gemini.get_gap_gemini(user.current_skills, required_skills_list)
@@ -86,49 +78,7 @@ def calculate_skill_gap_user(user, role_ids: list[str]) -> dict:
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
                 
-            # print(f"✅ Skill Gap salvato per l'utente {user.username}")
-            
         except Exception as e:
             print(f"❌ Errore salvataggio skill gap: {e}")
 
     return gap_report
-
-def get_role_skills_data(role_id: str):
-    # Leggiamo Excel
-    try:
-        df = pd.read_excel(FILE_INPUT)
-        # Colonna B = ID (indice 1), Colonna C = Titolo, Colonna E = Task
-        # Filtriamo per ID (convertendo in stringa per sicurezza)
-        row = df[df.iloc[:, 1].astype(str) == role_id]
-        
-        if row.empty:
-            print(f"❌ ID {role_id} non trovato nell'Excel.")
-            return None
-            
-        role_title = row.iloc[0, 2] # Colonna C
-        tasks = row.iloc[0, 4]      # Colonna E
-        
-        # --- CHIAMATA GEMINI ---
-        skills_generated = gemini.analyse_with_gemini(role_title, tasks)
-        
-        if not skills_generated:
-            return None
-
-        # Creiamo la struttura dati
-        new_entry = {
-            "info": {"title": role_title, "id": role_id},
-            "skills": []
-        }
-        
-        for s in skills_generated:
-            new_entry["skills"].append({
-                "Skill": s.get('skill'),
-                "Required Level": s.get('level'),
-                "Reason": s.get('reason')
-            })
-            
-        return new_entry
-
-    except Exception as e:
-        print(f"Errore generazione dati: {e}")
-        return None
