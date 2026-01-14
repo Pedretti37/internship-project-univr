@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
-from crud import crud_user
+from crud import crud_project, crud_user
 from dependencies import get_current_org
+from esco import escoAPI 
 
 from config import templates, pwd_context
 import crud.crud_org as crud_org
-from models import Organization
+from models import Organization, Project
 
 router = APIRouter()
 
@@ -49,15 +50,20 @@ async def org_home(request: Request, org = Depends(get_current_org)):
         response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
     
+    # Member list
     members = crud_user.get_users_by_ids(org.members)
+
+    # Project list
+    projects = crud_project.get_org_projects(org.id)
 
     response = templates.TemplateResponse("org/org_home.html", {
         "request": request, 
         "org": org,
-        "members": members
+        "members": members,
+        "projects": projects
     })
 
-    # No cache storage
+    # No cache storage headers
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
@@ -179,3 +185,114 @@ async def add_member(
         "error": error_msg,
         "success": success_msg
     })
+
+### --- Create Project GET --- ###
+@router.get("/org/create_project", response_class=HTMLResponse)
+async def create_project_form(request: Request, org = Depends(get_current_org)):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    # member list for assignment with checkboxes
+    members = crud_user.get_users_by_ids(org.members)
+
+    return templates.TemplateResponse("org/create_project.html", {
+        "request": request,
+        "org": org,
+        "members": members
+    })
+
+### --- Create Project POST --- ###
+@router.post("/org/create_project", response_class=HTMLResponse)
+async def create_project_submit(
+    org = Depends(get_current_org),
+    name: str = Form(...),
+    description: str = Form(...),
+    assigned_members: list[str] = Form(default=[]) 
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    new_project = Project(
+        org_id=org.id,
+        name=name,
+        description=description,
+        assigned_members_ids=assigned_members,
+        target_roles=[] # Empty for now
+    )
+
+    crud_project.create_project(new_project)
+
+    return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- PROJECT DASHBOARD GET --- ###
+@router.get("/org/project/{project_id}", response_class=HTMLResponse)
+async def view_project(
+    request: Request, 
+    project_id: str, 
+    org = Depends(get_current_org)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    project = crud_project.get_project(project_id)
+    
+    # Security check: ensure the project belongs to the org
+    if not project or project.org_id != org.id:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+
+    assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
+
+    return templates.TemplateResponse("org/project_detail.html", {
+        "request": request,
+        "org": org,
+        "project": project,
+        "team": assigned_members,
+        "search_results": None 
+    })
+
+
+### --- PROJECT: SEARCH ROLE POST --- ###
+@router.post("/org/project/{project_id}/search", response_class=HTMLResponse)
+async def project_search_role(
+    request: Request, 
+    project_id: str, 
+    search: str = Form(...),
+    org = Depends(get_current_org)
+):
+    if not org: return RedirectResponse(url="/", status_code=303)
+    
+    project = crud_project.get_project(project_id)
+    assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
+
+    # ESCO API Search
+    results = escoAPI.get_esco_occupations_list(search, limit=5)
+
+    return templates.TemplateResponse("org/project_detail.html", {
+        "request": request,
+        "org": org,
+        "project": project,
+        "team": assigned_members,
+        "search_results": results,
+        "last_search": search
+    })
+
+
+### --- PROJECT: ADD ROLE POST --- ###
+@router.post("/org/project/add_role", response_class=RedirectResponse)
+async def project_add_role(
+    project_id: str = Form(...),
+    uri: str = Form(...),
+    org = Depends(get_current_org)
+):
+    if not org: return RedirectResponse(url="/", status_code=303)
+
+    project = crud_project.get_project(project_id)
+    
+    if project and project.org_id == org.id:
+        role_data = escoAPI.get_single_role_details(uri)
+        
+        if role_data:
+            crud_project.add_target_role(project, role_data.model_dump())
+
+    # Refresh project detail page
+    return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)

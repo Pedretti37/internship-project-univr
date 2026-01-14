@@ -1,0 +1,12 @@
+.wizard-container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.form-group { margin-bottom: 20px; }
+label { display: block; font-weight: bold; margin-bottom: 8px; }
+input[type="text"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+
+/* Member Selection */
+.members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 10px; }
+.member-card-select { border: 1px solid #eee; padding: 10px; border-radius: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; }
+.member-card-select:hover { background-color: #f9f9f9; border-color: #aaa; }
+.member-card-select input { transform: scale(1.2); }
+        
+.actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; }

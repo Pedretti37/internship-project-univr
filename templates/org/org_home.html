@@ -55,10 +55,32 @@
 
             <div class="card">
                 <h2>Active Projects</h2>
-                <div>
-                    <p>No active skill gap assessments.</p>
-                    <button disabled>+ Create New Project (Coming Soon)</button>
+                
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items: center;">
+                    <span>Manage your assessments</span>
+                    <a href="/org/create_project" class="btn-primary" style="font-size:0.8em; text-decoration:none;">+ New Project</a>
                 </div>
+
+                {% if projects %}
+                    <div class="projects-list">
+                        {% for proj in projects %}
+                        <div style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 4px solid #007bff;">
+                            <h3 style="margin:0 0 5px 0;">{{ proj.name }}</h3>
+                            <p style="margin:0; font-size:0.9em; color:#666;">
+                                {{ proj.description }}
+                            </p>
+                            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                                <small>Team Size: <strong>{{ proj.assigned_members_ids|length }}</strong></small>
+                                <a href="/org/project/{{ proj.id }}" style="color: #007bff; text-decoration: none; font-weight: bold;">View Details →</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="background: #f9f9f9; padding: 20px; text-align: center; border: 2px dashed #ccc; border-radius: 5px;">
+                        <p style="color: #666;">No active skill gap assessments.</p>
+                    </div>
+                {% endif %}
             </div>
 
         </div>

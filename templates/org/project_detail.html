@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/project_detail.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="/org_home" style="text-decoration: none;">← Back to Dashboard</a>
+    
+    <div class="project-header">
+        <h1>Project: {{ project.name }}</h1>
+        <p style="color: #666; font-size: 1.1em;">{{ project.description }}</p>
+    </div>
+
+    <div class="grid-layout">
+        
+        <div class="card">
+            <h2>1. Define Target Roles</h2>
+            <p><small>Search and add the roles required for this project.</small></p>
+
+            {% if project.target_roles %}
+                <div style="margin: 20px 0;">
+                    {% for role in project.target_roles %}
+                    <div class="role-badge">
+                        <div>
+                            <strong>{{ role.title }}</strong>
+                            <br><small style="font-size: 0.8em;">ESCO ID: {{ role.id }}</small>
+                        </div>
+                        <span>✅</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    No target roles defined yet. Search below to add one.
+                </div>
+            {% endif %}
+
+            <hr style="margin: 20px 0;">
+
+            <h3>Add a Role</h3>
+            <form action="/org/project/{{ project.id }}/search" method="post" class="search-box">
+                <input type="text" name="search" placeholder="e.g. Software Engineer" value="{{ last_search }}" required>
+                <button type="submit" class="btn-primary">Search</button>
+            </form>
+
+            {% if search_results %}
+                <div style="margin-top: 15px;">
+                    <p><strong>Results for "{{ last_search }}":</strong></p>
+                    {% for res in search_results %}
+                    <div class="result-item">
+                        <span>{{ res.title }}</span>
+                        <form action="/org/project/add_role" method="post">
+                            <input type="hidden" name="project_id" value="{{ project.id }}">
+                            <input type="hidden" name="uri" value="{{ res.uri }}">
+                            <button type="submit" style="cursor:pointer; color:#28a745; border:1px solid #28a745; background:white; padding: 5px 10px; border-radius: 4px; font-weight:bold;">+ Add</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2>2. Assigned Team</h2>
+            <p><small>Employees involved in this assessment.</small></p>
+            
+            <ul class="team-list">
+            {% for member in team %}
+                <li>
+                    <strong>{{ member.name }} {{ member.surname }}</strong>
+                    <br><small style="color: #666;">@{{ member.username }} • {{ member.current_skills|length }} skills mapped</small>
+                </li>
+            {% endfor %}
+            </ul>
+            
+            <div style="margin-top: 40px; text-align: center;">
+                <hr>
+                {% if project.target_roles and team %}
+                    <h3>Analysis Ready</h3>
+                    <form action="/org/project/calculate_gap" method="post">
+                        <input type="hidden" name="project_id" value="{{ project.id }}">
+                        <button type="submit" class="btn-primary" style="width: 100%; padding: 15px; background-color: #2e7d32; font-size: 1.1em;">
+                            🚀 Calculate Skill Gap
+                        </button>
+                    </form>
+                {% else %}
+                    <p style="color: #999;"><em>To run the analysis, you need at least one Target Role and one Team Member.</em></p>
+                    <button disabled class="btn-primary" style="width: 100%; opacity: 0.5; cursor: not-allowed;">Calculate Skill Gap</button>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

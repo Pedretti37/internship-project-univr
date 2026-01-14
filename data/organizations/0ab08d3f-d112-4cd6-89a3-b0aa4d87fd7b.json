@@ -6,5 +6,7 @@
     "email": "apple@apple.com",
     "orgname": "d",
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$nfOek3KOkdLaW6v1PifEGA$tnqY55HR+xrJ4qvUTXgCLulylPrtGO9xRZfayTv3OoQ",
-    "members": []
+    "members": [
+        "6b5ccf29-fc65-4420-921f-5a5054d63881"
+    ]
 }

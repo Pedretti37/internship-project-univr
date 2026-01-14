@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/create_project.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="wizard-container">
+        <h1>Create New Project</h1>
+        <p>Step 1/2: Define project details and assign your team.</p>
+        <hr>
+
+        <form action="/org/create_project" method="post">
+            
+            <div class="form-group">
+                <label for="name">Project Name</label>
+                <input type="text" name="name" id="name" placeholder="e.g. AI Migration 2024" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" id="description" rows="3" placeholder="Brief description of the project goals..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Assign Team Members</label>
+                <p style="font-size: 0.9em; color: #666;">Select the employees who will be assessed for this project.</p>
+                
+                {% if members %}
+                    <div class="members-grid">
+                        {% for member in members %}
+                        <label class="member-card-select">
+                            <input type="checkbox" name="assigned_members" value="{{ member.id }}">
+                            <div>
+                                <strong>{{ member.name }} {{ member.surname }}</strong><br>
+                                <small>{{ member.username }}</small>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: red;">No members in your organization yet. <a href="/org_home">Go back and add members first.</a></p>
+                {% endif %}
+            </div>
+
+            <div class="actions">
+                <a href="/org_home" class="btn-text">Cancel</a>
+                <button type="submit" class="btn-primary">Create Project & Continue →</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

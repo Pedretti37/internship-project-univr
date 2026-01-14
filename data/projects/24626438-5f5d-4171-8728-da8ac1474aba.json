@@ -1,0 +1,22 @@
+{
+    "id": "24626438-5f5d-4171-8728-da8ac1474aba",
+    "org_id": "0ab08d3f-d112-4cd6-89a3-b0aa4d87fd7b",
+    "name": "Project One",
+    "description": "First try to create a project :)",
+    "assigned_members_ids": [
+        "6b5ccf29-fc65-4420-921f-5a5054d63881"
+    ],
+    "target_roles": [
+        {
+            "id": "2152",
+            "title": "satellite engineer",
+            "description": "Satellite engineers develop, test and oversee the manufacture of satellite systems and satellite programmes. They may also develop software programs, collect and research data, and test the satellite systems. Satellite engineers can also develop systems to command and control satellites. They monitor satellites for issues and report on the behaviour of the satellite in orbit.",
+            "essential_skills": "quality standards\ntypes of satellites\nengineering processes\nadjust engineering designs\ngeostationary satellites\ntroubleshoot\nmonitor satellites\naerospace engineering\nuse technical drawing software\nunmanned air systems\nproduction processes\nlaunching of satellites into orbit\nglobal navigation satellite system performance parameters\napprove engineering design\ntechnical drawings\nmanufacturing processes\nperform scientific research\nindustrial engineering\nengineering principles",
+            "optional_skills": "draft design specifications\nCAE software\nmaterial mechanics\nbuild a product's physical model\nplan space satellite missions\ndesign prototypes\ndefense system\nguidance, navigation and control\napply advanced manufacturing\ncontrol production\noversee assembly operations\nresearch satellite launch sites\naerodynamics\nuse CAD software\ndesign principles\nuse CAM software\nmanage product testing\nfluid mechanics\ndevelop test procedures\nmaterials science\nanalyse production processes for improvement\nmechanical engineering\nrecord test data\nsynthetic natural environment\nexecute feasibility study\ncreate a product's virtual model\nconduct performance tests",
+            "task": null,
+            "id_full": "2152.1.9",
+            "uri": "http://data.europa.eu/esco/occupation/24161923-e3e6-4096-b377-f1ee8a7ea31b"
+        }
+    ],
+    "created_at": "2026-01-14"
+}

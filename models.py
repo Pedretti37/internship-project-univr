@@ -1,3 +1,4 @@
+from datetime import datetime
 import uuid
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, Dict, List, Any
@@ -22,7 +23,7 @@ class Organization(BaseModel):
     email: EmailStr
     orgname: str
     hashed_password: str
-    members: List[User] = []
+    members: List[str] = []
 
 class Role(BaseModel):
     id: str
@@ -34,9 +35,11 @@ class Role(BaseModel):
     id_full: Optional[str] = None
     uri: Optional[str] = None
 
-class Course(BaseModel):
-    id: str
-    title: str
-    description: Optional[str] = None
-    learning_outcomes: Optional[str] = None
-    target_skills: List[str] = []
+class Project(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    org_id: str
+    name: str
+    description: str
+    assigned_members_ids: List[str] = []
+    target_roles: List[Dict[str, Any]] = []
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d"))

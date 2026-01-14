@@ -1,0 +1,35 @@
+.project-header { background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 25px; border-bottom: 3px solid #007bff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.grid-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 30px; }
+.card { background: white; border: 1px solid #e0e0e0; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+/* Target roles */
+.role-badge { 
+    background: #e3f2fd; 
+    color: #1565c0; 
+    padding: 8px 12px; 
+    border-radius: 6px; 
+    margin-bottom: 8px; 
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #1565c0;
+}
+
+/* Search Box */
+.search-box { display: flex; gap: 10px; margin-top: 15px; }
+.search-box input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+
+/* Search Results */
+.result-item {
+    background: #fafafa; 
+    border: 1px solid #eee; 
+    padding: 10px; 
+    margin-top: 5px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+/* Team List */
+.team-list li { padding: 10px 0; border-bottom: 1px solid #eee; }
+.team-list li:last-child { border-bottom: none; }
