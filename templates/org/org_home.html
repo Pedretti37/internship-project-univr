@@ -16,15 +16,51 @@
         </div>
     </nav>
 
-    <div class="main-container">
-        <h1>Current Projects</h1>
-        <p>This is your project list.</p>
+    <div class="container">
+        <h1>Welcome, {{ org.name }}</h1>
+        
+        {% if error %} <p class="status-err">{{ error }}</p> {% endif %}
+        {% if success %} <p class="status-ok">{{ success }}</p> {% endif %}
 
-        <hr style="width:100%; margin-top: 30px;">
+        <div class="dashboard-container">
+            
+            <div class="card">
+                <h2>My Team ({{ members|length }})</h2>
+                <p><small>Add users by their username</small></p>
+                
+                <form action="/add_member" method="post" class="add-form">
+                    <input type="text" name="username_to_add" placeholder="Username (e.g. mario_rossi)" required>
+                    <button type="submit" class="btn-primary">Add</button>
+                </form>
 
-        <h2>Recent Events (new tech, law changes, ecc...)</h2>
-        <div class="events-container">
-            <p>No recent events available.</p>
+                <hr>
+
+                {% if members %}
+                    <ul>
+                    {% for member in members %}
+                        <li class="member-item">
+                            <div>
+                                <strong>{{ member.name }} {{ member.surname }}</strong>
+                                <br>
+                                <span class="badge-skill">{{ member.current_skills|length }} Skills</span>
+                                <small style="color:#666">({{ member.username }})</small>
+                            </div>
+                            </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No members yet. Invite someone!</p>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <h2>Active Projects</h2>
+                <div>
+                    <p>No active skill gap assessments.</p>
+                    <button disabled>+ Create New Project (Coming Soon)</button>
+                </div>
+            </div>
+
         </div>
     </div>
 {% endblock %}

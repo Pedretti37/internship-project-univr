@@ -1,8 +1,0 @@
-{
-    "name": "Samsung",
-    "address": "Via Verdi 94",
-    "phone": "1234567890",
-    "email": "samsung@gmail.com",
-    "orgname": "smg",
-    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$JGSs1RqDcM65FyLkvNdaCw$ZUlr0unghha+MjMr9Ds250aUqWehZ+QCujO53CWjrs4"
-}

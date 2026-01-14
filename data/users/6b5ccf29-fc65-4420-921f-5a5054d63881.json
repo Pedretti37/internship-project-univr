@@ -1,0 +1,12 @@
+{
+    "id": "6b5ccf29-fc65-4420-921f-5a5054d63881",
+    "name": "Simone",
+    "surname": "Pedretti",
+    "username": "a",
+    "email": "simonepedretti04@gmail.com",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$VgpB6P2fc07pHeM8xzhnrA$4hyi7jNFpF8uHAt15UQ7FCX93XbNA0MexaSAGILOwWw",
+    "target_roles": [],
+    "current_skills": {},
+    "skill_gap": {},
+    "id_organization": null
+}

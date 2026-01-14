@@ -1,7 +1,9 @@
-from pydantic import BaseModel, EmailStr
+import uuid
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, Dict, List, Any
 
 class User(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     surname: str
     username: str
@@ -10,14 +12,17 @@ class User(BaseModel):
     target_roles: List[Dict[str, Any]] = []
     current_skills: Dict[str, int] = {}
     skill_gap: Dict[str, List[Any]] = {}
+    id_organization: Optional[str] = None
 
 class Organization(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     address: str
     phone: str
     email: EmailStr
     orgname: str
     hashed_password: str
+    members: List[User] = []
 
 class Role(BaseModel):
     id: str

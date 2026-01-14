@@ -2,49 +2,104 @@ import json
 import os
 from models import Organization
 
-FILE_INPUT = "data/ISCO-08 EN Structure and definitions.xlsx"
-
 DATA_DIR_ORGS = "data/organizations"
 os.makedirs(DATA_DIR_ORGS, exist_ok=True)
 
-### --- Organization CRUD operations --- ###
-def get_json_path_org(orgname: str) -> str:
-    safe_name = orgname.lower().strip()
-    return os.path.join(DATA_DIR_ORGS, f"{safe_name}.json")
+INDEX_FILE = "data/organizations/org_index.json"
+os.makedirs(os.path.dirname(INDEX_FILE), exist_ok=True)
 
-def get_organization(orgname: str) -> Organization | None:
-    path = get_json_path_org(orgname)
-    if not os.path.exists(path):
-        return None
-    
-    with open(path, "r") as f:
-        data = json.load(f)
-        return Organization(**data)
+### --- Helper: Path --- ###
+def get_json_path(id: str) -> str:
+    return os.path.join(DATA_DIR_ORGS, f"{id}.json")
 
+### --- Internal Index Management --- ###
+def _load_index() -> dict:
+    if not os.path.exists(INDEX_FILE):
+        return {}
+    try:
+        with open(INDEX_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return {}
+
+def _save_index(index_data: dict):
+    with open(INDEX_FILE, "w", encoding="utf-8") as f:
+        json.dump(index_data, f, indent=4)
+
+### --- CRUD: Create --- ###
 def create_organization(org: Organization):
-    path = get_json_path_org(org.orgname)
-    if os.path.exists(path):
-        raise ValueError("Organization already exists")
+    index = _load_index()
     
-    with open(path, "w") as f:
-        json.dump(org.model_dump(), f, indent=4) # model_dump() transforms the Pydantic model to a dict for JSON file
+    if org.orgname in index:
+        raise ValueError("Organization identifier already exists")
+
+    file_path = get_json_path(org.id)
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(json.dumps(org.model_dump(), indent=4))
+
+    index[org.orgname] = org.id
+    _save_index(index)
+    
+    return org
+
+### --- CRUD: Update & Manage --- ###
+def update_org(org: Organization):
+    path = get_json_path(org.id)
+    
+    if not os.path.exists(path):
+        return
+
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(org.model_dump(), f, indent=4)
+    except Exception as e:
+        print(f"Error updating organization: {e}")
+
+def add_member_to_org(org: Organization, user_id: str):
+    if user_id not in org.members:
+        org.members.append(user_id)
+
+    update_org(org)
+    return org
 
 def change_password_org(org: Organization, new_pw: str) -> bool:
-    path = get_json_path_org(org.orgname)
+    path = get_json_path(org.id)
     
     if not os.path.exists(path):
         return False
     
     try:
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         data["hashed_password"] = new_pw
 
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
         
         return True
-
-    except Exception as e:
+    except Exception:
         return False
+
+### --- CRUD: Getters --- ###
+def get_org_by_id(org_id: str) -> Organization | None:
+    path = get_json_path(org_id)
+    if not os.path.exists(path):
+        return None
+    
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return Organization(**data)
+    except Exception:
+        return None
+
+def get_org_by_orgname(orgname: str) -> Organization | None:
+    index = _load_index()
+
+    org_id = index.get(orgname)
+    
+    if not org_id:
+        return None
+        
+    return get_org_by_id(org_id)

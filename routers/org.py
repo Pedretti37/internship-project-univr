@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
+from crud import crud_user
 from dependencies import get_current_org
 
 from config import templates, pwd_context
@@ -24,7 +25,7 @@ async def org_login(request: Request):
 
 @router.post("/org_login", response_class=HTMLResponse)
 async def org_login(request: Request, orgname: str = Form(...), password: str = Form(...)):
-    org = crud_org.get_organization(orgname)
+    org = crud_org.get_org_by_orgname(orgname)
 
     if not org or not pwd_context.verify(password, org.hashed_password):
         response = RedirectResponse(url="/org_login", status_code=status.HTTP_303_SEE_OTHER)
@@ -34,7 +35,7 @@ async def org_login(request: Request, orgname: str = Form(...), password: str = 
 
     response = RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
-    response.set_cookie(key="session_token", value=org.orgname, path="/", httponly=True, max_age=1800)  # 30 minutes session
+    response.set_cookie(key="session_token", value=org.id, path="/", httponly=True, max_age=1800)  # 30 minutes session
     response.delete_cookie(key="flash_error")
 
     return response
@@ -47,11 +48,14 @@ async def org_home(request: Request, org = Depends(get_current_org)):
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
+    
+    members = crud_user.get_users_by_ids(org.members)
 
-    response = templates.TemplateResponse(
-        "org/org_home.html", 
-        {"request": request, "org": org}
-    )
+    response = templates.TemplateResponse("org/org_home.html", {
+        "request": request, 
+        "org": org,
+        "members": members
+    })
 
     # No cache storage
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -118,7 +122,7 @@ async def change_password(request: Request, org = Depends(get_current_org), old_
         error = "Your old password is not correct."
         return templates.TemplateResponse("org/org_profile.html", {
             "request": request,
-            "usorger": org,
+            "org": org,
             "wrong_pw": error
         })
     
@@ -140,3 +144,38 @@ async def change_password(request: Request, org = Depends(get_current_org), old_
             "org": org,
             "failed": failed
         })
+    
+### --- Add Member --- ###
+@router.post("/add_member", response_class=HTMLResponse)
+async def add_member(
+    request: Request, 
+    org = Depends(get_current_org), 
+    username_to_add: str = Form(...)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    error_msg = None
+    success_msg = None
+
+    user_to_add = crud_user.get_user_by_username(username_to_add)
+
+    if user_to_add:
+        if user_to_add.id in org.members:
+             error_msg = "User is already in your team."
+        else:
+             crud_org.add_member_to_org(org, user_to_add.id)
+             success_msg = f"User '{user_to_add.name} {user_to_add.surname}' added successfully!"
+    else:
+        error_msg = "User not found. Please check the username."
+
+    # Refresh member list
+    members_objects = crud_user.get_users_by_ids(org.members)
+
+    return templates.TemplateResponse("org/org_home.html", {
+        "request": request,
+        "org": org,
+        "members": members_objects,
+        "error": error_msg,
+        "success": success_msg
+    })

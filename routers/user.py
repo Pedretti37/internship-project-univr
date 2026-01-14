@@ -30,7 +30,7 @@ async def user_login(request: Request):
 ### --- User POST Login --- ###
 @router.post("/user_login", response_class=HTMLResponse)
 async def user_login(request: Request, username: str = Form(...), password: str = Form(...)):
-    user = crud_user.get_user(username)
+    user = crud_user.get_user_by_username(username)
 
     if not user or not pwd_context.verify(password, user.hashed_password):
         response = RedirectResponse(url="/user_login", status_code=status.HTTP_303_SEE_OTHER)
@@ -40,7 +40,7 @@ async def user_login(request: Request, username: str = Form(...), password: str 
 
     response = RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 
-    response.set_cookie(key="session_token", value=user.username, path="/", httponly=True, max_age=1800)  # 30 minutes session
+    response.set_cookie(key="session_token", value=user.id, path="/", httponly=True, max_age=1800)  # 30 minutes session
     response.delete_cookie(key="flash_error")
 
     return response
@@ -57,8 +57,8 @@ async def user_home(request: Request, user = Depends(get_current_user)):
     context_results = None
     context_search = ""
 
-    if user.username in USER_ROLES_LIST:
-        session_data = USER_ROLES_LIST[user.username]
+    if user.id in USER_ROLES_LIST:
+        session_data = USER_ROLES_LIST[user.id]
         context_results = session_data["results"]
         context_search = session_data["last_search"]
 
@@ -131,7 +131,7 @@ async def role_list(request: Request, search: str = Form(...), user = Depends(ge
     role_list = escoAPI.get_esco_occupations_list(role, limit=5)
     
     if user:
-        USER_ROLES_LIST[user.username] = {
+        USER_ROLES_LIST[user.id] = {
             "last_search": search,
             "results": role_list
         }
@@ -345,7 +345,6 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
 
     gap_analysis_result = crud_skill_models.calculate_skill_gap_user(user, role_ids)
 
-    # 2. Mostriamo i risultati
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
         "user": user,
