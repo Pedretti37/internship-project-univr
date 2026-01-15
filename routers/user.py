@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
-from typing import List
+from typing import List, Optional
 from crud import crud_user
 from dependencies import get_current_user
 
@@ -151,9 +151,9 @@ async def add_to_user_target_roles(
     user = Depends(get_current_user),
     role_id: str = Form(...),
     title: str = Form(...),
-    description: str = Form(...),
-    essential_skills: str = Form(...),
-    optional_skills: str = Form(...),
+    description: Optional[str] = Form(None),
+    essential_skills: Optional[str] = Form(None),
+    optional_skills: Optional[str] = Form(None),
     id_full: str = Form(...),
     uri: str = Form(...)
 ):
@@ -163,9 +163,9 @@ async def add_to_user_target_roles(
     role_object = Role(
         id=role_id,
         title=title,
-        description=description,
-        essential_skills=essential_skills,
-        optional_skills=optional_skills,
+        description=description if description else "No description available.",
+        essential_skills=essential_skills if essential_skills else "",
+        optional_skills=optional_skills if optional_skills else "",
         id_full=id_full,
         uri=uri
     )
@@ -205,8 +205,7 @@ async def add_to_user_skills(
     essential_skills: str = Form(...),
     optional_skills: str = Form(...),
     id_full: str = Form(...),
-    uri: str = Form(...),
-    level: int = Form(...)
+    uri: str = Form(...)
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -229,7 +228,7 @@ async def add_to_user_skills(
         for skill in skills_list:
             skill_clean = skill.strip()
             if skill_clean and len(skill_clean) > 1:
-                user.current_skills[skill_clean] = level
+                user.current_skills.append(skill_clean)
                 updated_skill = True
 
     if updated_skill:
@@ -283,9 +282,9 @@ async def details_page(
     request: Request, 
     role_id: str = Form(...),
     title: str = Form(...),
-    description: str = Form(...),
-    essential_skills: str = Form(...),
-    optional_skills: str = Form(...),
+    description: Optional[str] = Form(None),
+    essential_skills: Optional[str] = Form(None),
+    optional_skills: Optional[str] = Form(None),
     id_full: str = Form(...),
     uri: str = Form(...),
     user = Depends(get_current_user)):
@@ -296,9 +295,9 @@ async def details_page(
     role_object = Role(
         id=role_id,
         title=title,
-        description=description,
-        essential_skills=essential_skills,
-        optional_skills=optional_skills,
+        description=description if description else "No description available.",
+        essential_skills=essential_skills if essential_skills else "",
+        optional_skills=optional_skills if optional_skills else "",
         id_full=id_full,
         uri=uri
     )
@@ -331,11 +330,11 @@ async def delete_target_role(
 
 ### --- Calculating Skill Gap --- ###
 @router.post("/calculate_skill_gap", response_class=HTMLResponse)
-async def calculate_skill_gap(request: Request, user = Depends(get_current_user), role_ids: List[str] = Form(...)):
+async def calculate_skill_gap(request: Request, user = Depends(get_current_user)):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    if len(role_ids) > 5:
+    if len(user.target_roles) > 5:
         error = "You can analyze up to 5 target roles at a time."
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
@@ -343,10 +342,10 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
             "error": error
         })
 
-    gap_analysis_result = crud_skill_models.calculate_skill_gap_user(user, role_ids)
+    updated_user = crud_skill_models.skill_gap_user(user)
+    crud_user.update_user(updated_user)
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
-        "user": user,
-        "gap_report": gap_analysis_result
+        "user": updated_user,
     })

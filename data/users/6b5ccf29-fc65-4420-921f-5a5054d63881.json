@@ -5,8 +5,69 @@
     "username": "a",
     "email": "simonepedretti04@gmail.com",
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$VgpB6P2fc07pHeM8xzhnrA$4hyi7jNFpF8uHAt15UQ7FCX93XbNA0MexaSAGILOwWw",
-    "target_roles": [],
-    "current_skills": {},
-    "skill_gap": {},
+    "target_roles": [
+        {
+            "id": "2514",
+            "title": "embedded systems software developer",
+            "description": "Embedded systems software developers program, implement, document and maintain software to be run on an embedded system.",
+            "essential_skills": "Provide technical documentation\r\nAnalyse software specifications\r\nDevelop ict device driver\r\nDebug software\r\nInternet of things\r\nDevelop software prototype\r\nCreate flowchart diagram\r\nIct debugging tools\r\nUse software design patterns\r\nInterpret technical texts\r\nTools for software configuration management\r\nComputer programming\r\nUse software libraries\r\nEmbedded systems\r\nIntegrated development environment software\r\nUtilise computer-aided software engineering tools",
+            "optional_skills": "Groovy\r\nOpenedge advanced business language\r\nObjective-c\r\nObject-oriented modelling\r\nAdapt to changes in technological development plans\r\nJenkins (tools for software configuration management)\r\nSap r3\r\nVisual studio .net\r\nPuppet (tools for software configuration management)\r\nMl (computer programming)\r\nXcode\r\nPhp\r\nSoftware anomalies\r\nCollect customer feedback on applications\r\nLisp\r\nUse functional programming\r\nC++\r\nAssembly (computer programming)\r\nR\r\nScala\r\nApache maven\r\nSas language\r\nAbap\r\nUse object-oriented programming\r\nDevelop creative ideas\r\nPerl\r\nProlog (computer programming)\r\nJava (computer programming)\r\nPascal (computer programming)\r\nUse concurrent programming\r\nEclipse (integrated development environment software)\r\nUse automatic programming\r\nStaf\r\nMatlab\r\nSwift (computer programming)\r\nApl\r\nCommon lisp\r\nKdevelop\r\nDevelop automated migration methods\r\nRuby (computer programming)",
+            "id_full": "2514.2.1",
+            "uri": "http://data.europa.eu/esco/occupation/57af9090-55b4-4911-b2d0-86db01c00b02"
+        }
+    ],
+    "current_skills": [
+        "Use software libraries",
+        "Provide technical documentation",
+        "Use technical drawing software",
+        "Define technical requirements",
+        "Develop automated migration methods",
+        "Interpret technical requirements",
+        "Analyse software specifications",
+        "Project management",
+        "Use software design patterns",
+        "Create flowchart diagram",
+        "Develop software prototype",
+        "Engineering principles",
+        "Ict debugging tools",
+        "Perform scientific research",
+        "Engineering processes",
+        "Utilise computer-aided software engineering tools",
+        "Identify customer requirements",
+        "Debug software",
+        "Technical drawings",
+        "Tools for software configuration management",
+        "Manage engineering project",
+        "Computer programming",
+        "Integrated development environment software"
+    ],
+    "skill_gap": [
+        {
+            "role_id": "2514",
+            "role_title": "embedded systems software developer",
+            "match_score": 75,
+            "total_required": 16,
+            "matching_skills": [
+                "Provide technical documentation",
+                "Analyse software specifications",
+                "Debug software",
+                "Develop software prototype",
+                "Create flowchart diagram",
+                "Ict debugging tools",
+                "Use software design patterns",
+                "Tools for software configuration management",
+                "Computer programming",
+                "Use software libraries",
+                "Integrated development environment software",
+                "Utilise computer-aided software engineering tools"
+            ],
+            "missing_skills": [
+                "Develop ict device driver",
+                "Internet of things",
+                "Interpret technical texts",
+                "Embedded systems"
+            ]
+        }
+    ],
     "id_organization": null
 }

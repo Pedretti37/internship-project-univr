@@ -1,84 +1,45 @@
-import json
-import os
-import time
-from crud import crud_user
-from llm import gemini
+from models import User
 
-def calculate_skill_gap_user(user, role_ids: list[str]) -> dict:
-    gap_report = {}
+def skill_gap_user(user: User) -> User:
     
-    for rid in role_ids:
-        role_data = next((r for r in user.target_roles if r['id'] == rid), None) 
-        
-        if not role_data:
-            continue
-
-        role_title = role_data["info"]["title"]
-        required_skills_list = role_data["skills"] # Lista di dict
-        
-        gap_report[role_title] = []
-
-        # CHIAMATA UNICA A GEMINI
-        batch_results = gemini.get_gap_gemini(user.current_skills, required_skills_list)
-        
-        # Creiamo una mappa per accesso rapido ai risultati: {"SkillName": {gap: 2, user_level: 5}}
-        results_map = {r["skill_name"]: r for r in batch_results}
-
-        # Ricostruiamo il report finale
-        for req in required_skills_list:
-            req_name = req["Skill"]
-            req_level = int(req["Required Level"])
-            reason = req["Reason"]
+    # User skills in a set    
+    user_skills_set = set()
+    
+    if user.current_skills:
+        for skill in user.current_skills:
+            user_skills_set.add(skill.lower().strip())
             
-            # Recuperiamo i dati calcolati da Gemini
-            result = results_map.get(req_name)
-            
-            if result:
-                user_val = int(result.get("user_level", 0))
-                gap_val = req_level - user_val
+    user.skill_gap.clear()
+    
+    # Target roles iteration
+    for role in user.target_roles:
+        
+        ess_str = role.get('essential_skills', '') or ""
+        
+        required_skills_list = [s.strip() for s in ess_str.split('\n') if s.strip()]
+        
+        matching = []
+        missing = []
+        
+        for req_skill in required_skills_list:
+            if req_skill.lower().strip() in user_skills_set:
+                matching.append(req_skill)
             else:
-                # Fallback se Gemini si è dimenticato la skill
-                user_val = 0
-                gap_val = req_level
+                missing.append(req_skill)
 
-            # Determina Status
-            if user_val == 0:
-                 # Opzionale: Se l'utente non ha proprio la skill, è MISSING
-                 status = "MISSING"
-                 # Nota: gap_val sarà uguale a req_level (positivo)
-            elif gap_val == 0:
-                status = "MATCH"
-            elif gap_val > 0:
-                status = "GAP"
-            else: # gap negativo (es. gap -2 significa che ho 2 punti in più)
-                status = "OVERSKILLED"
+        # Percentage
+        total_req = len(required_skills_list)
+        match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
 
-            gap_report[role_title].append({
-                "skill_name": req_name,
-                "required": req_level,
-                "user_level": user_val,
-                "gap": gap_val,
-                "status": status,
-                "reason": reason
-            })
+        
+        role_gap_info = {
+            'role_id': role.get('id', ''),
+            'role_title': role.get('title', ''),
+            'match_score': match_pct,
+            'total_required': total_req,
+            'matching_skills': matching,
+            'missing_skills': missing
+        }
+        user.skill_gap.append(role_gap_info)
 
-        # Pausa tra un RUOLO e l'altro
-        time.sleep(10) 
-
-    user.skill_gap = gap_report
-    path = crud_user.get_json_path(user.username)
-
-    if os.path.exists(path):
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            
-            data["skill_gap"] = gap_report
-            
-            with open(path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
-                
-        except Exception as e:
-            print(f"❌ Errore salvataggio skill gap: {e}")
-
-    return gap_report
+    return user

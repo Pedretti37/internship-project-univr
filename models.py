@@ -11,8 +11,8 @@ class User(BaseModel):
     email: EmailStr
     hashed_password: str
     target_roles: List[Dict[str, Any]] = []
-    current_skills: Dict[str, int] = {}
-    skill_gap: Dict[str, List[Any]] = {}
+    current_skills: List[str] = []
+    skill_gap: List[Dict[str, Any]] = []
     id_organization: Optional[str] = None
 
 class Organization(BaseModel):
@@ -31,7 +31,6 @@ class Role(BaseModel):
     description: Optional[str] = None
     essential_skills: Optional[str] = None
     optional_skills: Optional[str] = None
-    task: Optional[str] = None
     id_full: Optional[str] = None
     uri: Optional[str] = None
 

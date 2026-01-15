@@ -85,7 +85,6 @@
 
     <div>
         <h2>Add the Essential Skills of this role to Your Skill Model</h2>
-        <p>Select your proficiency level for this role and add it to your skill set.</p>
         <form action="/add_to_user_skills" method="post">
             <input type="hidden" name="role_id" value="{{ role.id }}">
             <input type="hidden" name="title" value="{{ role.title }}">
@@ -94,20 +93,6 @@
             <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
             <input type="hidden" name="id_full" value="{{ role.id_full }}">
             <input type="hidden" name="uri" value="{{ role.uri }}">
-
-            <label for="level">Your proficiency level (1-9):</label>
-            <select name="level" id="level" required style="padding: 5px;">
-                <option value="" disabled selected>Select Level...</option>
-                <option value="1">1 - Beginner</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5 - Intermediate</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9 - Expert</option>
-            </select>
 
             <button type="submit" class="btn-add-skill">
                 <span>Add to My Skills</span>
