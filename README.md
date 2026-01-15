@@ -1,39 +1,62 @@
-# Internship Project - Univr
+# Skill Gap Analysis Platform - Internship Project @ Univr
 
 ## Project Goal
-The goal of this project is to analyze organizational skill gaps and map them to educational offerings, creating a bridge between employee needs and training solutions.
+The primary goal of this project is to bridge the gap between employee skills and organizational needs. The platform analyzes **organizational skill gaps** by mapping current employee competencies against target roles and suggests educational offerings to fill those gaps.
 
 ## Current Features
-The application is currently in the development phase. A basic Authentication System is now functional.
+The application is currently in the **development phase**.
 
-- **User Registration:** Users can sign up providing their info.
-- **User Profile:** Users can now enter their profile and change their password, update target roles (max 5 to analyse), compare skill models of current target roles with their skills.
-- **Organization Registrazion:** Organization can sign up providing their info.
-- **Secure Authentication:** Passwords are never stored in plain text. The system uses **Argon2** hashing for security.
-- **Login System:** Users/Orgs can log in to access their personal area.
-- **Guest Access:** A "Continue as Guest" mode allows limited access to the platform for non-registered users.
-- **Data Storage:** Currently using a lightweight JSON-based file system for user/orgs management. EXCEL file added for reading roles/function and their descriptions.
-- **ESCO API:** Using ESCO API to obtain different skill models based on user input.
+### User Module
+- **User Registration & Login:** Secure sign-up and authentication system.
+- **Profile Management:** Users can update personal info and change passwords.
+- **Skill Modeling:** Users can build their profile by importing standardized skills from the **ESCO API**.
+- **Target Roles:** Users can define up to 5 target roles to track their career path.
+- **Skill Gap Evaluation:** *(Coming soon)*
+
+### Organization Module
+- **Organization Registration:** Companies can sign up and create a business profile.
+- **Team Management:** Organizations can add existing users to their workforce.
+- **Project & Assessment:**
+    - Create specific projects with defined goals.
+    - Assign employees to projects.
+    - Define **Target Roles** (from ESCO) for the project.
+    - *(Coming Soon)*: Calculate the skill gap between the team's current skills and the project's target roles.
+
+### Core Features
+- **Secure Authentication:** Passwords are hashed using **Argon2** (via Passlib) and never stored in plain text.
+- **Data Storage:** Lightweight JSON-based file system for easy prototyping of Users, Organizations, and Projects.
+- **ESCO API Integration:** Real-time fetching of occupations and skills from the European Skills/Competences classification.
+- **Guest Access:** Limited "Continue as Guest" mode for platform exploration.
 
 ## Tech Stack
-- **Backend:** Python, FastAPI
-- **Data Validation:** Pydantic
-- **Security:** Passlib (Argon2-cffi)
-- **Frontend:** HTML5, CSS3, Jinja2 Templates
-- **Server:** Uvicorn
+
+| Component | Technology |
+|-----------|------------|
+| **Backend** | Python 3.10+, FastAPI |
+| **Server** | Uvicorn |
+| **Validation** | Pydantic |
+| **Security** | Passlib (Argon2-cffi) |
+| **Frontend** | HTML5, CSS3, Jinja2 Templates |
+| **External APIs** | ESCO API, Google Gemini (LLM) |
 
 ## Project Structure
-- `main.py`: Application entry point.
-- `routes/`: Route definitions.
-- `config.py`: Project main configuration file.
-- `crud/`: Handles file I/O operations (JSON reading/writing and EXCEL).
-- `models.py`: Pydantic models for data validation and structure.
-- `data/`: Directory containing JSON and EXCEL files.
-- `static/`: CSS.
-- `templates/`: HTML templates.
-- `dependencies.py`: File used for getting current User/Org.
-- `llm/`: Directory containing Gemini API and the possibility to search for AI models. (temporary: it will be switched for CEDEFOP files)
-- `esco/`: Directory for ESCO API code
+
+```text
+├── config.py           # Main configuration settings
+├── dependencies.py     # Dependency injection (Current User/Org retrieval)
+├── main.py             # Application entry point
+├── requirements.txt    # Python dependencies
+│
+├── crud/               # JSON I/O operations (Database layer)
+├── data/               # JSON Storage (Users, Orgs, Projects)
+├── esco/               # ESCO API integration logic
+├── llm/                # AI integration (Temp. Gemini API -> Future CEDEFOP DB)
+├── models.py           # Pydantic data models
+├── routes/             # API Endpoints (User, Org, etc.)
+│
+├── static/             # CSS and static assets
+└── templates/          # HTML Jinja2 templates
+```
 
 ## How to Run
 1.  **Clone the repository.**
