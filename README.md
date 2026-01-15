@@ -52,7 +52,7 @@ The application is currently in the **development phase**.
 ├── esco/               # ESCO API integration logic
 ├── cedefop/            # CEDEFOP database
 ├── models.py           # Pydantic data models
-├── routes/             # API Endpoints (User, Org, etc.)
+├── routers/            # Endpoints (User, Org, etc.)
 │
 ├── static/             # CSS and static assets
 └── templates/          # HTML Jinja2 templates
