@@ -349,3 +349,24 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
         "request": request,
         "user": updated_user,
     })
+
+### --- Read CEDEFOP Employment Data --- ###
+@router.post("/read_emp_occupation", response_class=HTMLResponse)
+async def read_emp_occupation(
+    request: Request,
+    user = Depends(get_current_user),
+    isco_id: str = Form(...),
+    target_year: int = Form(...)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    emp_data = crud_skill_models.read_emp_occupation(country="Italy", isco_id=isco_id, target_year=target_year)
+
+    return templates.TemplateResponse("user/user_profile.html", {
+        "request": request,
+        "user": user,
+        "emp_data": emp_data,
+        "isco_id": isco_id,
+        "target_year": str(target_year)
+    })

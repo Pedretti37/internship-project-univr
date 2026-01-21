@@ -169,5 +169,43 @@
 
             </div>
         </div>
+
+        <div class="card">
+            <h3>Check Future Employment Trend</h3>
+            <form action="/read_emp_occupation" method="post">
+                {% if user.target_roles %}
+                    <input type="hidden" name="isco_id" value="{{ user.target_roles[0].id }}">
+                    
+                    <label>Target Year:</label>
+                    <input type="number" name="target_year" placeholder="2025" min="2010" max="2035" required value="{{ target_year }}">
+                    
+                    <button type="submit" class="btn-primary">Analyze Trend</button>
+                {% else %}
+                    <p>Please add a target role to your profile first.</p>
+                {% endif %}
+            </form>
+
+            <hr>
+
+            {% if emp_data %}
+                {% if emp_data.error %}
+                    <div style="color: red; padding: 10px; background: #fee;">
+                        Error: {{ emp_data.error }}
+                    </div>
+                {% elif target_year and isco_id %}
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                        <h4>🇪🇺 CEDEFOP Forecast (Italy)</h4>
+                        <p>
+                            <strong>ISCO Code:</strong> {{ isco_id }} <br>
+                            <strong>Year:</strong> {{ target_year }}
+                        </p>
+                        <p style="font-size: 1.5em; color: #0d47a1;">
+                            <strong>Employees:</strong> {{ emp_data[target_year] }}
+                        </p>
+                        <small>Source: CEDEFOP Skills Forecast</small>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
