@@ -1,35 +1,234 @@
-.project-header { background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 25px; border-bottom: 3px solid #007bff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-.grid-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 30px; }
-.card { background: white; border: 1px solid #e0e0e0; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+/* =========================================
+   1. Layout & Typography Generali
+   ========================================= */
 
-/* Target roles */
-.role-badge { 
-    background: #e3f2fd; 
-    color: #1565c0; 
-    padding: 8px 12px; 
-    border-radius: 6px; 
-    margin-bottom: 8px; 
-    display: flex; 
+/* Link "Back to Dashboard" */
+.back-link {
+    text-decoration: none;
+    color: #007bff; /* O il colore primario del tuo tema */
+    display: inline-block;
+    margin-bottom: 15px;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Header del progetto */
+.project-description {
+    color: #666;
+    font-size: 1.1em;
+    margin-top: 5px;
+}
+
+/* Divisori orizzontali */
+.separator-hr {
+    margin: 20px 0;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+/* =========================================
+   2. Sezione Target Roles
+   ========================================= */
+
+.target-roles-container {
+    margin: 20px 0;
+}
+
+.esco-id-text {
+    font-size: 0.8em;
+    color: #555;
+}
+
+/* Box giallo di avviso (nessun ruolo) */
+.warning-no-roles {
+    background: #fff3cd;
+    color: #856404;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 15px 0;
+    border: 1px solid #ffeeba;
+}
+
+/* Risultati di ricerca */
+.search-results-container {
+    margin-top: 15px;
+}
+
+/* Bottone "+ Add" verde */
+.btn-add-role {
+    cursor: pointer;
+    color: #28a745;
+    border: 1px solid #28a745;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-add-role:hover {
+    background: #28a745;
+    color: white;
+}
+
+/* =========================================
+   3. Sezione Team
+   ========================================= */
+
+.member-details-text {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.analysis-section {
+    margin-top: 40px;
+}
+
+/* =========================================
+   4. Sezione Skill Gap Analysis (Card e Colori)
+   ========================================= */
+
+.analysis-title {
+    margin-bottom: 20px;
+}
+
+/* --- Card Base --- */
+.gap-card {
+    background: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border-left: 4px solid #ccc; /* Fallback */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Header della card */
+.gap-header {
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    border-left: 4px solid #1565c0;
+    margin-bottom: 10px;
 }
 
-/* Search Box */
-.search-box { display: flex; gap: 10px; margin-top: 15px; }
-.search-box input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-
-/* Search Results */
-.result-item {
-    background: #fafafa; 
-    border: 1px solid #eee; 
-    padding: 10px; 
-    margin-top: 5px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
+.gap-header h4 {
+    margin: 0;
+    font-size: 1.1em;
 }
 
-/* Team List */
-.team-list li { padding: 10px 0; border-bottom: 1px solid #eee; }
-.team-list li:last-child { border-bottom: none; }
+.gap-score {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* Progress Bar */
+.gap-progress-track {
+    background: #e9ecef;
+    height: 8px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.gap-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease-in-out;
+    width: calc(var(--score, 0) * 1%);
+}
+
+/* Liste Skills */
+.missing-skills-label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9em;
+    color: #dc3545;
+}
+
+.missing-skills-list {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.full-coverage-text {
+    color: #28a745;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* --- Form e Bottoni Aggiornamento --- */
+.analysis-update-form {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-text-update {
+    background: none;
+    border: none;
+    color: #666;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.btn-text-update:hover {
+    color: #333;
+}
+
+/* --- Varianti Colore (High/Medium/Low) --- */
+.status-high { border-left-color: #28a745; }
+.status-high .gap-score { color: #28a745; }
+.status-high .gap-progress-fill { background-color: #28a745; }
+
+.status-medium { border-left-color: #fd7e14; }
+.status-medium .gap-score { color: #fd7e14; }
+.status-medium .gap-progress-fill { background-color: #fd7e14; }
+
+.status-low { border-left-color: #dc3545; }
+.status-low .gap-score { color: #dc3545; }
+.status-low .gap-progress-fill { background-color: #dc3545; }
+
+/* =========================================
+   5. Stato Iniziale (Analysis Ready)
+   ========================================= */
+
+.analysis-action-container {
+    text-align: center;
+}
+
+.analysis-intro-text {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Bottone Grande "Calculate" */
+.btn-calculate-gap {
+    width: 100%;
+    padding: 15px;
+    background-color: #2e7d32;
+    color: white; /* Assicura contrasto */
+    font-size: 1.1em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-calculate-gap:hover {
+    background-color: #1b5e20;
+}
+
+/* Stato Disabilitato */
+.no-analysis-text {
+    color: #999;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.btn-calculate-gap.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #2e7d32; /* Mantiene il colore base ma sbiadito dall'opacity */
+}

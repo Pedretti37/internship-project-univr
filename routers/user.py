@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
-from typing import List, Optional
+from typing import Optional
 from crud import crud_user
 from dependencies import get_current_user
 
@@ -29,7 +29,7 @@ async def user_login(request: Request):
 
 ### --- User POST Login --- ###
 @router.post("/user_login", response_class=HTMLResponse)
-async def user_login(request: Request, username: str = Form(...), password: str = Form(...)):
+async def user_login(username: str = Form(...), password: str = Form(...)):
     user = crud_user.get_user_by_username(username)
 
     if not user or not pwd_context.verify(password, user.hashed_password):

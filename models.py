@@ -41,4 +41,5 @@ class Project(BaseModel):
     description: str
     assigned_members_ids: List[str] = []
     target_roles: List[Dict[str, Any]] = []
+    skill_gap: List[Dict[str, Any]] = []
     created_at: str = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d"))

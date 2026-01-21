@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
-from crud import crud_project, crud_user
+from crud import crud_project, crud_skill_models, crud_user
 from dependencies import get_current_org
 from esco import escoAPI 
 
@@ -11,7 +11,7 @@ from models import Organization, Project
 
 router = APIRouter()
 
-### --- Organization Login --- ###
+### --- Organization Login GET --- ###
 @router.get("/org_login", response_class=HTMLResponse)
 async def org_login(request: Request):
     error_message = request.cookies.get("flash_error")
@@ -24,8 +24,9 @@ async def org_login(request: Request):
     
     return response
 
+### --- Organization Login POST --- ###
 @router.post("/org_login", response_class=HTMLResponse)
-async def org_login(request: Request, orgname: str = Form(...), password: str = Form(...)):
+async def org_login(orgname: str = Form(...), password: str = Form(...)):
     org = crud_org.get_org_by_orgname(orgname)
 
     if not org or not pwd_context.verify(password, org.hashed_password):
@@ -71,11 +72,12 @@ async def org_home(request: Request, org = Depends(get_current_org)):
 
     return response
 
-### --- Organization Registration --- ###
+### --- Organization Registration GET --- ###
 @router.get("/org_register", response_class=HTMLResponse)
 async def org_register(request: Request):
     return templates.TemplateResponse("org/org_register.html", {"request": request})
 
+### --- Organization Registration POST --- ###
 @router.post("/org_register", response_class=HTMLResponse)
 async def register_org(
     request: Request, 
@@ -224,7 +226,7 @@ async def create_project_submit(
 
     return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
-### --- PROJECT DASHBOARD GET --- ###
+### --- View Project GET --- ###
 @router.get("/org/project/{project_id}", response_class=HTMLResponse)
 async def view_project(
     request: Request, 
@@ -250,8 +252,7 @@ async def view_project(
         "search_results": None 
     })
 
-
-### --- PROJECT: SEARCH ROLE POST --- ###
+### --- Project Search Role --- ###
 @router.post("/org/project/{project_id}/search", response_class=HTMLResponse)
 async def project_search_role(
     request: Request, 
@@ -276,8 +277,7 @@ async def project_search_role(
         "last_search": search
     })
 
-
-### --- PROJECT: ADD ROLE POST --- ###
+### --- Project Add Role POST --- ###
 @router.post("/org/project/add_role", response_class=RedirectResponse)
 async def project_add_role(
     project_id: str = Form(...),
@@ -295,4 +295,23 @@ async def project_add_role(
             crud_project.add_target_role(project, role_data.model_dump())
 
     # Refresh project detail page
+    return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- Project Calculate Skill Gap POST --- ###
+@router.post("/org/project/calculate_gap", response_class=RedirectResponse)
+async def project_calculate_skill_gap(
+    project_id: str = Form(...),
+    org = Depends(get_current_org)
+):
+    if not org: return RedirectResponse(url="/", status_code=303)
+
+    project = crud_project.get_project(project_id)
+    
+    if project and project.org_id == org.id:
+        assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
+        
+        updated_project = crud_skill_models.skill_gap_project(project, assigned_members)
+        
+        crud_project.update_project(updated_project)
+
     return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)

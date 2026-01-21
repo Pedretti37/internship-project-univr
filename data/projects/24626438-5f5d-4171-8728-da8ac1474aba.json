@@ -16,6 +16,78 @@
             "task": null,
             "id_full": "2152.1.9",
             "uri": "http://data.europa.eu/esco/occupation/24161923-e3e6-4096-b377-f1ee8a7ea31b"
+        },
+        {
+            "id": "2512",
+            "title": "software developer",
+            "description": "Software developers implement or program all kinds of software systems based on specifications and designs by using programming languages, tools, and platforms.",
+            "essential_skills": "Use software design patterns\nCreate flowchart diagram\nProvide technical documentation\nUtilise computer-aided software engineering tools\nEngineering processes\nPerform scientific research\nManage engineering project\nIdentify customer requirements\nUse software libraries\nUse technical drawing software\nProject management\nTools for software configuration management\nAnalyse software specifications\nComputer programming\nIntegrated development environment software\nEngineering principles\nIct debugging tools\nDebug software\nTechnical drawings\nDevelop software prototype\nDefine technical requirements\nInterpret technical requirements\nDevelop automated migration methods",
+            "optional_skills": "Ml (computer programming)\nDevelop creative ideas\nSap r3\nMicrosoft visual c++\nSmalltalk (computer programming)\nUse automatic programming\nObject-oriented modelling\nApl\nC#\nSwift (computer programming)\nAssembly (computer programming)\nR\nIntegrate system components\nAdapt to changes in technological development plans\nCommon lisp\nStaf\nApache maven\nVbscript\nScratch (computer programming)\nUse concurrent programming\nAjax\nScala\nPuppet (tools for software configuration management)\nMatlab\nLisp\nPascal (computer programming)\nCollect customer feedback on applications\nJavascript\nOpenedge advanced business language\nSas language\nJava (computer programming)\nUse functional programming\nVisual studio .net\nObjective-c\nTypescript\nCoffeescript\nUse logic programming\nC++\nHaskell\nDesign user interface",
+            "id_full": "2512.3",
+            "uri": "http://data.europa.eu/esco/occupation/f2b15a0e-e65a-438a-affb-29b9d50b77d1"
+        }
+    ],
+    "skill_gap": [
+        {
+            "role_id": "2152",
+            "role_title": "satellite engineer",
+            "match_score": 26,
+            "total_required": 19,
+            "matching_skills": [
+                "engineering processes",
+                "use technical drawing software",
+                "technical drawings",
+                "perform scientific research",
+                "engineering principles"
+            ],
+            "missing_skills": [
+                "quality standards",
+                "types of satellites",
+                "adjust engineering designs",
+                "geostationary satellites",
+                "troubleshoot",
+                "monitor satellites",
+                "aerospace engineering",
+                "unmanned air systems",
+                "production processes",
+                "launching of satellites into orbit",
+                "global navigation satellite system performance parameters",
+                "approve engineering design",
+                "manufacturing processes",
+                "industrial engineering"
+            ]
+        },
+        {
+            "role_id": "2512",
+            "role_title": "software developer",
+            "match_score": 100,
+            "total_required": 23,
+            "matching_skills": [
+                "Use software design patterns",
+                "Create flowchart diagram",
+                "Provide technical documentation",
+                "Utilise computer-aided software engineering tools",
+                "Engineering processes",
+                "Perform scientific research",
+                "Manage engineering project",
+                "Identify customer requirements",
+                "Use software libraries",
+                "Use technical drawing software",
+                "Project management",
+                "Tools for software configuration management",
+                "Analyse software specifications",
+                "Computer programming",
+                "Integrated development environment software",
+                "Engineering principles",
+                "Ict debugging tools",
+                "Debug software",
+                "Technical drawings",
+                "Develop software prototype",
+                "Define technical requirements",
+                "Interpret technical requirements",
+                "Develop automated migration methods"
+            ],
+            "missing_skills": []
         }
     ],
     "created_at": "2026-01-14"
