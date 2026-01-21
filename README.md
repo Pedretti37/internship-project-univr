@@ -11,7 +11,7 @@ The application is currently in the **development phase**.
 - **Profile Management:** Users can update personal info and change passwords.
 - **Skill Modeling:** Users can build their profile by importing standardized skills from the **ESCO API**.
 - **Target Roles:** Users can define up to 5 target roles to track their career path.
-- **Skill Gap Evaluation:** *(Coming soon)*
+- **Skill Gap Evaluation:** Users can evaluate the skill gap between their current skill set and target roles.
 
 ### Organization Module
 - **Organization Registration:** Companies can sign up and create a business profile.
@@ -50,9 +50,9 @@ The application is currently in the **development phase**.
 ├── crud/               # JSON I/O operations (Database layer)
 ├── data/               # JSON Storage (Users, Orgs, Projects)
 ├── esco/               # ESCO API integration logic
-├── llm/                # AI integration (Temp. Gemini API -> Future CEDEFOP DB)
+├── cedefop/            # CEDEFOP database
 ├── models.py           # Pydantic data models
-├── routes/             # API Endpoints (User, Org, etc.)
+├── routers/            # Endpoints (User, Org, etc.)
 │
 ├── static/             # CSS and static assets
 └── templates/          # HTML Jinja2 templates
@@ -60,12 +60,7 @@ The application is currently in the **development phase**.
 
 ## How to Run
 1.  **Clone the repository.**
-2.  **Configure Gemini API**  
-    To enable AI features, you need a valid Google API Key.
-    * Get your free API Key here: [Google AI Studio](https://aistudio.google.com/app/apikey)
-    * Open `llm/gemini.py`.
-    * Find the line `API_KEY = "CURRENT_KEY"` and replace `"CURRENT_KEY"` with your actual API key.
-3.  **Create & Activate venv (optional):**
+2.  **Create & Activate venv (optional):**
     ```bash
     python -m venv venv
     ```
@@ -77,12 +72,12 @@ The application is currently in the **development phase**.
     # Attiva env (Mac/Linux)
     source venv/bin/activate
     ```
-4.  **Install requirements:**
+3.  **Install requirements:**
     ```bash
     pip install -r requirements.txt
     ```
-5.  **Start the server:**
+4.  **Start the server:**
     ```bash
     uvicorn main:app --reload
     ```
-6.  Open browser at `http://127.0.0.1:8000`
+5.  Open browser at `http://127.0.0.1:8000`
