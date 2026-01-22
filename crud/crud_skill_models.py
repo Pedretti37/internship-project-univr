@@ -96,7 +96,7 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
     isco_clean = isco_id.strip()
     file_path = ""
 
-    # --- 1. Selezione File e Indici ---
+    # File and column selection based on ISCO code length
     if len(isco_clean) == 1:
         file_path = EMP_OCCUPATION
         target_isco = isco_clean
@@ -104,7 +104,7 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
         col_idx_data_start = 3
     else:
         file_path = EMP_OCCUPATION_DETAIL
-        target_isco = isco_clean[:2] # Prime due cifre
+        target_isco = isco_clean[:2]
         col_idx_isco = 2  
         col_idx_data_start = 4
 
@@ -112,7 +112,6 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
         return {"error": f"File not found: {file_path}"}
 
     try:
-        # Leggiamo il secondo foglio (sheet_name=1)
         df = pd.read_excel(file_path, header=0, sheet_name=1)
 
         if len(df.columns) <= col_idx_data_start:
@@ -121,7 +120,6 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
                          f"but we tried to read data starting at index {col_idx_data_start}."
             }
 
-        # --- 2. Filtro Riga ---
         col_country = df.columns[0]         
         col_isco_name = df.columns[col_idx_isco] 
 
@@ -136,10 +134,8 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
         if row.empty:
             return {"error": f"No data found for Country '{country}' and ISCO '{target_isco}' in file {file_path}"}
 
-        # --- 3. Estrazione Serie Storica Completa ---
-        # Prepariamo la struttura per Chart.js
         results = {
-            "history": [], # Lista di dizionari: [{"year": "2010", "value": 1500}, ...]
+            "history": [], # List of Dicts: [{"year": "2010", "value": 1500}, ...]
             "trend": "Stable",
             "growth_pct": 0
         }
@@ -159,7 +155,6 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
             if pd.notna(val):
                 val_int = int(val)
                 
-                # MODIFICA QUI: Aggiungiamo un dizionario alla lista history
                 results["history"].append({
                     "year": str(current_year),
                     "value": val_int
@@ -173,7 +168,7 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
             current_col_idx += 1
             current_year += 1
             
-        # --- 4. Calcolo Trend (Invariato) ---
+        # Trend calculation
         if val_now and val_end and val_now > 0:
             pct_change = ((val_end - val_now) / val_now) * 100
             results["growth_pct"] = round(pct_change, 2)

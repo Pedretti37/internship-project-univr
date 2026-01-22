@@ -2,7 +2,7 @@ from datetime import datetime
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
-from typing import Optional
+from typing import List, Optional
 from crud import crud_user
 from dependencies import get_current_user
 
@@ -124,11 +124,7 @@ async def user_profile(request: Request, user = Depends(get_current_user)):
         "user/user_profile.html", {
             "request": request, 
             "user": user, 
-            "countries_list": EU_COUNTRIES, 
-            "emp_data": None,    
-            "country": None,     
-            "isco_id": None,
-            "current_year": datetime.now().year
+            "countries_list": EU_COUNTRIES
         }
     )
 
@@ -262,7 +258,13 @@ async def add_to_user_skills(
 
 ### --- Password Change --- ###
 @router.post("/change_password_user", response_class=HTMLResponse)
-async def change_password(request: Request, user = Depends(get_current_user), old_pw: str = Form(...), new_pw: str = Form(...)):
+async def change_password(
+    request: Request, 
+    user = Depends(get_current_user), 
+    old_pw: str = Form(...), 
+    new_pw: str = Form(...)
+):
+
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
@@ -271,7 +273,8 @@ async def change_password(request: Request, user = Depends(get_current_user), ol
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
             "user": user,
-            "wrong_pw": error
+            "wrong_pw": error,
+            "countries_list": EU_COUNTRIES
         })
     
     new_pw_hashed = pwd_context.hash(new_pw)
@@ -283,14 +286,16 @@ async def change_password(request: Request, user = Depends(get_current_user), ol
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
             "user": user,
-            "success": msg
+            "success": msg,
+            "countries_list": EU_COUNTRIES
         })
     else:
         failed = "Failed to update your password."
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
             "user": user,
-            "failed": failed
+            "failed": failed,
+            "countries_list": EU_COUNTRIES,
         })
     
 ### --- Details for a selected Skill Model --- ###
@@ -347,7 +352,11 @@ async def delete_target_role(
 
 ### --- Calculating Skill Gap --- ###
 @router.post("/calculate_skill_gap", response_class=HTMLResponse)
-async def calculate_skill_gap(request: Request, user = Depends(get_current_user)):
+async def calculate_skill_gap(
+    request: Request, 
+    user = Depends(get_current_user)
+):
+
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -356,7 +365,8 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
             "user": user,
-            "error": error
+            "error": error,
+            "countries_list": EU_COUNTRIES
         })
 
     updated_user = crud_skill_models.skill_gap_user(user)
@@ -365,30 +375,49 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
         "user": updated_user,
-        "countries_list": EU_COUNTRIES, 
-        "emp_data": None,
-        "country": None
+        "countries_list": EU_COUNTRIES
     })
 
-### --- Read CEDEFOP Employment Data --- ###
 @router.post("/read_emp_occupation", response_class=HTMLResponse)
 async def read_emp_occupation(
     request: Request,
     user = Depends(get_current_user),
     country: str = Form(...),
-    isco_id: str = Form(...),
+    isco_id_list: List[str] = Form(...) 
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    emp_data = crud_skill_models.read_emp_occupation(country=country, isco_id=isco_id)
+    forecast_results = []
+
+    for role in user.target_roles:
+        if isinstance(role, dict):
+            r_id = role.get("id")
+            r_title = role.get("title")
+        else:
+            r_id = role.id
+            r_title = role.title
+
+        role_id_str = str(r_id).strip()
+        
+        # Role matches one of the ISCO IDs provided
+        if role_id_str in isco_id_list:
+            
+            # CEDEFOP
+            data = crud_skill_models.read_emp_occupation(country=country, isco_id=role_id_str)
+            
+            forecast_results.append({
+                "title": r_title,  
+                "isco_code": role_id_str, 
+                "data": data              
+            })
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
         "user": user,
-        "emp_data": emp_data,
+        "forecast_results": forecast_results, 
         "country": country,
         "countries_list": EU_COUNTRIES,
-        "isco_id": isco_id,
+        "isco_id_list": isco_id_list,
         "current_year": datetime.now().year
     })
