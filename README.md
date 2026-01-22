@@ -49,9 +49,8 @@ The application is currently in the **development phase**.
 ├── requirements.txt    # Python dependencies
 │
 ├── crud/               # JSON I/O operations (Database layer)
-├── data/               # JSON Storage (Users, Orgs, Projects)
+├── data/               # JSON Storage (Users, Orgs, Projects) and CEDEFOP database
 ├── esco/               # ESCO API integration logic
-├── cedefop/            # CEDEFOP database
 ├── models.py           # Pydantic data models
 ├── routers/            # Endpoints (User, Org, etc.)
 │
