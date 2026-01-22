@@ -11,6 +11,7 @@ The application is currently in the **development phase**.
 - **Profile Management:** Users can update personal info and change passwords.
 - **Skill Modeling:** Users can build their profile by importing standardized skills from the **ESCO API**.
 - **Target Roles:** Users can define up to 5 target roles to track their career path.
+- **Skill Forecast by CEDEFOP:** Users can now see whether their target roles are growing/declining occupation-wise per country.
 - **Skill Gap Evaluation:** Users can evaluate the skill gap between their current skill set and target roles.
 
 ### Organization Module
