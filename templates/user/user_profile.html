@@ -176,35 +176,86 @@
                 {% if user.target_roles %}
                     <input type="hidden" name="isco_id" value="{{ user.target_roles[0].id }}">
                     
-                    <label>Target Year:</label>
-                    <input type="number" name="target_year" placeholder="2025" min="2010" max="2035" required value="{{ target_year }}">
-                    
+                    <div style="margin-bottom: 10px;">
+                        <label>Select a Country:</label>
+                        <select name="country" id="country" required>
+                            <option value="" disabled {% if not country %}selected{% endif %}>Select a country</option>
+                            {% for c in countries_list %}
+                                <option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <button type="submit" class="btn-primary">Analyze Trend</button>
-                {% else %}
-                    <p>Please add a target role to your profile first.</p>
                 {% endif %}
             </form>
 
             <hr>
 
-            {% if emp_data %}
-                {% if emp_data.error %}
-                    <div style="color: red; padding: 10px; background: #fee;">
-                        Error: {{ emp_data.error }}
+            {% if emp_data and not emp_data.error %}
+                <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-top: 20px;">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <h4 style="margin: 0;">🇪🇺 Forecast: {{ country }}</h4>
+                            <small style="color: #666;">ISCO Code: {{ isco_id }}</small>
+                        </div>
+                        
+                        <div style="text-align: right;">
+                            <span>
+                                {{ emp_data.trend }} ({{ emp_data.growth_pct }}%)
+                            </span>
+                            <br><small>Overall Change ({{ current_year }}-2035)</small>
+                        </div>
                     </div>
-                {% elif target_year and isco_id %}
-                    <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin-top: 15px;">
-                        <h4>🇪🇺 CEDEFOP Forecast (Italy)</h4>
-                        <p>
-                            <strong>ISCO Code:</strong> {{ isco_id }} <br>
-                            <strong>Year:</strong> {{ target_year }}
-                        </p>
-                        <p style="font-size: 1.5em; color: #0d47a1;">
-                            <strong>Employees:</strong> {{ emp_data[target_year] }}
-                        </p>
-                        <small>Source: CEDEFOP Skills Forecast</small>
+
+                    <div style="max-height: 400px; overflow-y: auto; border: 1px solid #eee;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead style="background-color: #f8f9fa; position: sticky; top: 0;">
+                                <tr>
+                                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">Year</th>
+                                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">Employees</th>
+                                    <th style="padding: 12px; border-bottom: 2px solid #dee2e6;">Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in emp_data.history %}
+                                    <tr style="border-bottom: 1px solid #eee;">
+                                        <td style="padding: 10px;">
+                                            <strong>{{ row.year }}</strong>
+                                            {% if row.year == "2035" %} <span style="font-size: 0.8em; background: #e3f2fd; padding: 2px 5px; border-radius: 4px;">Future</span> {% endif %}
+                                        </td>
+                                        <td style="padding: 10px; font-family: monospace; font-size: 1.1em;">
+                                            {{ row.value }}
+                                        </td>
+                                        <td style="padding: 10px;">
+                                            {% if loop.index0 > 0 %}
+                                                {% set prev = emp_data.history[loop.index0 - 1].value %}
+                                                {% if row.value > prev %}
+                                                    <span style="color: green;">↗</span>
+                                                {% elif row.value < prev %}
+                                                    <span style="color: red;">↘</span>
+                                                {% else %}
+                                                    <span style="color: gray;">=</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span style="color: gray;">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                {% endif %}
+                    
+                    <p style="margin-top: 10px; font-size: 0.8em; color: #888; text-align: center;">
+                        Source: CEDEFOP Skills Forecast
+                    </p>
+
+                </div>
+            {% elif emp_data.error %}
+                <div class="alert alert-danger" style="margin-top: 20px;">
+                    Error: {{ emp_data.error }}
+                </div>
             {% endif %}
         </div>
     </div>

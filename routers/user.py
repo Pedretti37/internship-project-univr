@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
@@ -11,6 +12,15 @@ from esco import escoAPI
 from models import Role, User
 
 USER_ROLES_LIST = {}
+
+EU_COUNTRIES = [
+    "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", 
+    "Denmark", "EU-27", "Estonia", "Finland", "France", "Germany", "Greece", 
+    "Hungary", "Iceland", "Ireland", "Italy", "Latvia", "Lithuania", 
+    "Luxembourg", "Malta", "Netherlands", "Norway", "Poland", "Portugal", 
+    "Republic of North Macedonia", "Romania", "Slovakia", "Slovenia", 
+    "Spain", "Sweden", "Switzerland", "Turkey"
+]
 
 router = APIRouter()
 
@@ -111,8 +121,15 @@ async def user_profile(request: Request, user = Depends(get_current_user)):
         return response
 
     response = templates.TemplateResponse(
-        "user/user_profile.html", 
-        {"request": request, "user": user}
+        "user/user_profile.html", {
+            "request": request, 
+            "user": user, 
+            "countries_list": EU_COUNTRIES, 
+            "emp_data": None,    
+            "country": None,     
+            "isco_id": None,
+            "current_year": datetime.now().year
+        }
     )
 
     # No cache storage
@@ -348,6 +365,9 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
         "user": updated_user,
+        "countries_list": EU_COUNTRIES, 
+        "emp_data": None,
+        "country": None
     })
 
 ### --- Read CEDEFOP Employment Data --- ###
@@ -355,18 +375,20 @@ async def calculate_skill_gap(request: Request, user = Depends(get_current_user)
 async def read_emp_occupation(
     request: Request,
     user = Depends(get_current_user),
+    country: str = Form(...),
     isco_id: str = Form(...),
-    target_year: int = Form(...)
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    emp_data = crud_skill_models.read_emp_occupation(country="Italy", isco_id=isco_id, target_year=target_year)
+    emp_data = crud_skill_models.read_emp_occupation(country=country, isco_id=isco_id)
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
         "user": user,
         "emp_data": emp_data,
+        "country": country,
+        "countries_list": EU_COUNTRIES,
         "isco_id": isco_id,
-        "target_year": str(target_year)
+        "current_year": datetime.now().year
     })

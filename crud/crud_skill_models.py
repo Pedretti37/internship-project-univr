@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from typing import List
 from models import Project, User
+from datetime import datetime
 
 EMP_OCCUPATION = "data/cedefop/employees/Employment_occupation.xlsx"
 EMP_OCCUPATION_DETAIL = "data/cedefop/employees/Employment_occupation_detail.xlsx"
@@ -90,22 +91,20 @@ def skill_gap_project(project: Project, members: List[User]) -> Project:
 
     return project
 
-def read_emp_occupation(country: str, isco_id: str, target_year: int) -> dict:
+def read_emp_occupation(country: str, isco_id: str) -> dict:
     
     isco_clean = isco_id.strip()
     file_path = ""
 
+    # --- 1. Selezione File e Indici ---
     if len(isco_clean) == 1:
         file_path = EMP_OCCUPATION
         target_isco = isco_clean
-        
         col_idx_isco = 2  
         col_idx_data_start = 3
-        
     else:
         file_path = EMP_OCCUPATION_DETAIL
-        target_isco = isco_clean[:2] # First two characters
-        
+        target_isco = isco_clean[:2] # Prime due cifre
         col_idx_isco = 2  
         col_idx_data_start = 4
 
@@ -113,6 +112,7 @@ def read_emp_occupation(country: str, isco_id: str, target_year: int) -> dict:
         return {"error": f"File not found: {file_path}"}
 
     try:
+        # Leggiamo il secondo foglio (sheet_name=1)
         df = pd.read_excel(file_path, header=0, sheet_name=1)
 
         if len(df.columns) <= col_idx_data_start:
@@ -121,6 +121,7 @@ def read_emp_occupation(country: str, isco_id: str, target_year: int) -> dict:
                          f"but we tried to read data starting at index {col_idx_data_start}."
             }
 
+        # --- 2. Filtro Riga ---
         col_country = df.columns[0]         
         col_isco_name = df.columns[col_idx_isco] 
 
@@ -135,22 +136,54 @@ def read_emp_occupation(country: str, isco_id: str, target_year: int) -> dict:
         if row.empty:
             return {"error": f"No data found for Country '{country}' and ISCO '{target_isco}' in file {file_path}"}
 
-        results = {}
+        # --- 3. Estrazione Serie Storica Completa ---
+        # Prepariamo la struttura per Chart.js
+        results = {
+            "history": [], # Lista di dizionari: [{"year": "2010", "value": 1500}, ...]
+            "trend": "Stable",
+            "growth_pct": 0
+        }
+
+        this_year = datetime.now().year
+        
         start_year_file = 2010
-        
-        target_offset = target_year - start_year_file
-        
-        for i in range(target_offset + 1):
-            year = start_year_file + i
-            col_idx = col_idx_data_start + i
+        current_col_idx = col_idx_data_start
+        current_year = start_year_file
+
+        val_now = None
+        val_end = None
+
+        while current_col_idx < len(df.columns):
+            val = row.iloc[0, current_col_idx]
             
-            if col_idx < len(df.columns):
-                val = row.iloc[0, col_idx]
+            if pd.notna(val):
+                val_int = int(val)
                 
-                if pd.notna(val):
-                    results[str(year)] = int(val)
-                else:
-                    results[str(year)] = 0
+                # MODIFICA QUI: Aggiungiamo un dizionario alla lista history
+                results["history"].append({
+                    "year": str(current_year),
+                    "value": val_int
+                })
+
+                if current_year == this_year:
+                    val_now = val_int
+                
+                val_end = val_int
+
+            current_col_idx += 1
+            current_year += 1
+            
+        # --- 4. Calcolo Trend (Invariato) ---
+        if val_now and val_end and val_now > 0:
+            pct_change = ((val_end - val_now) / val_now) * 100
+            results["growth_pct"] = round(pct_change, 2)
+            
+            if pct_change > 5:
+                results["trend"] = "Growing"
+            elif pct_change < -5:
+                results["trend"] = "Declining"
+            else:
+                results["trend"] = "Stable"
             
         return results
 
