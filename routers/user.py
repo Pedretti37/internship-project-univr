@@ -141,7 +141,8 @@ async def user_profile(request: Request, user = Depends(get_current_user)):
 async def role_list(request: Request, search: str = Form(...), user = Depends(get_current_user)):
     role = search.title().strip()
 
-    role_list = escoAPI.get_esco_occupations_list(role, limit=5)
+    language = "en"
+    role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
     
     if user:
         USER_ROLES_LIST[user.id] = {
@@ -350,13 +351,14 @@ async def delete_target_role(
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
 
-### --- Calculating Skill Gap --- ###
-@router.post("/calculate_skill_gap", response_class=HTMLResponse)
-async def calculate_skill_gap(
-    request: Request, 
-    user = Depends(get_current_user)
+### --- Occupation Forecast and Gap --- ###
+@router.post("/occupation_forecast_and_gap", response_class=HTMLResponse)
+async def occupation_forecast_and_gap(
+    request: Request,
+    user = Depends(get_current_user),
+    country: str = Form(...),
+    isco_id_list: List[str] = Form(...) 
 ):
-
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -368,25 +370,6 @@ async def calculate_skill_gap(
             "error": error,
             "countries_list": EU_COUNTRIES
         })
-
-    updated_user = crud_skill_models.skill_gap_user(user)
-    crud_user.update_user(updated_user)
-
-    return templates.TemplateResponse("user/user_profile.html", {
-        "request": request,
-        "user": updated_user,
-        "countries_list": EU_COUNTRIES
-    })
-
-@router.post("/read_emp_occupation", response_class=HTMLResponse)
-async def read_emp_occupation(
-    request: Request,
-    user = Depends(get_current_user),
-    country: str = Form(...),
-    isco_id_list: List[str] = Form(...) 
-):
-    if not user:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     forecast_results = []
 
@@ -411,6 +394,10 @@ async def read_emp_occupation(
                 "isco_code": role_id_str, 
                 "data": data              
             })
+
+    # Skill gap update
+    updated_user = crud_skill_models.skill_gap_user(user)
+    crud_user.update_user(updated_user)
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,

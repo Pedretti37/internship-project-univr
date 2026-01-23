@@ -7,15 +7,6 @@
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$Zsz5vxdCiFGq9R6jdI6xtg$TZODA/m+kbhsOkOrY5wWkAue7DDsBfBuqoo5xyLn2lo",
     "target_roles": [
         {
-            "id": "8341",
-            "title": "land-based machinery operator",
-            "description": "Land-based machinery operators operate specialised equipment and machinery for agricultural production and maintenance of landscape.",
-            "essential_skills": "Road traffic laws\r\nMechanical tools\r\nUnderstand instructions\r\nOperate agricultural machinery\r\nIdentify plants characteristics\r\nWork in a land-based team\r\nSpread fertiliser\r\nPlant disease control\r\nPesticides\r\nTow a tractor implement using the power take-off\r\nHandle chemical products for soil and plants\r\nImplement instructions\r\nHarvest crop\r\nHerbicides\r\nHarvest cover crops",
-            "optional_skills": "Prepare equipment for harvest\r\nFertiliser products\r\nCreate solutions to problems\r\nOperate gps systems\r\nMaintain mechanical equipment\r\nApply precision farming\r\nMake independent operating decisions\r\nIrrigate soil\r\nOperate landscaping equipment\r\nFertilisation principles\r\nAddress problems critically\r\nLoad equipment\r\nUse different communication channels\r\nPerform loading and unloading operations\r\nAgronomy\r\nVariety of botanicals\r\nCommunicate with customers\r\nUse a computer\r\nUnload equipment\r\nEnvironmental policy",
-            "id_full": "8341.2",
-            "uri": "http://data.europa.eu/esco/occupation/1b8c75a9-407b-4554-a7d6-df391672c6b1"
-        },
-        {
             "id": "2512",
             "title": "software developer",
             "description": "Software developers implement or program all kinds of software systems based on specifications and designs by using programming languages, tools, and platforms.",
@@ -51,30 +42,6 @@
         "Integrated development environment software"
     ],
     "skill_gap": [
-        {
-            "role_id": "8341",
-            "role_title": "land-based machinery operator",
-            "match_score": 0,
-            "total_required": 15,
-            "matching_skills": [],
-            "missing_skills": [
-                "Road traffic laws",
-                "Mechanical tools",
-                "Understand instructions",
-                "Operate agricultural machinery",
-                "Identify plants characteristics",
-                "Work in a land-based team",
-                "Spread fertiliser",
-                "Plant disease control",
-                "Pesticides",
-                "Tow a tractor implement using the power take-off",
-                "Handle chemical products for soil and plants",
-                "Implement instructions",
-                "Harvest crop",
-                "Herbicides",
-                "Harvest cover crops"
-            ]
-        },
         {
             "role_id": "2512",
             "role_title": "software developer",

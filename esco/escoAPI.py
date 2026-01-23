@@ -9,13 +9,13 @@ HEADERS = {
 }
 BASE_URL = "https://ec.europa.eu/esco/api"
 
-def get_single_role_details(uri: str) -> Role | None:
+def get_single_role_details(uri: str, language: str) -> Role | None:
     if not uri:
         return None
 
     try:
         # Fetch role details from ESCO API
-        details_params = {'uri': uri, 'language': 'en'}
+        details_params = {'uri': uri, 'language': language}
         details_resp = requests.get(f"{BASE_URL}/resource/occupation", params=details_params, headers=HEADERS)
         
         if details_resp.status_code != 200:
@@ -27,10 +27,12 @@ def get_single_role_details(uri: str) -> Role | None:
         # Title and Description
         title = d_data.get('title', 'Unknown Role')
         desc_obj = d_data.get('description', {}) or d_data.get('definition', {})
+
+        definition = "No description available."
         if isinstance(desc_obj, dict):
-            definition = desc_obj.get('en', {}).get('literal', 'No description available.')
-        else:
-            definition = "No description format recognized."
+            lang_data = desc_obj.get(language) or desc_obj.get('en')
+            if lang_data:
+                definition = lang_data.get('literal', 'No description available.')
 
         # ISCO Code Extraction
         raw_val = d_data.get('code')
@@ -81,8 +83,8 @@ def get_single_role_details(uri: str) -> Role | None:
         print(f"Exception fetching single details for {uri}: {e}")
         return None
 
-def get_esco_occupations_list(keyword, limit=10):
-    search_params = {'text': keyword, 'type': 'occupation', 'language': 'en', 'limit': limit}
+def get_esco_occupations_list(keyword, language, limit=10):
+    search_params = {'text': keyword, 'type': 'occupation', 'language': language, 'limit': limit}
     
     try:
         # print(f"🔍 Searching ESCO for: {keyword}...")
@@ -103,7 +105,7 @@ def get_esco_occupations_list(keyword, limit=10):
         uri = hit['uri']
 
         # Calling the single details function
-        role_data = get_single_role_details(uri)
+        role_data = get_single_role_details(uri, language=language)
         
         if role_data:
             output_list.append(role_data)

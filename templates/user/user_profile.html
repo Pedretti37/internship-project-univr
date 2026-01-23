@@ -117,8 +117,8 @@
         <hr style="width:100%; margin-top: 30px;">
 
         <div class="card">
-            <h3>Check Future Employment Trend</h3>
-            <form action="/read_emp_occupation" method="post">
+            <h3>Check Future Employment Trend & Skill Gap Analysis</h3>
+            <form action="/occupation_forecast_and_gap" method="post">
                 {% if user.target_roles %}
                     {% for role in user.target_roles %}
                         <input type="hidden" name="isco_id_list" value="{{ role.id }}">
@@ -133,7 +133,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <button type="submit" class="btn-primary">Analyze Trend</button>
+                    <button type="submit" class="btn-primary">Analyze</button>
                 {% endif %}
             </form>
 
@@ -231,14 +231,6 @@
 
         <div>
             <h2>Skill gap Assessment</h2>
-
-            <div>
-                <form action="/calculate_skill_gap" method="post">
-                    {% if user.target_roles %}
-                        <button type="submit">Calculate your skill gap</button>
-                    {% endif %}
-                </form>
-            </div>
 
             <div>
                 {% if error %}
