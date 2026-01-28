@@ -17,73 +17,77 @@
             "uri": "http://data.europa.eu/esco/occupation/f2b15a0e-e65a-438a-affb-29b9d50b77d1"
         },
         {
-            "id": "2514",
-            "title": "embedded systems software developer",
-            "description": "Embedded systems software developers program, implement, document and maintain software to be run on an embedded system.",
-            "essential_skills": "Use software libraries\nUse software design patterns\nIct debugging tools\nTools for software configuration management\nDevelop ict device driver\nUtilise computer-aided software engineering tools\nAnalyse software specifications\nInternet of things\nCreate flowchart diagram\nEmbedded systems\nDebug software\nDevelop software prototype\nInterpret technical texts\nComputer programming\nProvide technical documentation\nIntegrated development environment software",
-            "optional_skills": "Eclipse (integrated development environment software)\nR\nAssembly (computer programming)\nAnsible\nProlog (computer programming)\nHaskell\nWorld wide web consortium standards\nPascal (computer programming)\nPhp\nVbscript\nVisual studio .net\nAsp.net\nLisp\nObjective-c\nStaf\nSap r3\nC#\nUse functional programming\nC++\nApl\nCommon lisp\nCobol\nKdevelop\nUse logic programming\nPython (computer programming)\nTypescript\nXcode\nMicrosoft visual c++\nSwift (computer programming)\nSoftware anomalies\nGroovy\nApache maven\nJava (computer programming)\nIct security legislation\nMatlab\nJavascript\nCollect customer feedback on applications\nScala\nAdapt to changes in technological development plans\nPerl",
-            "id_full": "2514.2.1",
-            "uri": "http://data.europa.eu/esco/occupation/57af9090-55b4-4911-b2d0-86db01c00b02"
+            "id": "1330",
+            "title": "software manager",
+            "description": "Software managers oversee the acquisition and development of software systems in order to provide support to all organisational units. They also monitor the results and quality of the different software solutions and projects implemented in the organisation.",
+            "essential_skills": "Data storage\nApply system organisational policies\nSoftware metrics\nManage data\nAnalyse software specifications\nExecute analytical mathematical calculations\nEvaluate cost of software products\nManage business knowledge\nOrganisational policies\nQuality assurance methodologies\nCreate software design\nManage ict project\nEnsure adherence to organisational ict standards\nUnified modelling language\nIct project management\nIct project management methodologies\nSystems development life-cycle\nUse ict ticketing system\nMonitor technology trends\nApply ict system usage policies",
+            "optional_skills": "Lean project management\nUse different communication channels\nUtilise methodologies for user centered design\nMobile operating systems\nAgile project management\nApply conflict management\nProcess-based management\nAnalyse ict technical proposals\nManage schedule of tasks\nManage tender processes\nManage software localisation\nAndroid (mobile operating systems)\nIct system user requirements\nInteract with users to gather requirements\nMonitor ict research\nTrain employees\nCoach employees\nIdentify ict user needs\nGive live presentation\nIos\nProvide user documentation\nBlackberry\nManage staff\nNegotiate buying conditions\nWindows phone",
+            "id_full": "1330.5.1",
+            "uri": "http://data.europa.eu/esco/occupation/f31f487b-4ce2-40f3-90e8-7d0011b4ef1d"
         }
     ],
     "skill_gap": [
         {
             "role_id": "2512",
             "role_title": "software developer",
-            "match_score": 52,
+            "match_score": 100,
             "total_required": 23,
             "matching_skills": [
+                "Identify customer requirements",
                 "Create flowchart diagram",
                 "Use software libraries",
-                "Ict debugging tools",
-                "Analyse software specifications",
-                "Integrated development environment software",
-                "Tools for software configuration management",
-                "Utilise computer-aided software engineering tools",
-                "Debug software",
-                "Develop software prototype",
-                "Use software design patterns",
-                "Computer programming",
-                "Provide technical documentation"
-            ],
-            "missing_skills": [
-                "Identify customer requirements",
                 "Manage engineering project",
                 "Use technical drawing software",
                 "Technical drawings",
+                "Ict debugging tools",
+                "Analyse software specifications",
                 "Engineering processes",
+                "Integrated development environment software",
                 "Project management",
                 "Engineering principles",
-                "Develop automated migration methods",
-                "Define technical requirements",
-                "Perform scientific research",
-                "Interpret technical requirements"
-            ]
-        },
-        {
-            "role_id": "2514",
-            "role_title": "embedded systems software developer",
-            "match_score": 100,
-            "total_required": 16,
-            "matching_skills": [
-                "Use software libraries",
-                "Use software design patterns",
-                "Ict debugging tools",
                 "Tools for software configuration management",
-                "Develop ict device driver",
+                "Develop automated migration methods",
                 "Utilise computer-aided software engineering tools",
-                "Analyse software specifications",
-                "Internet of things",
-                "Create flowchart diagram",
-                "Embedded systems",
                 "Debug software",
+                "Define technical requirements",
                 "Develop software prototype",
-                "Interpret technical texts",
+                "Perform scientific research",
+                "Use software design patterns",
+                "Interpret technical requirements",
                 "Computer programming",
-                "Provide technical documentation",
-                "Integrated development environment software"
+                "Provide technical documentation"
             ],
             "missing_skills": []
+        },
+        {
+            "role_id": "1330",
+            "role_title": "software manager",
+            "match_score": 5,
+            "total_required": 20,
+            "matching_skills": [
+                "Analyse software specifications"
+            ],
+            "missing_skills": [
+                "Data storage",
+                "Apply system organisational policies",
+                "Software metrics",
+                "Manage data",
+                "Execute analytical mathematical calculations",
+                "Evaluate cost of software products",
+                "Manage business knowledge",
+                "Organisational policies",
+                "Quality assurance methodologies",
+                "Create software design",
+                "Manage ict project",
+                "Ensure adherence to organisational ict standards",
+                "Unified modelling language",
+                "Ict project management",
+                "Ict project management methodologies",
+                "Systems development life-cycle",
+                "Use ict ticketing system",
+                "Monitor technology trends",
+                "Apply ict system usage policies"
+            ]
         }
     ],
     "created_at": "2026-01-28"
