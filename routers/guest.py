@@ -15,7 +15,8 @@ async def gust_home(request: Request):
 async def role_list_guest(request: Request, search: str = Form(...)):
     role = search.title().strip()
 
-    role_list = escoAPI.get_esco_occupations_list(role, limit=5)
+    language = "en"
+    role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
 
     return templates.TemplateResponse("guest_home.html", {
         "request": request,

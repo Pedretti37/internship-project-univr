@@ -1,0 +1,90 @@
+{
+    "id": "5f6cd065-289e-46f4-908c-73a5074a7a21",
+    "org_id": "d9eac73e-a6f4-4f6c-b939-209c7972313c",
+    "name": "Internship on Skill forecast @univr",
+    "description": "Web App development on skill forecast",
+    "assigned_members_ids": [
+        "8f609b02-b95d-4907-bc76-4aa71b274152"
+    ],
+    "target_roles": [
+        {
+            "id": "2512",
+            "title": "software developer",
+            "description": "Software developers implement or program all kinds of software systems based on specifications and designs by using programming languages, tools, and platforms.",
+            "essential_skills": "Identify customer requirements\nCreate flowchart diagram\nUse software libraries\nManage engineering project\nUse technical drawing software\nTechnical drawings\nIct debugging tools\nAnalyse software specifications\nEngineering processes\nIntegrated development environment software\nProject management\nEngineering principles\nTools for software configuration management\nDevelop automated migration methods\nUtilise computer-aided software engineering tools\nDebug software\nDefine technical requirements\nDevelop software prototype\nPerform scientific research\nUse software design patterns\nInterpret technical requirements\nComputer programming\nProvide technical documentation",
+            "optional_skills": "Use logic programming\nOpenedge advanced business language\nWorld wide web consortium standards\nScala\nMl (computer programming)\nAbap\nMicrosoft visual c++\nApache maven\nJava (computer programming)\nSoftware anomalies\nObjective-c\nPython (computer programming)\nMatlab\nCollect customer feedback on applications\nTypescript\nApl\nUtilise machine learning\nHaskell\nPerl\nCoffeescript\nC#\nSmalltalk (computer programming)\nSwift (computer programming)\nStaf\nCobol\nGroovy\nPhp\nAdapt to changes in technological development plans\nMigrate existing data\nAsp.net\nProlog (computer programming)\nXcode\nInternet of things\nPuppet (tools for software configuration management)\nKdevelop\nUse concurrent programming\nAssembly (computer programming)\nErlang\nVbscript\nDesign user interface",
+            "id_full": "2512.3",
+            "uri": "http://data.europa.eu/esco/occupation/f2b15a0e-e65a-438a-affb-29b9d50b77d1"
+        },
+        {
+            "id": "2514",
+            "title": "embedded systems software developer",
+            "description": "Embedded systems software developers program, implement, document and maintain software to be run on an embedded system.",
+            "essential_skills": "Use software libraries\nUse software design patterns\nIct debugging tools\nTools for software configuration management\nDevelop ict device driver\nUtilise computer-aided software engineering tools\nAnalyse software specifications\nInternet of things\nCreate flowchart diagram\nEmbedded systems\nDebug software\nDevelop software prototype\nInterpret technical texts\nComputer programming\nProvide technical documentation\nIntegrated development environment software",
+            "optional_skills": "Eclipse (integrated development environment software)\nR\nAssembly (computer programming)\nAnsible\nProlog (computer programming)\nHaskell\nWorld wide web consortium standards\nPascal (computer programming)\nPhp\nVbscript\nVisual studio .net\nAsp.net\nLisp\nObjective-c\nStaf\nSap r3\nC#\nUse functional programming\nC++\nApl\nCommon lisp\nCobol\nKdevelop\nUse logic programming\nPython (computer programming)\nTypescript\nXcode\nMicrosoft visual c++\nSwift (computer programming)\nSoftware anomalies\nGroovy\nApache maven\nJava (computer programming)\nIct security legislation\nMatlab\nJavascript\nCollect customer feedback on applications\nScala\nAdapt to changes in technological development plans\nPerl",
+            "id_full": "2514.2.1",
+            "uri": "http://data.europa.eu/esco/occupation/57af9090-55b4-4911-b2d0-86db01c00b02"
+        }
+    ],
+    "skill_gap": [
+        {
+            "role_id": "2512",
+            "role_title": "software developer",
+            "match_score": 52,
+            "total_required": 23,
+            "matching_skills": [
+                "Create flowchart diagram",
+                "Use software libraries",
+                "Ict debugging tools",
+                "Analyse software specifications",
+                "Integrated development environment software",
+                "Tools for software configuration management",
+                "Utilise computer-aided software engineering tools",
+                "Debug software",
+                "Develop software prototype",
+                "Use software design patterns",
+                "Computer programming",
+                "Provide technical documentation"
+            ],
+            "missing_skills": [
+                "Identify customer requirements",
+                "Manage engineering project",
+                "Use technical drawing software",
+                "Technical drawings",
+                "Engineering processes",
+                "Project management",
+                "Engineering principles",
+                "Develop automated migration methods",
+                "Define technical requirements",
+                "Perform scientific research",
+                "Interpret technical requirements"
+            ]
+        },
+        {
+            "role_id": "2514",
+            "role_title": "embedded systems software developer",
+            "match_score": 100,
+            "total_required": 16,
+            "matching_skills": [
+                "Use software libraries",
+                "Use software design patterns",
+                "Ict debugging tools",
+                "Tools for software configuration management",
+                "Develop ict device driver",
+                "Utilise computer-aided software engineering tools",
+                "Analyse software specifications",
+                "Internet of things",
+                "Create flowchart diagram",
+                "Embedded systems",
+                "Debug software",
+                "Develop software prototype",
+                "Interpret technical texts",
+                "Computer programming",
+                "Provide technical documentation",
+                "Integrated development environment software"
+            ],
+            "missing_skills": []
+        }
+    ],
+    "created_at": "2026-01-28"
+}

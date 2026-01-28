@@ -153,12 +153,12 @@ async def change_password(request: Request, org = Depends(get_current_org), old_
             "failed": failed
         })
     
-### --- Add Member --- ###
-@router.post("/add_member", response_class=HTMLResponse)
-async def add_member(
+### --- Invite Member --- ###
+@router.post("/invite_member", response_class=HTMLResponse)
+async def invite_member(
     request: Request, 
     org = Depends(get_current_org), 
-    username_to_add: str = Form(...)
+    username_to_invite: str = Form(...)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -166,7 +166,21 @@ async def add_member(
     error_msg = None
     success_msg = None
 
-    user_to_add = crud_user.get_user_by_username(username_to_add)
+    user_to_invite = crud_user.get_user_by_username(username_to_invite)
+    created = crud_org.create_invitation(org.id, user_to_invite.id)
+
+    if created:
+        success_msg = f"Invitation sent to '{username_to_invite}' successfully!"
+    else:
+        error_msg = "Failed to send invitation. Please try again."
+
+    return templates.TemplateResponse("org/org_home.html", {
+        "request": request,
+        "org": org,
+        "members": crud_user.get_users_by_ids(org.members),
+        "error": error_msg,
+        "success": success_msg
+    })
 
     if user_to_add:
         if user_to_add.id in org.members:
@@ -176,7 +190,6 @@ async def add_member(
              success_msg = f"User '{user_to_add.name} {user_to_add.surname}' added successfully!"
     else:
         error_msg = "User not found. Please check the username."
-
     # Refresh member list
     members_objects = crud_user.get_users_by_ids(org.members)
 
@@ -266,7 +279,8 @@ async def project_search_role(
     assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
 
     # ESCO API Search
-    results = escoAPI.get_esco_occupations_list(search, limit=5)
+    language = "en"
+    results = escoAPI.get_esco_occupations_list(search, language=language, limit=10)
 
     return templates.TemplateResponse("org/project_detail.html", {
         "request": request,
@@ -288,8 +302,9 @@ async def project_add_role(
 
     project = crud_project.get_project(project_id)
     
+    language = "en"
     if project and project.org_id == org.id:
-        role_data = escoAPI.get_single_role_details(uri)
+        role_data = escoAPI.get_single_role_details(uri, language=language)
         
         if role_data:
             crud_project.add_target_role(project, role_data.model_dump())

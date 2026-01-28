@@ -15,6 +15,13 @@ class User(BaseModel):
     skill_gap: List[Dict[str, Any]] = []
     id_organization: Optional[str] = None
 
+class Invitation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    org_id: str
+    user_id: str
+    status: str  # e.g., "pending", "accepted", "declined"
+    created_at: str = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d"))
+
 class Organization(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str

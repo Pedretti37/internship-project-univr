@@ -28,9 +28,9 @@
                 <h2>My Team ({{ members|length }})</h2>
                 <p><small>Add users by their username</small></p>
                 
-                <form action="/add_member" method="post" class="add-form">
-                    <input type="text" name="username_to_add" placeholder="Username (e.g. mario_rossi)" required>
-                    <button type="submit" class="btn-primary">Add</button>
+                <form action="/invite_member" method="post" class="add-form">
+                    <input type="text" name="username_to_invite" placeholder="Username" required>
+                    <button type="submit" class="btn-primary">Invite</button>
                 </form>
 
                 <hr>

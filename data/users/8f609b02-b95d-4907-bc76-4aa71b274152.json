@@ -1,0 +1,29 @@
+{
+    "id": "8f609b02-b95d-4907-bc76-4aa71b274152",
+    "name": "Simone",
+    "surname": "Pedretti",
+    "username": "a",
+    "email": "simonepedretti04@gmail.com",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$2vt/j3HOea8VYqw1ZgyBUA$dDTAL1jZ3x4vHIVgnRYoVgF/pLyl4zzR81M367UqtYU",
+    "target_roles": [],
+    "current_skills": [
+        "Integrated development environment software",
+        "Internet of things",
+        "Analyse software specifications",
+        "Develop software prototype",
+        "Provide technical documentation",
+        "Tools for software configuration management",
+        "Embedded systems",
+        "Use software design patterns",
+        "Use software libraries",
+        "Ict debugging tools",
+        "Computer programming",
+        "Create flowchart diagram",
+        "Develop ict device driver",
+        "Utilise computer-aided software engineering tools",
+        "Interpret technical texts",
+        "Debug software"
+    ],
+    "skill_gap": [],
+    "id_organization": "d9eac73e-a6f4-4f6c-b939-209c7972313c"
+}

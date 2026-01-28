@@ -8,6 +8,8 @@ os.makedirs(DATA_DIR_USERS, exist_ok=True)
 INDEX_FILE = "data/users/user_index.json"
 os.makedirs(os.path.dirname(INDEX_FILE), exist_ok=True)
 
+DATA_INV_DIR = "data/organizations/invitations"
+
 ### --- User GET path --- ###
 def get_json_path(id: str) -> str:
     return os.path.join(DATA_DIR_USERS, f"{id}.json")
@@ -75,7 +77,7 @@ def _save_index(index_data):
     with open(INDEX_FILE, "w") as f:
         json.dump(index_data, f, indent=4)
 
-# --- Get USER --- #
+### --- Get USER --- ###
 def get_user_by_id(user_id: str) -> User | None:
     """Recupera l'utente direttamente tramite ID (veloce)"""
     path = os.path.join(DATA_DIR_USERS, f"{user_id}.json")
@@ -109,3 +111,20 @@ def get_user_by_username(username: str) -> User | None:
         
     # Ora che abbiamo l'ID, carichiamo il file vero
     return get_user_by_id(user_id)
+
+### --- Get Pending Invitations for User --- ###
+def get_pending_invitations_for_user(user_id: str) -> list:
+    invitations = []
+    
+    if not os.path.exists(DATA_INV_DIR):
+        return invitations
+    
+    for filename in os.listdir(DATA_INV_DIR):
+        if filename.endswith(".json"):
+            path = os.path.join(DATA_INV_DIR, filename)
+            with open(path, "r") as f:
+                data = json.load(f)
+                if data.get("user_id") == user_id and data.get("status") == "pending":
+                    invitations.append(data)
+    
+    return invitations

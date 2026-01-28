@@ -65,6 +65,31 @@
 
                 </div>
             </details>
+
+            <div>
+                {% if invitations %}
+                    <h2>Recent Invitations</h2>
+                    <ul>
+                        {% for inv in invitations %}
+                            <li>
+                                Organization: {{ inv.name }} 
+                                <small><p>({{ inv.created_at }})</p></small>
+                                <form action="/accept_invitation" method="post" style="display:inline;">
+                                    <input type="hidden" name="inv_id" value="{{ inv.raw_id }}">
+                                    <input type="hidden" name="org_id" value="{{ inv.org_id }}">
+
+                                    <button type="submit" title="accept_invitation">
+                                        ✅
+                                    </button>
+                                    <button type="submit" formaction="/decline_invitation" title="decline_invitation">
+                                        ❌
+                                    </button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
         </div>
 
         <hr style="width:100%; margin-top: 30px;">

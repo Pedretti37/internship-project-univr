@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
 from typing import List, Optional
-from crud import crud_user
+from crud import crud_user, crud_org
 from dependencies import get_current_user
 
 from config import templates, pwd_context
@@ -120,11 +120,25 @@ async def user_profile(request: Request, user = Depends(get_current_user)):
         response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
 
+    raw_invitations = crud_user.get_pending_invitations_for_user(user.id)
+    clean_invitations = []
+    if raw_invitations:
+        for raw in raw_invitations:
+            clean = {}
+            org = crud_org.get_org_by_id(raw["org_id"])
+            clean["name"] = org.orgname          
+            clean["created_at"] = raw["created_at"]
+            clean["raw_id"] = raw["id"]          
+            clean["org_id"] = raw["org_id"]
+            clean_invitations.append(clean)
+
+
     response = templates.TemplateResponse(
         "user/user_profile.html", {
             "request": request, 
             "user": user, 
-            "countries_list": EU_COUNTRIES
+            "countries_list": EU_COUNTRIES,
+            "invitations": clean_invitations
         }
     )
 
@@ -408,3 +422,49 @@ async def occupation_forecast_and_gap(
         "isco_id_list": isco_id_list,
         "current_year": datetime.now().year
     })
+
+### --- Accept Invitation --- ###
+@router.post("/accept_invitation", response_class=RedirectResponse)
+async def accept_invitation(
+    user = Depends(get_current_user),
+    org_id: str = Form(...),
+    inv_id: str = Form(...)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    user.id_organization = org_id
+    crud_user.update_user(user)
+
+    org = crud_org.get_org_by_id(org_id)
+    if org:
+        org.members.append(user.id)
+        crud_org.update_org(org)
+
+    inv = crud_org.get_inv_by_id(inv_id)
+    if inv:
+        inv.status = "accepted"
+        crud_org.update_invitation(inv)
+
+    return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- Decline Invitation --- ###
+@router.post("/decline_invitation", response_class=RedirectResponse)
+async def accept_invitation(
+    user = Depends(get_current_user),
+    inv_id: str = Form(...)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    inv = crud_org.get_inv_by_id(inv_id)
+    if inv:
+        inv.status = "declined"
+        crud_org.update_invitation(inv)
+
+    return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
+
+
+    
+
+

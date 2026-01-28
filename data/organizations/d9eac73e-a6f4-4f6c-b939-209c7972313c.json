@@ -1,0 +1,12 @@
+{
+    "id": "d9eac73e-a6f4-4f6c-b939-209c7972313c",
+    "name": "Samsung",
+    "address": "Via Tre Santi 76A",
+    "phone": "4932014592",
+    "email": "samsung@gmail.com",
+    "orgname": "b",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$8v5fixGCsJZy7r0XYozROg$wvqTJ5shQiT9FuPVN7sHjOVXDyFehCQxeGqm26HdqEA",
+    "members": [
+        "8f609b02-b95d-4907-bc76-4aa71b274152"
+    ]
+}
