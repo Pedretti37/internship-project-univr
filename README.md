@@ -28,6 +28,7 @@ The application is currently in the **development phase**.
 - **Data Storage:** Lightweight JSON-based file system for easy prototyping of Users, Organizations, and Projects.
 - **ESCO API Integration:** Real-time fetching of occupations and skills from the European Skills/Competences classification.
 - **Guest Access:** Limited "Continue as Guest" mode for platform exploration.
+- **Educational Courses:** From PDF to JSON containing information about DHBW learning courses (just one macro sector for now: Mechanical Engineering)
 
 ## Tech Stack
 
@@ -43,17 +44,17 @@ The application is currently in the **development phase**.
 ## Project Structure
 
 ```text
-├── config.py               # Main configuration settings
-├── dependencies.py         # Dependency injection (Current User/Org retrieval)
-├── main.py                 # Application entry point
-├── requirements.txt        # Python dependencies
+├── config.py                   # Main configuration settings
+├── dependencies.py             # Dependency injection (Current User/Org retrieval)
+├── main.py                     # Application entry point
+├── requirements.txt            # Python dependencies
 │
-├── crud/                   # JSON I/O operations (Database layer)
-├── data/                   # JSON Storage (Users, Orgs, Projects) and CEDEFOP database
-├── educational_offerings/  # PDF to JSON for educational courses & skill gap
-├── esco/                   # ESCO API integration logic
-├── models.py               # Pydantic data models
-├── routers/                # Endpoints (User, Org, etc.)
+├── crud/                       # JSON I/O operations (Database layer)
+├── data/                       # JSON Storage (Users, Orgs, Projects) and CEDEFOP database
+├── educational_offerings/      # PDF to JSON for educational courses
+├── esco/                       # ESCO API integration logic
+├── models.py                   # Pydantic data models
+├── routers/                    # Endpoints (User, Org, etc.)
 │
 ├── static/                 # CSS and static assets
 └── templates/              # HTML Jinja2 templates
