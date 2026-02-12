@@ -56,3 +56,4 @@ class Course(BaseModel):
     title: str
     description: Optional[str] = None
     skills_covered: List[str] = []
+    role_ids: List[str] = []

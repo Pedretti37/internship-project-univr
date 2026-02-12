@@ -309,11 +309,15 @@
                 <ul>
                     {% for course in recommended_courses %}
                         <li>
-                            <p>{{ course.title }}</p>
-                            <p><small>{{ course.skills_covered|join(', ') }}</small></p>
+                            <h4>{{ course.title }}</h4>
+                            <p>{{ course.description }}</p>
+                            <p><small>Skills Covered: {{ course.skills_covered|join(', ') }}</small></p>
+                            <p><small>Role IDs: {{ course.role_ids|join(', ') }}</small></p>
                         </li>
                     {% endfor %}
                 </ul>
+            {% else %}
+                <p>No recommended courses available.</p>
             {% endif %}
         </div>
     </div>

@@ -25,15 +25,6 @@
             "uri": "http://data.europa.eu/esco/occupation/38240cc5-d1d9-4de9-9480-29c51da291eb"
         },
         {
-            "id": "2151",
-            "title": "electromechanical engineer",
-            "description": "Electromechanical engineers design and develop equipment and machinery that use both electrical and mechanical technology. They make draughts and prepare documents detailing the material requisitions, the assembly process and other technical specifications. Electromechanical engineers also test and evaluate the prototypes. They oversee the manufacturing process.",
-            "essential_skills": "Engineering principles\r\nElectrical engineering\r\nDesign drawings\r\nTest electromechanical systems\r\nElectric motors\r\nElectric drives\r\nMathematics\r\nElectricity\r\nEnvironmental threats\r\nElectrical wiring diagrams\r\nDesign electromechanical systems\r\nRecord test data\r\nModel electromechanical systems\r\nElectric generators\r\nDesign prototypes\r\nElectricity principles\r\nPrepare production prototypes\r\nApprove engineering design\r\nGather technical information\r\nPerform data analysis\r\nReport analysis results\r\nUse technical drawing software\r\nElectrical machines\r\nPerform scientific research\r\nConduct literature research\r\nEnvironmental legislation\r\nMechanical engineering\r\nAdjust engineering designs\r\nAnalyse test data\r\nPhysics\r\nAbide by regulations on banned materials\r\nMonitor manufacturing quality standards\r\nElectromechanics",
-            "optional_skills": "Write routine reports\r\nPerform test run\r\nUse cam software\r\nDraft bill of materials\r\nPerform project management\r\nDesign firmware\r\nElectronics\r\nMaintain safe engineering watches\r\nDevelop product design\r\nProgram firmware\r\nUse cad software\r\nPrepare assembly drawings\r\nExamine engineering principles\r\nMicroelectromechanical systems\r\nCae software\r\nFirmware\r\nPerform resource planning\r\nApply technical communication skills\r\nDefine technical requirements\r\nCoordinate engineering teams\r\nPower electronics\r\nQuality standards\r\nCommunicate with customers\r\nProvide technical documentation\r\nAssemble electromechanical systems\r\nTrain employees\r\nDefine manufacturing quality criteria\r\nCreate technical plans\r\nBuild business relationships\r\nMonitor machine operations\r\nPower engineering",
-            "id_full": "2151.1.3",
-            "uri": "http://data.europa.eu/esco/occupation/77abfaec-a250-4765-95fa-6091e8da1bba"
-        },
-        {
             "id": "3115",
             "title": "mechanical engineering technician",
             "description": "Mechanical engineering technicians provide technical support to mechanical engineers in producing and manufacturing mechanical machinery. They help make designs and adjustments, and perform tests. They also develop layouts and drawings, collate and interpret data and write reports.",
@@ -95,49 +86,6 @@
                 "Design drawings",
                 "Cad software",
                 "Liaise with engineers"
-            ]
-        },
-        {
-            "role_id": "2151",
-            "role_title": "electromechanical engineer",
-            "match_score": 18,
-            "total_required": 33,
-            "matching_skills": [
-                "Engineering principles",
-                "Approve engineering design",
-                "Use technical drawing software",
-                "Perform scientific research",
-                "Mechanical engineering",
-                "Adjust engineering designs"
-            ],
-            "missing_skills": [
-                "Electrical engineering",
-                "Design drawings",
-                "Test electromechanical systems",
-                "Electric motors",
-                "Electric drives",
-                "Mathematics",
-                "Electricity",
-                "Environmental threats",
-                "Electrical wiring diagrams",
-                "Design electromechanical systems",
-                "Record test data",
-                "Model electromechanical systems",
-                "Electric generators",
-                "Design prototypes",
-                "Electricity principles",
-                "Prepare production prototypes",
-                "Gather technical information",
-                "Perform data analysis",
-                "Report analysis results",
-                "Electrical machines",
-                "Conduct literature research",
-                "Environmental legislation",
-                "Analyse test data",
-                "Physics",
-                "Abide by regulations on banned materials",
-                "Monitor manufacturing quality standards",
-                "Electromechanics"
             ]
         },
         {
