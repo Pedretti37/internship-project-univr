@@ -413,10 +413,29 @@ async def occupation_forecast_and_gap(
     updated_user = crud_skill_models.skill_gap_user(user)
     crud_user.update_user(updated_user)
 
+    for result in forecast_results:
+        data = result["data"]
+        if data["growth_pct"] >= -5:
+            # Role is expected to grow or remain stable --> provide educational courses and training opportunities
+            role_missing_skills = []
+            for role in updated_user.skill_gap:
+                if 0 <= role["match_score"] < 100:
+                    role_missing_skills.append({
+                        "role_id": role["role_id"],
+                        "role_title": role["role_title"],
+                        "missing_skills": role["missing_skills"]
+                    })
+
+            # List of recommended courses for the missing skills
+            # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
+            # assuming "Mechanical Engineer" and similar role as default role type
+            recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(role_missing_skills)
+
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
-        "user": user,
+        "user": updated_user,
         "forecast_results": forecast_results, 
+        "recommended_courses": recommended_courses,
         "country": country,
         "countries_list": EU_COUNTRIES,
         "isco_id_list": isco_id_list,

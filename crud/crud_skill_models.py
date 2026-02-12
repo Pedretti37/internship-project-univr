@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from typing import List
-from models import Project, User
+from models import Project, User, Course
 from datetime import datetime
 
 EMP_OCCUPATION = "data/cedefop/employees/Employment_occupation.xlsx"
@@ -91,6 +91,7 @@ def skill_gap_project(project: Project, members: List[User]) -> Project:
 
     return project
 
+# Forecast employment trends for a given ISCO code and country
 def read_emp_occupation(country: str, isco_id: str) -> dict:
     
     isco_clean = isco_id.strip()
@@ -185,3 +186,25 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
     except Exception as e:
         print(f"Error reading Excel: {e}")
         return {"error": str(e)}
+    
+# Recommend courses for skill gap
+def recommend_courses_for_skill_gap(roles: List[dict]) -> List[Course]:
+    recommended_courses = []
+
+    i = 0
+    for role in roles:
+        missing_skills = role["missing_skills"]
+        for skill in missing_skills:
+            # Search for courses that cover this skill
+            course = Course(
+                title=f"Course {i}",
+                description="---",
+                skills_covered=[skill]
+            )
+            recommended_courses.append(course)
+            i += 1
+    
+    # Remove duplicates
+    #recommended_courses = list(set(recommended_courses))
+
+    return recommended_courses

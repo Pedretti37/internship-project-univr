@@ -50,3 +50,9 @@ class Project(BaseModel):
     target_roles: List[Dict[str, Any]] = []
     skill_gap: List[Dict[str, Any]] = []
     created_at: str = Field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d"))
+
+class Course(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: Optional[str] = None
+    skills_covered: List[str] = []

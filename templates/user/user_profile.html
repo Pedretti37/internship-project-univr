@@ -299,5 +299,22 @@
 
             </div>
         </div>
+
+        <hr style="width:100%; margin-top: 30px;">
+
+        <div class="educational-courses">
+            {% if recommended_courses %}
+                <h2>Recommended Educational Courses</h2>
+                <p>Based on your skill gap analysis, we recommend the following courses to help you upskill:</p>
+                <ul>
+                    {% for course in recommended_courses %}
+                        <li>
+                            <p>{{ course.title }}</p>
+                            <p><small>{{ course.skills_covered|join(', ') }}</small></p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
