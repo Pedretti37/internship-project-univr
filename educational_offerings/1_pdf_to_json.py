@@ -1,3 +1,4 @@
+import os
 import pdfplumber
 import json
 import re
@@ -9,7 +10,7 @@ def extract_modules_dhbw_optimized(pdf_path):
     
     with pdfplumber.open(pdf_path) as pdf:
         # Iteration over pages
-        for page in enumerate(pdf.pages):
+        for page in pdf.pages:
             text = page.extract_text()
             if not text:
                 continue
@@ -80,9 +81,11 @@ try:
     
     if len(data) > 0:
         output_filename = "educational_offerings.json"
-        with open(output_filename, 'w', encoding='utf-8') as f:
+        output_dir = os.path.join("educational_offerings", output_filename)
+        os.makedirs(os.path.dirname(output_dir), exist_ok=True)
+        with open(output_dir, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
-        print(f"Database salvato correttamente in: {output_filename}")
+        print(f"Database salvato correttamente in: {output_dir}")
     else:
         print("Nessun modulo trovato. Controlla se il PDF è scansionato (immagine) o testo.")
 

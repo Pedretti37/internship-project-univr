@@ -1,5 +1,10 @@
 import json
-import os
+import os, sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 from esco import escoAPI
 
 # Load json module
@@ -102,15 +107,23 @@ def tag_courses_with_esco_role(role_search_term, courses_json_path):
             total_skills_tagged += len(unique_found)
 
     # Output saving
-    output_filename = "educational_offerings_esco_tagged.json"
-    with open(output_filename, 'w', encoding='utf-8') as f:
+    filename_only = "educational_offerings_esco_tagged.json"
+    
+    output_dir = os.path.join("educational_offerings", "courses")
+    
+    os.makedirs(output_dir, exist_ok=True)
+    
+    full_output_path = os.path.join(output_dir, filename_only)
+
+    # 5. Salva il file
+    with open(full_output_path, 'w', encoding='utf-8') as f:
         json.dump(courses, f, ensure_ascii=False, indent=4)
         
     print(f"\n🚀 FINE LAVORO!")
     print(f"   - Moduli analizzati: {len(courses)}")
     print(f"   - Moduli con almeno un match: {matches_found}")
     print(f"   - Totale tag assegnati: {total_skills_tagged}")
-    print(f"💾 File salvato: {output_filename}")
+    print(f"💾 File salvato: {full_output_path}")
 
 # Execution
 if __name__ == "__main__":

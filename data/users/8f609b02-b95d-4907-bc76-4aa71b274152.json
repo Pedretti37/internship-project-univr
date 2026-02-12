@@ -16,22 +16,22 @@
             "uri": "http://data.europa.eu/esco/occupation/f2b15a0e-e65a-438a-affb-29b9d50b77d1"
         },
         {
-            "id": "6130",
-            "title": "mixed farmer",
-            "description": "Mixed farmers are responsible for managing all aspects of livestock and crop production as a small enterprise or for self-sufficiency.",
-            "essential_skills": "Operate agricultural machinery\r\nHealth and safety regulations\r\nEnvironmental legislation in agriculture and forestry\r\nSupervise hygiene procedures in agricultural settings\r\nAgronomical production principles\r\nCrop production principles\r\nLivestock reproduction\r\nAgricultural production principles\r\nLivestock farming systems",
-            "optional_skills": "Manage production enterprise\r\nManage the health and welfare of livestock\r\nMarket farm products\r\nManage farm products\r\nAgricultural business management\r\nDairy animal production\r\nAgritourism",
-            "id_full": "6130.2",
-            "uri": "http://data.europa.eu/esco/occupation/1c1e86f9-6347-42d6-aa6e-c95b138bf640"
+            "id": "2514",
+            "title": "embedded systems software developer",
+            "description": "Embedded systems software developers program, implement, document and maintain software to be run on an embedded system.",
+            "essential_skills": "Create flowchart diagram\r\nEmbedded systems\r\nUse software libraries\r\nUse software design patterns\r\nIntegrated development environment software\r\nAnalyse software specifications\r\nDevelop ict device driver\r\nTools for software configuration management\r\nDebug software\r\nProvide technical documentation\r\nIct debugging tools\r\nInternet of things\r\nComputer programming\r\nInterpret technical texts\r\nDevelop software prototype\r\nUtilise computer-aided software engineering tools",
+            "optional_skills": "Groovy\r\nScratch (computer programming)\r\nR\r\nLisp\r\nProlog (computer programming)\r\nPhp\r\nPuppet (tools for software configuration management)\r\nStaf\r\nKdevelop\r\nAsp.net\r\nAssembly (computer programming)\r\nTypescript\r\nSoftware anomalies\r\nC++\r\nEclipse (integrated development environment software)\r\nMl (computer programming)\r\nJavascript\r\nHaskell\r\nVbscript\r\nDevelop creative ideas\r\nUse concurrent programming\r\nCommon lisp\r\nPerl\r\nSas language\r\nUse automatic programming\r\nRuby (computer programming)\r\nCobol\r\nIntegrate system components\r\nWorld wide web consortium standards\r\nPascal (computer programming)\r\nJenkins (tools for software configuration management)\r\nUse functional programming\r\nScala\r\nIct security legislation\r\nC#\r\nOpenedge advanced business language\r\nMatlab\r\nDesign user interface\r\nDevelop automated migration methods\r\nUse object-oriented programming",
+            "id_full": "2514.2.1",
+            "uri": "http://data.europa.eu/esco/occupation/57af9090-55b4-4911-b2d0-86db01c00b02"
         },
         {
-            "id": "1330",
-            "title": "software manager",
-            "description": "Software managers oversee the acquisition and development of software systems in order to provide support to all organisational units. They also monitor the results and quality of the different software solutions and projects implemented in the organisation.",
-            "essential_skills": "Create software design\r\nIct project management methodologies\r\nExecute analytical mathematical calculations\r\nData storage\r\nApply system organisational policies\r\nSystems development life-cycle\r\nManage ict project\r\nIct project management\r\nUnified modelling language\r\nManage business knowledge\r\nMonitor technology trends\r\nQuality assurance methodologies\r\nSoftware metrics\r\nManage data\r\nOrganisational policies\r\nAnalyse software specifications\r\nEvaluate cost of software products\r\nUse ict ticketing system\r\nEnsure adherence to organisational ict standards\r\nApply ict system usage policies",
-            "optional_skills": "Ios\r\nTrain employees\r\nManage software localisation\r\nNegotiate buying conditions\r\nProcess-based management\r\nProvide user documentation\r\nAndroid (mobile operating systems)\r\nManage tender processes\r\nCoach employees\r\nIct system user requirements\r\nWindows phone\r\nUtilise methodologies for user centered design\r\nMobile operating systems\r\nMonitor ict research\r\nUse different communication channels\r\nApply conflict management\r\nManage schedule of tasks\r\nLean project management\r\nAnalyse ict technical proposals\r\nManage staff\r\nIdentify ict user needs\r\nAgile project management\r\nBlackberry\r\nInteract with users to gather requirements\r\nGive live presentation",
-            "id_full": "1330.5.1",
-            "uri": "http://data.europa.eu/esco/occupation/f31f487b-4ce2-40f3-90e8-7d0011b4ef1d"
+            "id": "2519",
+            "title": "software tester",
+            "description": "Software testers perform software tests. They may also plan and design them. They may also debug and repair software although this mainly corresponds to designers and developers. They ensure that applications function properly before delivering them to internal and external clients.",
+            "essential_skills": "Levels of software testing\r\nProvide software testing documentation\r\nSoftware architecture models\r\nSoftware anomalies\r\nSoftware metrics\r\nAddress problems critically\r\nPerform software unit testing\r\nReplicate customer software issues\r\nReport test findings\r\nExecute software tests",
+            "optional_skills": "Erlang\r\nMeasure software usability\r\nSap r3\r\nCoffeescript\r\nAbap\r\nSparql\r\nLisp\r\nSwift (computer programming)\r\nAgile project management\r\nQuery languages\r\nMatlab\r\nAudit techniques\r\nTypescript\r\nOpenedge advanced business language\r\nRuby (computer programming)\r\nProcess-based management\r\nPascal (computer programming)\r\nApplication usability\r\nSoftware components libraries\r\nIct performance analysis methods\r\nResource description framework query language\r\nApl\r\nDevelop automated software tests\r\nIct debugging tools\r\nPython (computer programming)\r\nHaskell\r\nR\r\nAsp.net\r\nUnstructured data\r\nSmalltalk (computer programming)\r\nLdap\r\nDevelop ict test suite\r\nTools for ict test automation\r\nComputer programming\r\nPhp\r\nC++\r\nProlog (computer programming)\r\nIct project management methodologies\r\nAjax\r\nMicrosoft visual c++",
+            "id_full": "2519.6",
+            "uri": "http://data.europa.eu/esco/occupation/106f79e4-6264-45f1-9e7a-297435cd684b"
         }
     ],
     "current_skills": [
@@ -109,51 +109,47 @@
             "missing_skills": []
         },
         {
-            "role_id": "6130",
-            "role_title": "mixed farmer",
-            "match_score": 0,
-            "total_required": 9,
-            "matching_skills": [],
-            "missing_skills": [
-                "Operate agricultural machinery",
-                "Health and safety regulations",
-                "Environmental legislation in agriculture and forestry",
-                "Supervise hygiene procedures in agricultural settings",
-                "Agronomical production principles",
-                "Crop production principles",
-                "Livestock reproduction",
-                "Agricultural production principles",
-                "Livestock farming systems"
-            ]
+            "role_id": "2514",
+            "role_title": "embedded systems software developer",
+            "match_score": 100,
+            "total_required": 16,
+            "matching_skills": [
+                "Create flowchart diagram",
+                "Embedded systems",
+                "Use software libraries",
+                "Use software design patterns",
+                "Integrated development environment software",
+                "Analyse software specifications",
+                "Develop ict device driver",
+                "Tools for software configuration management",
+                "Debug software",
+                "Provide technical documentation",
+                "Ict debugging tools",
+                "Internet of things",
+                "Computer programming",
+                "Interpret technical texts",
+                "Develop software prototype",
+                "Utilise computer-aided software engineering tools"
+            ],
+            "missing_skills": []
         },
         {
-            "role_id": "1330",
-            "role_title": "software manager",
-            "match_score": 5,
-            "total_required": 20,
-            "matching_skills": [
-                "Analyse software specifications"
-            ],
+            "role_id": "2519",
+            "role_title": "software tester",
+            "match_score": 0,
+            "total_required": 10,
+            "matching_skills": [],
             "missing_skills": [
-                "Create software design",
-                "Ict project management methodologies",
-                "Execute analytical mathematical calculations",
-                "Data storage",
-                "Apply system organisational policies",
-                "Systems development life-cycle",
-                "Manage ict project",
-                "Ict project management",
-                "Unified modelling language",
-                "Manage business knowledge",
-                "Monitor technology trends",
-                "Quality assurance methodologies",
+                "Levels of software testing",
+                "Provide software testing documentation",
+                "Software architecture models",
+                "Software anomalies",
                 "Software metrics",
-                "Manage data",
-                "Organisational policies",
-                "Evaluate cost of software products",
-                "Use ict ticketing system",
-                "Ensure adherence to organisational ict standards",
-                "Apply ict system usage policies"
+                "Address problems critically",
+                "Perform software unit testing",
+                "Replicate customer software issues",
+                "Report test findings",
+                "Execute software tests"
             ]
         }
     ],

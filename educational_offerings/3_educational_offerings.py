@@ -4,21 +4,20 @@ import time
 import re
 from deep_translator import GoogleTranslator
 
-# --- CONFIGURAZIONE FILE ---
+# File paths
 PROJECT_FILE = 'data\\projects\\5f6cd065-289e-46f4-908c-73a5074a7a21.json'
 COURSES_FILE = 'educational_offerings_esco_tagged.json'
 OUTPUT_FILE = 'skill_matching_results_v2.json'
 
-# --- LISTA DI STOP WORDS TEDESCHE E INGLESI (PAROLE DA IGNORARE) ---
-# Queste parole sono troppo comuni e creerebbero "falsi positivi" se usate per la ricerca.
+# Words to ignore during matching (common words that don't add value)
 STOP_WORDS = {
-    # Tedesco
+    # Deutsch
     'und', 'oder', 'die', 'der', 'das', 'den', 'dem', 'des', 'ein', 'eine', 'einer', 
     'einem', 'eines', 'für', 'mit', 'von', 'im', 'in', 'zu', 'auf', 'aus', 'an', 
     'bei', 'als', 'um', 'sie', 'er', 'es', 'wir', 'ihr', 'ist', 'sind', 'war', 
     'wird', 'werden', 'wenden', 'führen', 'durch', 'stellen', 'sicher', 'erstellen', 
     'bewerten', 'verwalten', 'verwenden', 'überwachen', 'dass', 'wie', 'können',
-    # Inglese (perché cerchiamo anche i termini originali)
+    # English
     'and', 'or', 'the', 'a', 'an', 'for', 'with', 'from', 'in', 'on', 'at', 'to', 
     'by', 'as', 'is', 'are', 'was', 'were', 'be', 'use', 'apply', 'create', 
     'manage', 'ensure', 'monitor', 'execute', 'develop', 'system', 'systems'
@@ -50,19 +49,16 @@ def translate_skills_to_german(skills_list):
     
     for i, skill in enumerate(skills_list, 1):
         try:
-            # 1. Traduzione
             translated = translator.translate(skill)
             
-            # 2. Estrazione Keywords (Tokenizzazione)
-            # Uniamo originale e tradotto, puliamo punteggiatura e minuscolo
+            # Keyword extraction: Combine original and translated, clean punctuation, lowercase
             full_text = f"{skill} {translated}".lower()
-            # Regex per prendere solo parole
             words = re.findall(r'\b\w+\b', full_text)
             
-            # 3. Filtraggio Stop Words (tieni solo le parole significative)
+            # Filtering out stop words
             keywords = [w for w in words if w not in STOP_WORDS and len(w) > 2]
             
-            # Rimuovi duplicati
+            # Set to remove duplicates
             keywords = list(set(keywords))
             
             processed_skills[skill] = {
@@ -87,23 +83,19 @@ def find_matching_courses(processed_skills_map, courses_data):
         found_courses = []
 
         for course in courses_data:
-            # Prepara il testo del corso (Titolo + Descrizione)
+            # Course title and outcomes combined
             title = course.get('title_de', '')
             outcomes = course.get('learning_outcomes_de', '')
             course_text = (title + " " + outcomes).lower()
             
             matched_keywords = []
             
-            # Cerca OGNI keyword nel testo del corso
             for kw in keywords:
                 if kw in course_text:
                     matched_keywords.append(kw)
             
-            # CRITERIO DI MATCH:
-            # Consideriamo valido se troviamo almeno una parola chiave "forte"
-            # (o più di una se sono parole comuni, ma qui semplifichiamo a > 0)
+            # Match score based on number of matched keywords
             if matched_keywords:
-                # Calcola uno score semplice (quante parole ha trovato)
                 score = len(matched_keywords)
                 found_courses.append({
                     "title": title,
@@ -112,20 +104,18 @@ def find_matching_courses(processed_skills_map, courses_data):
                     "score": score
                 })
         
-        # Ordina i corsi per score (chi ha più keyword matchate vince)
         found_courses.sort(key=lambda x: x['score'], reverse=True)
         
-        # Salviamo solo se abbiamo trovato qualcosa
         if found_courses:
             matches[original_skill] = {
                 "german_translation": translation,
-                "top_matches": found_courses[:5] # Teniamo solo i migliori 5
+                "top_matches": found_courses[:5] # Keep top 5 matches
             }
 
     return matches
 
 def main():
-    print("--- MATCHING SKILL INTELLIGENTE (V2) ---")
+    print("--- MATCHING SKILL INTELLIGENTE ---")
     
     project = load_json(PROJECT_FILE)
     courses = load_json(COURSES_FILE)
@@ -140,22 +130,18 @@ def main():
         print(f"Nessuna skill mancante per {target_role}.")
         return
 
-    # 1. Traduzione + Estrazione Parole Chiave
     processed_skills = translate_skills_to_german(missing_skills)
 
-    # 2. Ricerca basata su Keywords
     results = find_matching_courses(processed_skills, courses)
     
     print(f"\n--- RISULTATO ---")
     print(f"Trovate corrispondenze per {len(results)} skill su {len(missing_skills)}.")
 
-    # 3. Output a schermo dei migliori match
     for skill, data in results.items():
         print(f"\nSkill: {skill} (DE: {data['german_translation']})")
         for match in data['top_matches'][:2]:
             print(f"   -> Corso: {match['title']} (Keywords: {match['matched_keywords']})")
 
-    # 4. Salvataggio
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
     print(f"\nSalvati risultati dettagliati in '{OUTPUT_FILE}'")

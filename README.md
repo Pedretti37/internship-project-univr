@@ -43,19 +43,20 @@ The application is currently in the **development phase**.
 ## Project Structure
 
 ```text
-├── config.py           # Main configuration settings
-├── dependencies.py     # Dependency injection (Current User/Org retrieval)
-├── main.py             # Application entry point
-├── requirements.txt    # Python dependencies
+├── config.py               # Main configuration settings
+├── dependencies.py         # Dependency injection (Current User/Org retrieval)
+├── main.py                 # Application entry point
+├── requirements.txt        # Python dependencies
 │
-├── crud/               # JSON I/O operations (Database layer)
-├── data/               # JSON Storage (Users, Orgs, Projects) and CEDEFOP database
-├── esco/               # ESCO API integration logic
-├── models.py           # Pydantic data models
-├── routers/            # Endpoints (User, Org, etc.)
+├── crud/                   # JSON I/O operations (Database layer)
+├── data/                   # JSON Storage (Users, Orgs, Projects) and CEDEFOP database
+├── educational_offerings/  # PDF to JSON for educational courses & skill gap
+├── esco/                   # ESCO API integration logic
+├── models.py               # Pydantic data models
+├── routers/                # Endpoints (User, Org, etc.)
 │
-├── static/             # CSS and static assets
-└── templates/          # HTML Jinja2 templates
+├── static/                 # CSS and static assets
+└── templates/              # HTML Jinja2 templates
 ```
 
 ## How to Run
