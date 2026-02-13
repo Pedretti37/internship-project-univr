@@ -3,7 +3,6 @@ import pandas as pd
 from typing import List
 from models import Project, User, Course
 from datetime import datetime
-from deep_translator import GoogleTranslator
 
 EMP_OCCUPATION = "data/cedefop/employees/Employment_occupation.xlsx"
 EMP_OCCUPATION_DETAIL = "data/cedefop/employees/Employment_occupation_detail.xlsx"
@@ -190,44 +189,44 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
         return {"error": str(e)}
     
 # Recommend courses for skill gap
-def recommend_courses_for_skill_gap(roles: List[dict]) -> List[Course]:
+def recommend_courses_for_skill_gap(missing_skills_de: List[str]) -> List[Course]:
     recommended_courses = []
-    translator = GoogleTranslator(source='en', target='de') # Problem with translation, we may need to use escoAPI to get official German skill names in order to match with courses
     #print(len(roles))
     
-    for role in roles:
-        missing_skills = role["missing_skills"]
-        missing_skills_de = translator.translate_batch(missing_skills)
-        # Reading educational offerings file
-        if not os.path.exists(ED_COURSES_MEC_ENGINEER):
-            print(f"Educational offerings file not found: {ED_COURSES_MEC_ENGINEER}")
-            continue
-        try:
-            courses_df = pd.read_json(ED_COURSES_MEC_ENGINEER)
-        except Exception as e:
-            print(f"Error reading educational offerings file: {e}")
-            continue
+    # Reading educational offerings file
+    if not os.path.exists(ED_COURSES_MEC_ENGINEER):
+        print(f"Educational offerings file not found: {ED_COURSES_MEC_ENGINEER}")
+        return []
+    
+    try:
+        courses_df = pd.read_json(ED_COURSES_MEC_ENGINEER)
+    except Exception as e:
+        print(f"Error reading educational offerings file: {e}")
+        return []
 
-        for skill in missing_skills_de:
-            # Search for courses that cover this skill
-            # Courses_df has columns: 'title_de', 'ects', 'learning_outcomes_de', 'esco_skills_match'
-            matching_courses = courses_df[courses_df['esco_skills_match'].apply(lambda x: skill in x)]
-            for _, course_row in matching_courses.iterrows():
-                course = Course(
-                    title=course_row['title_de'],
-                    description=course_row.get('learning_outcomes_de', ''),
-                    skills_covered=course_row.get('esco_skills_match', []),
-                    role_ids=course_row.get('role_ids', [])
-                )
-                recommended_courses.append(course)
+    # Managing potential NaN by filling with empty lists
+    courses_df['esco_skills_match'] = courses_df['esco_skills_match'].apply(
+        lambda x: x if isinstance(x, list) else []
+    )
+
+    def has_missing_skill(course_skills):
+        # True if there is an element in common between the course skills and the missing skills
+        return bool(set(course_skills) & set(missing_skills_de))
+
+    # DF filtering
+    matched_df = courses_df[courses_df['esco_skills_match'].apply(has_missing_skill)]
+    print(f"Found {len(matched_df)} courses matching at least one missing skill.")
+
+    for _, course_row in matched_df.iterrows():
+        course = Course(
+            title=course_row.get('title_de', 'Senza Titolo'),
+            description=course_row.get('learning_outcomes_de', ''),
+            skills_covered=course_row.get('esco_skills_match', []), 
+            role_ids=course_row.get('role_ids', [])
+        )
+        recommended_courses.append(course)
     
     # Remove duplicates
-    unique_courses = []
-    seen = set()
-    for course in recommended_courses:
-        course_tuple = (course.title, course.description, tuple(course.role_ids))
-        if course_tuple not in seen:
-            seen.add(course_tuple)
-            unique_courses.append(course)
-
-    return unique_courses
+    unique_courses_map = {c.title: c for c in recommended_courses}
+    
+    return list(unique_courses_map.values())

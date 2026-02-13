@@ -9,6 +9,7 @@ HEADERS = {
 }
 BASE_URL = "https://ec.europa.eu/esco/api"
 
+### API function to get details
 def get_single_role_details(uri: str, language: str) -> Role | None:
     if not uri:
         return None
@@ -83,6 +84,7 @@ def get_single_role_details(uri: str, language: str) -> Role | None:
         print(f"Exception fetching single details for {uri}: {e}")
         return None
 
+### Main function to search and get details for occupations
 def get_esco_occupations_list(keyword, language, limit=10):
     search_params = {'text': keyword, 'type': 'occupation', 'language': language, 'limit': limit}
     
@@ -114,3 +116,61 @@ def get_esco_occupations_list(keyword, language, limit=10):
         time.sleep(0.05) 
 
     return output_list
+
+### Skill translation function (EN -> DE)
+def translate_skill_esco(roles: list[dict]) -> list[str]:
+    results = []  
+    not_found = []
+
+    for role in roles:
+        # print("--- Processing role ---")
+        try:
+            # URI extraction
+            role_uri = role.get("role_uri")
+            if not role_uri:
+                not_found.append(role["role_title"])
+                continue
+            # print(f"Role URI found: {role_uri}")
+            
+            # English Skills
+            resp_en = requests.get(f"{BASE_URL}/resource/occupation", params={'uri': role_uri, 'language': 'en', 'viewMode': 'FULL'}).json()
+            # print(f"URL: {BASE_URL}/resource/occupation?uri={role_uri}&language=en&viewMode=FULL")
+            links = resp_en.get('_links', {})
+            all_skills_en = links.get('hasEssentialSkill', [])
+
+            en_skill_map = {}
+            for item in all_skills_en:
+                en_skill_map[item['title'].lower()] = item['uri']
+            # print(f"English skills mapped: {en_skill_map.keys()}")
+
+            # German Skills
+            resp_de = requests.get(f"{BASE_URL}/resource/occupation", params={'uri': role_uri, 'language': 'de', 'viewMode': 'FULL'}).json()
+            # print(f"URL: {BASE_URL}/resource/occupation?uri={role_uri}&language=de&viewMode=FULL")
+            links = resp_de.get('_links', {})
+            all_skills_de = links.get('hasEssentialSkill', [])
+
+            de_skill_map = {}
+            for item in all_skills_de:
+                de_skill_map[item['uri']] = item['title']
+            # print(f"German skills mapped: {de_skill_map.values()}")
+
+            for skill_en in role["missing_skills"]:
+                uri = en_skill_map.get(skill_en.lower())
+                # print(f"Processing skill: '{skill_en}' -> URI: {uri}")
+                if uri:
+                    translation = de_skill_map.get(uri)
+                    # print(f"Translation found: '{skill_en}' -> '{translation}'")
+                    if translation:
+                        results.append(translation)
+                    else:
+                        not_found.append(skill_en) # URI is found but no German translation available
+                else:
+                    # ESCO definition not found for this skill
+                    not_found.append(skill_en)
+        
+        except Exception as e:
+            return f"Error during API call: {str(e)}"
+        # print("--------------------------")
+    
+    # print(results)
+    return results #, not_found

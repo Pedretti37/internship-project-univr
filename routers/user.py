@@ -371,7 +371,8 @@ async def occupation_forecast_and_gap(
     request: Request,
     user = Depends(get_current_user),
     country: str = Form(...),
-    isco_id_list: List[str] = Form(...) 
+    isco_id_list: List[str] = Form(...),
+    role_uri_list: List[str] = Form(...)
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -391,6 +392,7 @@ async def occupation_forecast_and_gap(
         if isinstance(role, dict):
             r_id = role.get("id")
             r_title = role.get("title")
+            r_uri = role.get("uri")
         else:
             r_id = role.id
             r_title = role.title
@@ -405,7 +407,8 @@ async def occupation_forecast_and_gap(
             
             forecast_results.append({
                 "title": r_title,  
-                "isco_code": role_id_str, 
+                "isco_code": role_id_str,
+                "uri": r_uri,
                 "data": data              
             })
 
@@ -428,14 +431,20 @@ async def occupation_forecast_and_gap(
             role_missing_skills.append({
                 "role_id": result["isco_code"],
                 "role_title": result["title"],
+                "role_uri": result["uri"],
                 "missing_skills": next((role["missing_skills"] for role in role_list if role["role_id"] == result["isco_code"]), [])
             })
     # print(role_missing_skills)
+    missing_skills_de = escoAPI.translate_skill_esco(role_missing_skills)
+    if missing_skills_de:
+        print(f"Missing skills in German: {missing_skills_de}")
+    else:
+        print("No missing skills found or translation failed.")
 
     # List of recommended courses for the missing skills
     # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
     # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(role_missing_skills)
+    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills_de)
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,

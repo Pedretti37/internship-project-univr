@@ -147,6 +147,7 @@
                 {% if user.target_roles %}
                     {% for role in user.target_roles %}
                         <input type="hidden" name="isco_id_list" value="{{ role.id }}">
+                        <input type="hidden" name="role_uri_list" value="{{ role.uri }}">
                     {% endfor %}
 
                     <div style="margin-bottom: 10px;">
