@@ -32,28 +32,14 @@ def tag_courses_with_esco_role(role_search_term, courses_json_path):
     print(f"   URI: {target_role.uri}")
     
     # Skill preparation (Parsing the \n string)
-    essential_list = target_role.essential_skills.split('\n')
-    optional_list = target_role.optional_skills.split('\n')
-    
-    all_esco_skills = [s.strip() for s in (essential_list + optional_list) if s.strip()]
+    essential_dict = {uri: skill for uri, skill in target_role.essential_skills.items()}
+    # optional_dict = target_role.optional_skills.items()
     
     # Remove duplicates while preserving order
-    all_esco_skills = list(dict.fromkeys(all_esco_skills))
 
-    print(f"   -> Scaricate {len(all_esco_skills)} skills ufficiali in Tedesco.")
-    print(f"   -> Esempi: {all_esco_skills[:3]}...")
+    print(f"   -> Scaricate {len(essential_dict)} skills ufficiali in Tedesco.")
 
     # Courses matching
-    courses = load_courses(courses_json_path)
-    if not courses:
-        return
-
-    print(f"📊 2. Analizzo {len(courses)} moduli didattici dal JSON...")
-
-    matches_found = 0
-    total_skills_tagged = 0
-
-
     courses = load_courses(courses_json_path)
     if not courses:
         return
@@ -67,13 +53,13 @@ def tag_courses_with_esco_role(role_search_term, courses_json_path):
         # TExt extraction and normalization
         course_text = (course.get('title_de', '') + " " + course.get('learning_outcomes_de', '')).lower()
         
-        found_skills = []
+        found_skills = {}
         
-        for skill_phrase in all_esco_skills:
+        for uri, skill_phrase in essential_dict.items():
             skill_clean = skill_phrase.lower().strip()
             
             if skill_clean in course_text:
-                found_skills.append(skill_phrase)
+                found_skills[uri] = skill_phrase
                 continue # FOund direct match, skip to next skill
 
             # More advanced matching: split into words and check presence
@@ -96,11 +82,11 @@ def tag_courses_with_esco_role(role_search_term, courses_json_path):
                  is_match = True
             
             if is_match:
-                found_skills.append(skill_phrase)
+                found_skills[uri] = skill_phrase
 
-        unique_found = list(set(found_skills))
+        unique_found = list(found_skills.values())
         
-        course['esco_skills_match'] = unique_found
+        course['esco_skills_match'] = found_skills
         
         if unique_found:
             matches_found += 1
@@ -127,4 +113,4 @@ def tag_courses_with_esco_role(role_search_term, courses_json_path):
 
 # Execution
 if __name__ == "__main__":
-    tag_courses_with_esco_role("Maschinenbauingenieur", "educational_offerings.json")
+    tag_courses_with_esco_role("Maschinenbauingenieur", "educational_offerings/educational_offerings.json")

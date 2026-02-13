@@ -1,8 +1,9 @@
+import ast
 from datetime import datetime
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
-from typing import List, Optional
+from typing import Optional
 from crud import crud_user, crud_org
 from dependencies import get_current_user
 
@@ -188,12 +189,38 @@ async def add_to_user_target_roles(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
+    # Manual conversion from string to dict
+    if essential_skills:
+        try:
+            # ast.literal_eval manages {'key': 'value'}
+            e_skills_dict = ast.literal_eval(essential_skills)
+            
+            # Controllo extra: assicuriamoci che sia davvero un dict
+            if not isinstance(e_skills_dict, dict):
+                e_skills_dict = {}
+        except (ValueError, SyntaxError):
+            print(f"Errore nel parsing di essential_skills: {essential_skills}")
+            e_skills_dict = {}
+    else:
+        e_skills_dict = {}
+
+    # Optional Skills
+    if optional_skills:
+        try:
+            o_skills_dict = ast.literal_eval(optional_skills)
+            if not isinstance(o_skills_dict, dict):
+                o_skills_dict = {}
+        except (ValueError, SyntaxError):
+            o_skills_dict = {}
+    else:
+        o_skills_dict = {}
+
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
-        essential_skills=essential_skills if essential_skills else "",
-        optional_skills=optional_skills if optional_skills else "",
+        essential_skills=e_skills_dict,
+        optional_skills=o_skills_dict,
         id_full=id_full,
         uri=uri
     )
@@ -238,12 +265,38 @@ async def add_to_user_skills(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
+    # Manual conversion from string to dict
+    if essential_skills:
+        try:
+            # ast.literal_eval manages {'key': 'value'}
+            e_skills_dict = ast.literal_eval(essential_skills)
+            
+            # Controllo extra: assicuriamoci che sia davvero un dict
+            if not isinstance(e_skills_dict, dict):
+                e_skills_dict = {}
+        except (ValueError, SyntaxError):
+            print(f"Errore nel parsing di essential_skills: {essential_skills}")
+            e_skills_dict = {}
+    else:
+        e_skills_dict = {}
+
+    # Optional Skills
+    if optional_skills:
+        try:
+            o_skills_dict = ast.literal_eval(optional_skills)
+            if not isinstance(o_skills_dict, dict):
+                o_skills_dict = {}
+        except (ValueError, SyntaxError):
+            o_skills_dict = {}
+    else:
+        o_skills_dict = {}
+
     role_object = Role(
         id=role_id,
         title=title,
         description=description,
-        essential_skills=essential_skills,
-        optional_skills=optional_skills,
+        essential_skills=e_skills_dict,
+        optional_skills=o_skills_dict,
         id_full=id_full,
         uri=uri
     )
@@ -251,12 +304,11 @@ async def add_to_user_skills(
     message_text = "Error: No skills were added."
     updated_skill = False
 
-    if essential_skills:
-        skills_list = essential_skills.split('\n') 
-        for skill in skills_list:
+    if e_skills_dict:
+        for uri, skill in e_skills_dict.items():
             skill_clean = skill.strip()
             if skill_clean and len(skill_clean) > 1:
-                user.current_skills.append(skill_clean)
+                user.current_skills[uri] = skill_clean
                 updated_skill = True
 
     if updated_skill:
@@ -329,12 +381,38 @@ async def details_page(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
+    # Manual conversion from string to dict
+    if essential_skills:
+        try:
+            # ast.literal_eval manages {'key': 'value'}
+            e_skills_dict = ast.literal_eval(essential_skills)
+            
+            # Controllo extra: assicuriamoci che sia davvero un dict
+            if not isinstance(e_skills_dict, dict):
+                e_skills_dict = {}
+        except (ValueError, SyntaxError):
+            print(f"Errore nel parsing di essential_skills: {essential_skills}")
+            e_skills_dict = {}
+    else:
+        e_skills_dict = {}
+
+    # Optional Skills
+    if optional_skills:
+        try:
+            o_skills_dict = ast.literal_eval(optional_skills)
+            if not isinstance(o_skills_dict, dict):
+                o_skills_dict = {}
+        except (ValueError, SyntaxError):
+            o_skills_dict = {}
+    else:
+        o_skills_dict = {}
+
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
-        essential_skills=essential_skills if essential_skills else "",
-        optional_skills=optional_skills if optional_skills else "",
+        essential_skills=e_skills_dict,
+        optional_skills=o_skills_dict,
         id_full=id_full,
         uri=uri
     )
@@ -371,8 +449,6 @@ async def occupation_forecast_and_gap(
     request: Request,
     user = Depends(get_current_user),
     country: str = Form(...),
-    isco_id_list: List[str] = Form(...),
-    role_uri_list: List[str] = Form(...)
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -387,7 +463,6 @@ async def occupation_forecast_and_gap(
         })
 
     forecast_results = []
-
     for role in user.target_roles:
         if isinstance(role, dict):
             r_id = role.get("id")
@@ -396,26 +471,25 @@ async def occupation_forecast_and_gap(
         else:
             r_id = role.id
             r_title = role.title
+            r_uri = role.uri
 
         role_id_str = str(r_id).strip()
+            
+        # CEDEFOP
+        data = crud_skill_models.read_emp_occupation(country=country, isco_id=role_id_str)
         
-        # Role matches one of the ISCO IDs provided
-        if role_id_str in isco_id_list:
-            
-            # CEDEFOP
-            data = crud_skill_models.read_emp_occupation(country=country, isco_id=role_id_str)
-            
-            forecast_results.append({
-                "title": r_title,  
-                "isco_code": role_id_str,
-                "uri": r_uri,
-                "data": data              
-            })
+        forecast_results.append({
+            "title": r_title,  
+            "isco_code": role_id_str,
+            "uri": r_uri,
+            "data": data              
+        })
 
     # Skill gap update
     updated_user = crud_skill_models.skill_gap_user(user)
     crud_user.update_user(updated_user)
 
+    # Course recommendation
     role_list = []
     role_missing_skills = []
     for role in updated_user.skill_gap:
@@ -453,7 +527,6 @@ async def occupation_forecast_and_gap(
         "recommended_courses": recommended_courses,
         "country": country,
         "countries_list": EU_COUNTRIES,
-        "isco_id_list": isco_id_list,
         "current_year": datetime.now().year
     })
 

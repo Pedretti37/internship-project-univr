@@ -11,7 +11,7 @@ class User(BaseModel):
     email: EmailStr
     hashed_password: str
     target_roles: List[Dict[str, Any]] = []
-    current_skills: List[str] = []
+    current_skills: Dict[str, str] = {}
     skill_gap: List[Dict[str, Any]] = []
     id_organization: Optional[str] = None
 
@@ -36,8 +36,8 @@ class Role(BaseModel):
     id: str
     title: str
     description: Optional[str] = None
-    essential_skills: Optional[str] = None
-    optional_skills: Optional[str] = None
+    essential_skills: Dict[str, str] = {}
+    optional_skills: Dict[str, str] = {}
     id_full: Optional[str] = None
     uri: Optional[str] = None
 
@@ -54,6 +54,6 @@ class Project(BaseModel):
 class Course(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
+    ects: int
     description: Optional[str] = None
     skills_covered: List[str] = []
-    role_ids: List[str] = []

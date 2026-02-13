@@ -100,8 +100,8 @@
             <a href="https://app.muchskills.com/dashboard" class="link-muchskills" target="_blank" rel="noopener noreferrer">Use MuchSkill to manage your skills!</a>
 
             <ul>
-                {% for skill in user.current_skills %}
-                    <li>{{ skill }}</li>
+                {% for uri, skill in user.current_skills.items() %}
+                    <li>{{ skill }}<a href="{{ uri }}" target="_blank"> ↗</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -145,11 +145,6 @@
             <h3>Check Future Employment Trend & Skill Gap Analysis</h3>
             <form action="/occupation_forecast_and_gap" method="post">
                 {% if user.target_roles %}
-                    {% for role in user.target_roles %}
-                        <input type="hidden" name="isco_id_list" value="{{ role.id }}">
-                        <input type="hidden" name="role_uri_list" value="{{ role.uri }}">
-                    {% endfor %}
-
                     <div style="margin-bottom: 10px;">
                         <label>Select a Country:</label>
                         <select name="country" id="country" required>
@@ -280,8 +275,8 @@
                             {% if gap.missing_skills %}
                                 <h4 style="color: #d32f2f; margin-top: 10px;">⚠️ Missing Skills:</h4>
                                 <ul>
-                                    {% for skill in gap.missing_skills %}
-                                        <li>{{ skill }}</li>
+                                    {% for uri, skill in gap.missing_skills.items() %}
+                                        <li>{{ skill }}<a href="{{ uri }}" target="_blank"> ↗</a></li>
                                     {% endfor %}
                                 </ul>
                             {% else %}

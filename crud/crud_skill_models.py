@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from typing import List
+from typing import Dict, List
 from models import Project, User, Course
 from datetime import datetime
 
@@ -9,34 +9,22 @@ EMP_OCCUPATION_DETAIL = "data/cedefop/employees/Employment_occupation_detail.xls
 ED_COURSES_MEC_ENGINEER = "educational_offerings/courses/educational_offerings_esco_tagged.json"
 
 def skill_gap_user(user: User) -> User:
-    
-    # User skills in a set    
-    user_skills_set = set()
-    
-    if user.current_skills:
-        for skill in user.current_skills:
-            user_skills_set.add(skill.lower().strip())
-            
     user.skill_gap.clear()
     
     # Target roles iteration
     for role in user.target_roles:
         
-        ess_str = role.get('essential_skills', '') or ""
+        matching = {}
+        missing = {}
         
-        required_skills_list = [s.strip() for s in ess_str.split('\n') if s.strip()]
-        
-        matching = []
-        missing = []
-        
-        for req_skill in required_skills_list:
-            if req_skill.lower().strip() in user_skills_set:
-                matching.append(req_skill)
+        for uri, skill in role['essential_skills'].items():
+            if (uri, skill) in user.current_skills.items():
+                matching[uri] = skill
             else:
-                missing.append(req_skill)
+                missing[uri] = skill
 
         # Percentage
-        total_req = len(required_skills_list)
+        total_req = len(role['essential_skills'])
         match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
 
         
@@ -189,7 +177,7 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
         return {"error": str(e)}
     
 # Recommend courses for skill gap
-def recommend_courses_for_skill_gap(missing_skills_de: List[str]) -> List[Course]:
+def recommend_courses_for_skill_gap(missing_skills_de: Dict[str, str]) -> List[Course]:
     recommended_courses = []
     #print(len(roles))
     
@@ -204,29 +192,52 @@ def recommend_courses_for_skill_gap(missing_skills_de: List[str]) -> List[Course
         print(f"Error reading educational offerings file: {e}")
         return []
 
-    # Managing potential NaN by filling with empty lists
-    courses_df['esco_skills_match'] = courses_df['esco_skills_match'].apply(
-        lambda x: x if isinstance(x, list) else []
-    )
+    missing_skill_names = set(name.lower() for name in missing_skills_de.values())
+    
+    if not missing_skill_names:
+        print("⚠️ Nessuna skill mancante valida fornita.")
+        return []
+    
+    # Dataframe normalization
+    def normalize_course_skills(x):
+        if isinstance(x, list):
+            return [s.lower() for s in x if isinstance(s, str)]
+        elif isinstance(x, dict):
+            return [s.lower() for s in x.values() if isinstance(s, str)]
+        return []
 
-    def has_missing_skill(course_skills):
-        # True if there is an element in common between the course skills and the missing skills
-        return bool(set(course_skills) & set(missing_skills_de))
+    courses_df['skills_normalized'] = courses_df['esco_skills_match'].apply(normalize_course_skills)
 
-    # DF filtering
-    matched_df = courses_df[courses_df['esco_skills_match'].apply(has_missing_skill)]
-    print(f"Found {len(matched_df)} courses matching at least one missing skill.")
+    # Matching function
+    def has_missing_skill(course_skills_list):
+        return bool(set(course_skills_list) & missing_skill_names)
 
+    # Filtered df
+    matched_df = courses_df[courses_df['skills_normalized'].apply(has_missing_skill)]
+    print(f"✅ Found {len(matched_df)} courses matching at least one missing skill.")
+
+    # Recommended courses creation
     for _, course_row in matched_df.iterrows():
+        course_skills_original = course_row.get('esco_skills_match', [])
+        
+        if isinstance(course_skills_original, list):
+            raw_skills = course_skills_original
+        elif isinstance(course_skills_original, dict):
+            raw_skills = list(course_skills_original.values())
+        else:
+            raw_skills = []
+
+        covered = [s for s in raw_skills if s.lower() in missing_skill_names]
+
         course = Course(
-            title=course_row.get('title_de', 'Senza Titolo'),
-            description=course_row.get('learning_outcomes_de', ''),
-            skills_covered=course_row.get('esco_skills_match', []), 
-            role_ids=course_row.get('role_ids', [])
+            title=course_row.get('title_de', 'No Title'),
+            ects=course_row.get('ects', 'N/A'),
+            description=course_row.get('learning_outcomes_de', 'N/A'),
+            skills_covered=covered # Only skills that are actually in the missing list
         )
         recommended_courses.append(course)
     
-    # Remove duplicates
+    # 7. RIMOZIONE DUPLICATI
     unique_courses_map = {c.title: c for c in recommended_courses}
     
     return list(unique_courses_map.values())

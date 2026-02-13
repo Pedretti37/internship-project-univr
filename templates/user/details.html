@@ -35,20 +35,16 @@
         {% if role.essential_skills %}
             <h2>Essential Skills</h2>
             <ul>
-            {% for line in role.essential_skills.split('\n') %}
-                {% if line.strip() %}
-                    <li>{{ line }}</li>
-                {% endif %}
+            {% for uri, skill in role.essential_skills.items() %}
+                <li>{{ skill }}: <a href="{{ uri }}" target="_blank"> ↗</a></li>
             {% endfor %}
             </ul>
         {% endif %}
         {% if role.optional_skills %}
             <h2>Optional Skills</h2>
             <ul>
-            {% for line in role.optional_skills.split('\n') %}
-                {% if line.strip() %}
-                    <li>{{ line }}</li>
-                {% endif %}
+            {% for uri, skill in role.optional_skills.items() %}
+                <li>{{ skill }}: <a href="{{ uri }}" target="_blank"> ↗</a></li>
             {% endfor %}
             </ul>
         {% endif %}

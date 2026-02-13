@@ -56,26 +56,27 @@ def get_single_role_details(uri: str, language: str) -> Role | None:
                 # Links only 
                 source = links.get(key_name, [])
             
-            titles = []
+            titles = {}
             for item in source:
                 t = item.get('title')
-                if t:
-                    titles.append(t)
+                u = item.get('uri')
+                if t and u:
+                    titles[u] = t
             return titles
 
         essential_titles = extract_titles('hasEssentialSkill')
         optional_titles = extract_titles('hasOptionalSkill')
 
         # Up to 40 skills each for now
-        str_essential = "\n".join([t.capitalize() for t in essential_titles[:40]])
-        str_optional = "\n".join([t.capitalize() for t in optional_titles[:40]])
+        # str_essential = "\n".join([t.capitalize() for t in list(essential_titles.values())[:40]])
+        # str_optional = "\n".join([t.capitalize() for t in list(optional_titles.values())[:40]])
 
         return Role(
             id=str(isco_family),
             title=title,
             description=definition,
-            essential_skills=str_essential,
-            optional_skills=str_optional,
+            essential_skills=essential_titles,
+            optional_skills=optional_titles,
             id_full=str(isco_code_raw),
             uri=uri
         )
@@ -118,9 +119,9 @@ def get_esco_occupations_list(keyword, language, limit=10):
     return output_list
 
 ### Skill translation function (EN -> DE)
-def translate_skill_esco(roles: list[dict]) -> list[str]:
-    results = []  
-    not_found = []
+def translate_skill_esco(roles: list[dict]) -> dict[str, str]:
+    results = {}  
+    not_found = {}
 
     for role in roles:
         # print("--- Processing role ---")
@@ -131,17 +132,6 @@ def translate_skill_esco(roles: list[dict]) -> list[str]:
                 not_found.append(role["role_title"])
                 continue
             # print(f"Role URI found: {role_uri}")
-            
-            # English Skills
-            resp_en = requests.get(f"{BASE_URL}/resource/occupation", params={'uri': role_uri, 'language': 'en', 'viewMode': 'FULL'}).json()
-            # print(f"URL: {BASE_URL}/resource/occupation?uri={role_uri}&language=en&viewMode=FULL")
-            links = resp_en.get('_links', {})
-            all_skills_en = links.get('hasEssentialSkill', [])
-
-            en_skill_map = {}
-            for item in all_skills_en:
-                en_skill_map[item['title'].lower()] = item['uri']
-            # print(f"English skills mapped: {en_skill_map.keys()}")
 
             # German Skills
             resp_de = requests.get(f"{BASE_URL}/resource/occupation", params={'uri': role_uri, 'language': 'de', 'viewMode': 'FULL'}).json()
@@ -154,22 +144,16 @@ def translate_skill_esco(roles: list[dict]) -> list[str]:
                 de_skill_map[item['uri']] = item['title']
             # print(f"German skills mapped: {de_skill_map.values()}")
 
-            for skill_en in role["missing_skills"]:
-                uri = en_skill_map.get(skill_en.lower())
-                # print(f"Processing skill: '{skill_en}' -> URI: {uri}")
-                if uri:
-                    translation = de_skill_map.get(uri)
-                    # print(f"Translation found: '{skill_en}' -> '{translation}'")
-                    if translation:
-                        results.append(translation)
-                    else:
-                        not_found.append(skill_en) # URI is found but no German translation available
+            for uri, skill_en in role["missing_skills"].items():
+                translation = de_skill_map.get(uri)
+                if translation:
+                    results[uri] = translation
                 else:
-                    # ESCO definition not found for this skill
-                    not_found.append(skill_en)
+                    not_found[uri] = skill_en
         
         except Exception as e:
-            return f"Error during API call: {str(e)}"
+            print(f"Error during API call: {str(e)}")
+            continue
         # print("--------------------------")
     
     # print(results)
