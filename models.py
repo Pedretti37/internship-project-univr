@@ -56,4 +56,4 @@ class Course(BaseModel):
     title: str
     ects: int
     description: Optional[str] = None
-    skills_covered: List[str] = []
+    skills_covered: Dict[str, str] = {}

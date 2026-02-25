@@ -177,7 +177,7 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
         return {"error": str(e)}
     
 # Recommend courses for skill gap
-def recommend_courses_for_skill_gap(missing_skills_uri: List[str]) -> List[Course]:
+def recommend_courses_for_skill_gap(missing_skills_uri: Dict[str, str]) -> List[Course]:
     recommended_courses = []
     
     # Reading educational offerings file
@@ -193,15 +193,23 @@ def recommend_courses_for_skill_gap(missing_skills_uri: List[str]) -> List[Cours
     
     # print(courses_df.head())  # Debug: Check the structure of the DataFrame
 
-    for course in courses_df.itertuples():
-        for uri_skill in course.esco_skills_match.keys():
-            if uri_skill in missing_skills_uri:
-                course = Course(
-                    title=course.title_de,
-                    ects=course.ects,
-                    description=course.learning_outcomes_de,
-                    skills_covered=list(course.esco_skills_match.keys())
-                )
-                recommended_courses.append(course)
+    for row in courses_df.itertuples():
+        # 1. Trova tutte le skill mancanti coperte da questo specifico corso
+        # Usiamo una dictionary comprehension per raccogliere i match
+        matched_skills = {
+            uri: missing_skills_uri[uri] 
+            for uri in row.esco_skills_match.keys() 
+            if uri in missing_skills_uri
+        }
+
+        # 2. Se il corso copre almeno una skill, creiamo l'oggetto una sola volta
+        if matched_skills:
+            new_course = Course(
+                title=row.title_de,
+                ects=row.ects,
+                description=row.learning_outcomes_de,
+                skills_covered=matched_skills  # Qui passiamo tutte le skill trovate
+            )
+            recommended_courses.append(new_course)
 
     return recommended_courses

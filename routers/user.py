@@ -490,26 +490,22 @@ async def occupation_forecast_and_gap(
     crud_user.update_user(updated_user)
 
     # Course recommendation
-    role_list = []
-    missing_skills_uri = []
+    missing_skills = {}
     for role in updated_user.skill_gap:
         if 0 <= role["match_score"] < 100:
-            role_list.append(role)
+            for result in forecast_results:
+                data = result["data"]
+                if data["growth_pct"] >= -5:
+                    # Role is expected to grow or remain stable --> provide educational courses and training opportunities
+                    for skill_uri, skill_name in role["missing_skills"].items():
+                        missing_skills[skill_uri] = skill_name
 
-    for result in forecast_results:
-        data = result["data"]
-        # print(data["growth_pct"])
-        if data["growth_pct"] >= -5 and result["isco_code"] in [role["role_id"] for role in role_list]:
-            # Role is expected to grow or remain stable --> provide educational courses and training opportunities
-            # print(f"Role id {result['isco_code']} added.")
-            missing_skills_uri.extend(role["missing_skills"].keys())
-
-    # print(len(missing_skills_uri))
+    # print(len(missing_skills))
 
     # List of recommended courses for the missing skills
     # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
     # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills_uri)
+    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills)
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,

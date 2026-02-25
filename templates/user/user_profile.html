@@ -309,8 +309,8 @@
                             <p>{{ course.description }}</p>
                             <p><small>Skills covered:</small></p>
                             <ul>
-                                {% for skill in course.skills_covered %}
-                                    <li>{{ skill }}</li>
+                                {% for uri, skill in course.skills_covered.items() %}
+                                    <li>{{ skill }}<a href="{{ uri }}" target="_blank"> ↗</a></li>
                                 {% endfor %}
                             </ul>
                         </li>
