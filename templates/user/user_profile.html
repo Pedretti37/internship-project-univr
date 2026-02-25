@@ -307,8 +307,12 @@
                         <li>
                             <h4>{{ course.title }}</h4>
                             <p>{{ course.description }}</p>
-                            <p><small>Skills Covered: {{ course.skills_covered|join(', ') }}</small></p>
-                            <p><small>Role IDs: {{ course.role_ids|join(', ') }}</small></p>
+                            <p><small>Skills covered:</small></p>
+                            <ul>
+                                {% for skill in course.skills_covered %}
+                                    <li>{{ skill }}</li>
+                                {% endfor %}
+                            </ul>
                         </li>
                     {% endfor %}
                 </ul>

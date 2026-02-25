@@ -119,11 +119,11 @@ def get_esco_occupations_list(keyword, language, limit=10):
     return output_list
 
 ### Skill translation function (EN -> DE)
-def translate_skill_esco(roles: list[dict]) -> dict[str, str]:
+def translate_skill_esco(missing_skills_uri: list[str]) -> dict[str, str]:
     results = {}  
     not_found = {}
 
-    for role in roles:
+    for role in missing_skills_uri:
         # print("--- Processing role ---")
         try:
             # URI extraction
@@ -135,7 +135,7 @@ def translate_skill_esco(roles: list[dict]) -> dict[str, str]:
 
             # German Skills
             resp_de = requests.get(f"{BASE_URL}/resource/occupation", params={'uri': role_uri, 'language': 'de', 'viewMode': 'FULL'}).json()
-            # print(f"URL: {BASE_URL}/resource/occupation?uri={role_uri}&language=de&viewMode=FULL")
+            print(f"URL: {BASE_URL}/resource/occupation?uri={role_uri}&language=de&viewMode=FULL")
             links = resp_de.get('_links', {})
             all_skills_de = links.get('hasEssentialSkill', [])
 

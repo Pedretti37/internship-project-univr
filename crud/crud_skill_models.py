@@ -177,9 +177,8 @@ def read_emp_occupation(country: str, isco_id: str) -> dict:
         return {"error": str(e)}
     
 # Recommend courses for skill gap
-def recommend_courses_for_skill_gap(missing_skills_de: Dict[str, str]) -> List[Course]:
+def recommend_courses_for_skill_gap(missing_skills_uri: List[str]) -> List[Course]:
     recommended_courses = []
-    #print(len(roles))
     
     # Reading educational offerings file
     if not os.path.exists(ED_COURSES_MEC_ENGINEER):
@@ -191,53 +190,18 @@ def recommend_courses_for_skill_gap(missing_skills_de: Dict[str, str]) -> List[C
     except Exception as e:
         print(f"Error reading educational offerings file: {e}")
         return []
-
-    missing_skill_names = set(name.lower() for name in missing_skills_de.values())
     
-    if not missing_skill_names:
-        print("⚠️ Nessuna skill mancante valida fornita.")
-        return []
-    
-    # Dataframe normalization
-    def normalize_course_skills(x):
-        if isinstance(x, list):
-            return [s.lower() for s in x if isinstance(s, str)]
-        elif isinstance(x, dict):
-            return [s.lower() for s in x.values() if isinstance(s, str)]
-        return []
+    # print(courses_df.head())  # Debug: Check the structure of the DataFrame
 
-    courses_df['skills_normalized'] = courses_df['esco_skills_match'].apply(normalize_course_skills)
+    for course in courses_df.itertuples():
+        for uri_skill in course.esco_skills_match.keys():
+            if uri_skill in missing_skills_uri:
+                course = Course(
+                    title=course.title_de,
+                    ects=course.ects,
+                    description=course.learning_outcomes_de,
+                    skills_covered=list(course.esco_skills_match.keys())
+                )
+                recommended_courses.append(course)
 
-    # Matching function
-    def has_missing_skill(course_skills_list):
-        return bool(set(course_skills_list) & missing_skill_names)
-
-    # Filtered df
-    matched_df = courses_df[courses_df['skills_normalized'].apply(has_missing_skill)]
-    print(f"✅ Found {len(matched_df)} courses matching at least one missing skill.")
-
-    # Recommended courses creation
-    for _, course_row in matched_df.iterrows():
-        course_skills_original = course_row.get('esco_skills_match', [])
-        
-        if isinstance(course_skills_original, list):
-            raw_skills = course_skills_original
-        elif isinstance(course_skills_original, dict):
-            raw_skills = list(course_skills_original.values())
-        else:
-            raw_skills = []
-
-        covered = [s for s in raw_skills if s.lower() in missing_skill_names]
-
-        course = Course(
-            title=course_row.get('title_de', 'No Title'),
-            ects=course_row.get('ects', 'N/A'),
-            description=course_row.get('learning_outcomes_de', 'N/A'),
-            skills_covered=covered # Only skills that are actually in the missing list
-        )
-        recommended_courses.append(course)
-    
-    # 7. RIMOZIONE DUPLICATI
-    unique_courses_map = {c.title: c for c in recommended_courses}
-    
-    return list(unique_courses_map.values())
+    return recommended_courses

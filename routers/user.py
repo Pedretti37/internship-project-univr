@@ -491,7 +491,7 @@ async def occupation_forecast_and_gap(
 
     # Course recommendation
     role_list = []
-    role_missing_skills = []
+    missing_skills_uri = []
     for role in updated_user.skill_gap:
         if 0 <= role["match_score"] < 100:
             role_list.append(role)
@@ -502,23 +502,14 @@ async def occupation_forecast_and_gap(
         if data["growth_pct"] >= -5 and result["isco_code"] in [role["role_id"] for role in role_list]:
             # Role is expected to grow or remain stable --> provide educational courses and training opportunities
             # print(f"Role id {result['isco_code']} added.")
-            role_missing_skills.append({
-                "role_id": result["isco_code"],
-                "role_title": result["title"],
-                "role_uri": result["uri"],
-                "missing_skills": next((role["missing_skills"] for role in role_list if role["role_id"] == result["isco_code"]), [])
-            })
-    # print(role_missing_skills)
-    missing_skills_de = escoAPI.translate_skill_esco(role_missing_skills)
-    if missing_skills_de:
-        print(f"Missing skills in German: {missing_skills_de}")
-    else:
-        print("No missing skills found or translation failed.")
+            missing_skills_uri.extend(role["missing_skills"].keys())
+
+    # print(len(missing_skills_uri))
 
     # List of recommended courses for the missing skills
     # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
     # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills_de)
+    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills_uri)
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,

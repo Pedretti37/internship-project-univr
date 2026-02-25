@@ -360,24 +360,15 @@
             "uri": "http://data.europa.eu/esco/occupation/d1974e0c-8f92-473b-a32d-f0616c08b1ff"
         }
     ],
-    "current_skills": {
-        "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919": "engineering processes",
-        "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": "approve engineering design",
-        "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": "adjust engineering designs",
-        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
-        "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": "perform scientific research",
-        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
-        "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78": "engineering principles",
-        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
-        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering"
-    },
+    "current_skills": {},
     "skill_gap": [
         {
             "role_id": "2144",
             "role_title": "mechanical engineer",
-            "match_score": 100,
+            "match_score": 0,
             "total_required": 9,
-            "matching_skills": {
+            "matching_skills": {},
+            "missing_skills": {
                 "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": "perform scientific research",
                 "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919": "engineering processes",
                 "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": "adjust engineering designs",
@@ -387,22 +378,20 @@
                 "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
                 "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
                 "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering"
-            },
-            "missing_skills": {}
+            }
         },
         {
             "role_id": "7222",
             "role_title": "precision mechanic",
-            "match_score": 7,
+            "match_score": 0,
             "total_required": 13,
-            "matching_skills": {
-                "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics"
-            },
+            "matching_skills": {},
             "missing_skills": {
                 "http://data.europa.eu/esco/skill/a99c6783-50c0-4f7a-99df-bf93429ef6dc": "use precision tools",
                 "http://data.europa.eu/esco/skill/42c25baf-ccb3-47d9-a872-bb2ceb615538": "operate precision measuring equipment",
                 "http://data.europa.eu/esco/skill/6ed2fb8d-3580-497f-8a21-30a0ada5caae": "secure working area",
                 "http://data.europa.eu/esco/skill/2fea2558-630e-480d-9e12-47a05bc19b55": "precision mechanics",
+                "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
                 "http://data.europa.eu/esco/skill/b27411a8-c401-4241-841b-c742ae32a8d3": "micromechanics",
                 "http://data.europa.eu/esco/skill/465ff64a-1271-4064-8ed1-e969cb68d8b4": "perform test run",
                 "http://data.europa.eu/esco/skill/9ea652f6-accf-45bb-b9a8-590f06f7bd51": "supply machine",
