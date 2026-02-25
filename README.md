@@ -13,6 +13,7 @@ The application is currently in the **development phase**.
 - **Target Roles:** Users can define up to 5 target roles to track their career path.
 - **Skill Forecast by CEDEFOP:** Users can now see whether their target roles are growing/declining occupation-wise per country.
 - **Skill Gap Evaluation:** Users can evaluate the skill gap between their current skill set and target roles.
+- **Educational Offerings:** An algorithm is being set up to allow users to see available courses offered by DHBW based on their missing skill.
 
 ### Organization Module
 - **Organization Registration:** Companies can sign up and create a business profile.
