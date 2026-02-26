@@ -21,22 +21,22 @@ def tag_courses_with_esco_role(role_search_term, courses_json_path):
     print(f"🔍 1. Interrogo ESCO per il ruolo: '{role_search_term}'...")
     print(f"   ℹ️  Nota: Richiedo i risultati in TEDESCO (language='de') per il matching con i PDF.")
 
-    results = escoAPI.get_esco_occupations_list(role_search_term, language='de', limit=1)
+    results = escoAPI.get_esco_occupations_list(role_search_term, language='de', limit=5)
     
     if not results:
         print("⚠️  Nessun ruolo trovato su ESCO. Prova con un termine diverso (es. 'Maschinenbauingenieur').")
         return
     
-    target_role = results[0] # Most relevant result
-    print(f"✅ Ruolo Trovato: {target_role.title}")
-    print(f"   URI: {target_role.uri}")
+    # target_role = results[0] # Most relevant result
+    essential_dict = {}
+    for target_role in results:
+        print(f"✅ Ruolo Trovato: {target_role.title}")
+        print(f"   URI: {target_role.uri}")
     
-    # Skill preparation (Parsing the \n string)
-    essential_dict = {uri: skill for uri, skill in target_role.essential_skills.items()}
-    # optional_dict = target_role.optional_skills.items()
+        # Skill preparation (Parsing the \n string)
+        essential_dict.update({uri: skill for uri, skill in target_role.essential_skills.items()})
+        # optional_dict = target_role.optional_skills.items()
     
-    # Remove duplicates while preserving order
-
     print(f"   -> Scaricate {len(essential_dict)} skills ufficiali in Tedesco.")
 
     # Courses matching

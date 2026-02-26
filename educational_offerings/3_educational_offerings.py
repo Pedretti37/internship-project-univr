@@ -6,7 +6,7 @@ from deep_translator import GoogleTranslator
 
 # File paths
 PROJECT_FILE = 'data\\projects\\5f6cd065-289e-46f4-908c-73a5074a7a21.json'
-COURSES_FILE = 'educational_offerings_esco_tagged.json'
+COURSES_FILE = 'v2_educational_offerings_esco_tagged.json'
 OUTPUT_FILE = 'skill_matching_results_v2.json'
 
 # Words to ignore during matching (common words that don't add value)
