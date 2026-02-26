@@ -40,7 +40,7 @@ The application is currently in the **development phase**.
 | **Validation** | Pydantic |
 | **Security** | Passlib (Argon2-cffi) |
 | **Frontend** | HTML5, CSS3, Jinja2 Templates |
-| **External APIs** | ESCO API, Google Gemini (LLM) |
+| **External APIs** | ESCO API |
 
 ## Project Structure
 
