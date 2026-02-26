@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/course_details.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="/user_profile">← Back</a>
+    
+    <h1>{{ course.title }}</h1>
+    
+    <div class="details-box">
+        <h3>Description</h3>
+        <p>{{ course.description }}</p>
+        
+        <h3>ECTS Credits</h3>
+        <p>{{ course.ects }}</p>
+    </div>
+
+    {% if course.skills_covered %}
+        <div class="details-box">
+            <h3>Skills Covered</h3>
+            <ul>
+            {% for uri, skill in course.skills_covered.items() %}
+                <li>{{ skill }} <a href="{{ uri }}">-></a></li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <div>
+            <p>No skills covered for this course.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

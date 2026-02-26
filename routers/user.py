@@ -10,9 +10,11 @@ from dependencies import get_current_user
 from config import templates, pwd_context
 import crud.crud_skill_models as crud_skill_models
 from esco import escoAPI
-from models import Role, User
+from models import Course, Role, User
 
 USER_ROLES_LIST = {}
+USER_COURSES_LIST = {}
+USER_FORECAST_RESULTS = {}
 
 EU_COUNTRIES = [
     "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", 
@@ -132,14 +134,30 @@ async def user_profile(request: Request, user = Depends(get_current_user)):
             clean["raw_id"] = raw["id"]          
             clean["org_id"] = raw["org_id"]
             clean_invitations.append(clean)
+        
+    if user.id in USER_COURSES_LIST:
+        session_data = USER_COURSES_LIST[user.id]
+        recommended_courses = session_data["results"]
+    else:
+        recommended_courses = None
 
+    if user.id in USER_FORECAST_RESULTS:
+        session_data = USER_FORECAST_RESULTS[user.id]
+        forecast_results = session_data["results"]
+        country = session_data["country"]
+    else:
+        forecast_results = None
+        country = None
 
     response = templates.TemplateResponse(
         "user/user_profile.html", {
             "request": request, 
             "user": user, 
             "countries_list": EU_COUNTRIES,
-            "invitations": clean_invitations
+            "invitations": clean_invitations,
+            "recommended_courses": recommended_courses,
+            "forecast_results": forecast_results,
+            "country": country
         }
     )
 
@@ -485,6 +503,11 @@ async def occupation_forecast_and_gap(
             "data": data              
         })
 
+    USER_FORECAST_RESULTS[user.id] = {
+        "country": country,
+        "results": forecast_results
+    }
+
     # Skill gap update
     updated_user = crud_skill_models.skill_gap_user(user)
     crud_user.update_user(updated_user)
@@ -506,6 +529,11 @@ async def occupation_forecast_and_gap(
     # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
     # assuming "Mechanical Engineer" and similar role as default role type
     recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills)
+
+    USER_COURSES_LIST[user.id] = {
+        "results": recommended_courses
+    }
+
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
@@ -558,7 +586,47 @@ async def accept_invitation(
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
 
+@router.post("/course_details", response_class=HTMLResponse)
+async def course_details(
+    request: Request,
+    id: str = Form(...),
+    title: str = Form(...),
+    ects: int = Form(...),
+    description: str = Form(...),
+    skills_covered: str = Form(...),
+    user = Depends(get_current_user)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
+    # Manual conversion from string to dict
+    if skills_covered:
+        try:
+            # ast.literal_eval manages {'key': 'value'}
+            e_skills_dict = ast.literal_eval(skills_covered)
+            
+            # Controllo extra: assicuriamoci che sia davvero un dict
+            if not isinstance(e_skills_dict, dict):
+                e_skills_dict = {}
+        except (ValueError, SyntaxError):
+            print(f"Errore nel parsing di skills_covered: {skills_covered}")
+            e_skills_dict = {}
+    else:
+        e_skills_dict = {}
+
+    course_obj = Course(
+        id=id,
+        title=title,
+        ects=ects,
+        description=description,
+        skills_covered=e_skills_dict
+    )
+
+    return templates.TemplateResponse("course_details.html", {
+        "request": request,
+        "user": user,
+        "course": course_obj
+    })
     
 
 
