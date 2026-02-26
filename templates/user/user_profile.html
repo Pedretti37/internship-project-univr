@@ -306,24 +306,12 @@
                     {% for course in recommended_courses %}
                         <li>
                             <div class="course-card">
-                                <form action="/course_details" method="post" style="display: inline;">
-                                    <input type="hidden" name="id" value="{{ course.id }}">
-                                    <input type="hidden" name="title" value="{{ course.title }}">
-                                    <input type="hidden" name="ects" value="{{ course.ects }}">
-                                    <input type="hidden" name="description" value="{{ course.description }}">
-                                    <input type="hidden" name="skills_covered" value="{{ course.skills_covered }}">
-
-                                    <h3>
-                                        <button type="submit" style="background:none; border:none; padding:0; color:blue; text-decoration:underline; cursor:pointer; font-size: inherit; font-weight: bold;">
-                                            {{ course.title }}
-                                        </button>
-                                    </h3>
-                                </form>
-
+                                <h3>{{ course.title }}</h3>
+                                <p>{{ course.description }}</p>
                                 <p><small>Skills covered:</small></p>
                                 <ul>
                                     {% for uri, skill in course.skills_covered.items() %}
-                                        <li>{{ skill }}<a href="{{ uri }}" target="_blank"> ↗</a></li>
+                                        <li>{{ skill }} <a href="{{ uri }}" target="_blank">↗</a></li>
                                     {% endfor %}
                                 </ul>
                             </div>

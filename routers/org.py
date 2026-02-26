@@ -42,6 +42,16 @@ async def org_login(orgname: str = Form(...), password: str = Form(...)):
 
     return response
 
+### --- Logout --- ###
+@router.get("/org_logout")
+async def logout():
+    response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    # Delete current session
+    response.set_cookie(key="session_token", value="", path="/", httponly=True, max_age=0)
+
+    return response
+
 ### --- Organization Home --- ###
 @router.get("/org_home", response_class=HTMLResponse)
 async def org_home(request: Request, org = Depends(get_current_org)):

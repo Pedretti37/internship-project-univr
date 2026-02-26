@@ -1,42 +1,47 @@
 import os
 import pandas as pd
 from typing import Dict, List
-from models import Project, User, Course
+from models import Project, User, Course, Role
 from datetime import datetime
 
 EMP_OCCUPATION = "data/cedefop/employees/Employment_occupation.xlsx"
 EMP_OCCUPATION_DETAIL = "data/cedefop/employees/Employment_occupation_detail.xlsx"
 ED_COURSES_MEC_ENGINEER = "educational_offerings/courses/educational_offerings_esco_tagged.json"
 
-def skill_gap_user(user: User) -> User:
-    user.skill_gap.clear()
-    
-    # Target roles iteration
-    for role in user.target_roles:
-        
-        matching = {}
-        missing = {}
-        
-        for uri, skill in role['essential_skills'].items():
-            if (uri, skill) in user.current_skills.items():
-                matching[uri] = skill
-            else:
-                missing[uri] = skill
+def skill_gap_user(user: User, role_list: List[Role]) -> User:
+    for role in role_list:
+        role_id = role.get('id')
 
-        # Percentage
-        total_req = len(role['essential_skills'])
-        match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
+        ruolo_gia_calcolato = any(gap.get('role_id') == role_id for gap in user.skill_gap)
 
-        
-        role_gap_info = {
-            'role_id': role.get('id', ''),
-            'role_title': role.get('title', ''),
-            'match_score': match_pct,
-            'total_required': total_req,
-            'matching_skills': matching,
-            'missing_skills': missing
-        }
-        user.skill_gap.append(role_gap_info)
+        if not ruolo_gia_calcolato:
+            matching = {}
+            missing = {}
+            
+            essential_skills = role.get('essential_skills', {})
+            
+            for uri, skill in essential_skills.items():
+                if uri in user.current_skills:
+                    matching[uri] = skill
+                else:
+                    missing[uri] = skill
+
+            print(f"Matching: {matching.values()}")
+            print(f"Missing: {missing.values()}")
+
+            total_req = len(essential_skills)
+            match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
+            
+            role_gap_info = {
+                'role_id': role_id,
+                'role_title': role.get('title', ''),
+                'match_score': match_pct,
+                'total_required': total_req,
+                'matching_skills': matching,
+                'missing_skills': missing
+            }
+            
+            user.skill_gap.append(role_gap_info)
 
     return user
 

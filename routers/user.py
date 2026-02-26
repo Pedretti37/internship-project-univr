@@ -10,7 +10,7 @@ from dependencies import get_current_user
 from config import templates, pwd_context
 import crud.crud_skill_models as crud_skill_models
 from esco import escoAPI
-from models import Course, Role, User
+from models import Role, User
 
 USER_ROLES_LIST = {}
 USER_COURSES_LIST = {}
@@ -56,6 +56,22 @@ async def user_login(username: str = Form(...), password: str = Form(...)):
     response.set_cookie(key="session_token", value=user.id, path="/", httponly=True, max_age=1800)  # 30 minutes session
     response.delete_cookie(key="flash_error")
 
+    return response
+
+### --- Logout --- ###
+@router.get("/user_logout")
+async def logout(user = Depends(get_current_user)):
+    response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    # Delete current session
+    response.set_cookie(key="session_token", value="", path="/", httponly=True, max_age=0)
+
+    if user.id in USER_ROLES_LIST:
+        del USER_ROLES_LIST[user.id]
+    if user.id in USER_COURSES_LIST:
+        del USER_COURSES_LIST[user.id]
+    if user.id in USER_FORECAST_RESULTS:
+        del USER_FORECAST_RESULTS[user.id]
     return response
 
 ### --- User Home --- ###
@@ -481,6 +497,7 @@ async def occupation_forecast_and_gap(
         })
 
     forecast_results = []
+    role_list = []
     for role in user.target_roles:
         if isinstance(role, dict):
             r_id = role.get("id")
@@ -503,14 +520,16 @@ async def occupation_forecast_and_gap(
             "data": data              
         })
 
+        if data['growth_pct'] >= -5:
+            role_list.append(role)
+    
+    updated_user = crud_skill_models.skill_gap_user(user, role_list)
+    crud_user.update_user(updated_user)
+
     USER_FORECAST_RESULTS[user.id] = {
         "country": country,
         "results": forecast_results
     }
-
-    # Skill gap update
-    updated_user = crud_skill_models.skill_gap_user(user)
-    crud_user.update_user(updated_user)
 
     # Course recommendation
     missing_skills = {}
@@ -586,47 +605,6 @@ async def accept_invitation(
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
 
-@router.post("/course_details", response_class=HTMLResponse)
-async def course_details(
-    request: Request,
-    id: str = Form(...),
-    title: str = Form(...),
-    ects: int = Form(...),
-    description: str = Form(...),
-    skills_covered: str = Form(...),
-    user = Depends(get_current_user)
-):
-    if not user:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    # Manual conversion from string to dict
-    if skills_covered:
-        try:
-            # ast.literal_eval manages {'key': 'value'}
-            e_skills_dict = ast.literal_eval(skills_covered)
-            
-            # Controllo extra: assicuriamoci che sia davvero un dict
-            if not isinstance(e_skills_dict, dict):
-                e_skills_dict = {}
-        except (ValueError, SyntaxError):
-            print(f"Errore nel parsing di skills_covered: {skills_covered}")
-            e_skills_dict = {}
-    else:
-        e_skills_dict = {}
-
-    course_obj = Course(
-        id=id,
-        title=title,
-        ects=ects,
-        description=description,
-        skills_covered=e_skills_dict
-    )
-
-    return templates.TemplateResponse("course_details.html", {
-        "request": request,
-        "user": user,
-        "course": course_obj
-    })
-    
 
 
