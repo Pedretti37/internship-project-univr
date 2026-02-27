@@ -47,30 +47,31 @@ def skill_gap_user(user: User, role_list: List[Role]) -> User:
 
 def skill_gap_project(project: Project, members: List[User]) -> Project:
     
-    team_skills_set = set()
+    team_skills = {}
     for user in members:
         if user.current_skills:
-            for skill in user.current_skills:
-                team_skills_set.add(skill.lower().strip())
+            for uri, skill in user.current_skills:
+                team_skills[uri] = skill
 
-    project.skill_gap.clear()
+    if hasattr(project, 'skill_gap'):
+        project.skill_gap.clear()
+    else:
+        project.skill_gap = []
 
     for role in project.target_roles:
+        required_skills = role.get('essential_skills')
+
+        matching = {}
+        missing = {}
         
-        ess_str = role.get('essential_skills', '') or ""
-        required_skills_list = [s.strip() for s in ess_str.split('\n') if s.strip()]
-        
-        matching = []
-        missing = []
-        
-        for req_skill in required_skills_list:
-            if req_skill.lower().strip() in team_skills_set:
-                matching.append(req_skill)
+        for uri, req_skill in required_skills.items():
+            if uri and req_skill in team_skills:
+                matching[uri] = req_skill
             else:
-                missing.append(req_skill)
+                missing[uri] = req_skill
 
         # Percentage 
-        total_req = len(required_skills_list)
+        total_req = len(required_skills)
         match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
         
         role_gap_info = {

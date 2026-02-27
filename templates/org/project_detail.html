@@ -108,8 +108,8 @@
                             {% if gap.missing_skills %}
                                 <p class="missing-skills-label">⚠️ Missing Skills in Team:</p>
                                 <ul class="missing-skills-list">
-                                    {% for skill in gap.missing_skills %}
-                                        <li>{{ skill }}</li>
+                                    {% for uri, skill in gap.missing_skills.items() %}
+                                        <li>{{ skill }} <a href="{{ uri }}">↗</a></li>
                                     {% endfor %}
                                 </ul>
                             {% else %}
