@@ -12,28 +12,19 @@
 
         <div class="nav-right">
             <a href="/org_profile" class="nav-link">Profile</a>
-            <a href="/org_logout" class="nav-link btn-logout">Logout</a>
+            <a href="/org_logout" class="nav-link logout-btn">Logout</a>
         </div>
     </nav>
 
-    <div class="container">
-        <h1>Welcome, {{ org.name }}</h1>
+    <div class="main-container">
         
         {% if error %} <p class="status-err">{{ error }}</p> {% endif %}
         {% if success %} <p class="status-ok">{{ success }}</p> {% endif %}
 
         <div class="dashboard-container">
             
-            <div class="card">
+            <div>
                 <h2>My Team ({{ members|length }})</h2>
-                <p><small>Add users by their username</small></p>
-                
-                <form action="/invite_member" method="post" class="add-form">
-                    <input type="text" name="username_to_invite" placeholder="Username" required>
-                    <button type="submit" class="btn-primary">Invite</button>
-                </form>
-
-                <hr>
 
                 {% if members %}
                     <ul>
@@ -43,42 +34,48 @@
                                 <strong>{{ member.name }} {{ member.surname }}</strong>
                                 <br>
                                 <span class="badge-skill">{{ member.current_skills|length }} Skills</span>
-                                <small style="color:#666">({{ member.username }})</small>
+                                <small class="member-username">({{ member.username }})</small>
                             </div>
-                            </li>
+                        </li>
                     {% endfor %}
                     </ul>
                 {% else %}
                     <p>No members yet. Invite someone!</p>
                 {% endif %}
+                
+                <p><small>Add users by their username</small></p>
+                <form action="/invite_member" method="post" class="add-form">
+                    <input type="text" name="username_to_invite" placeholder="Username" required>
+                    <button type="submit" class="btn-primary">Invite</button>
+                </form>
+
+                <hr class="hr">
+            </div>
+
+            <div class="project-header">
+                <h2>Active Projects</h2>
+                <a href="/org/create_project" class="btn-primary btn-new-project">+ New Project</a>
             </div>
 
             <div class="card">
-                <h2>Active Projects</h2>
-                
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items: center;">
-                    <span>Manage your assessments</span>
-                    <a href="/org/create_project" class="btn-primary" style="font-size:0.8em; text-decoration:none;">+ New Project</a>
-                </div>
-
                 {% if projects %}
                     <div class="projects-list">
                         {% for proj in projects %}
-                        <div style="background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 4px solid #007bff;">
-                            <h3 style="margin:0 0 5px 0;">{{ proj.name }}</h3>
-                            <p style="margin:0; font-size:0.9em; color:#666;">
+                        <div class="project-card">
+                            <h3>{{ proj.name }}</h3>
+                            <p class="project-desc">
                                 {{ proj.description }}
                             </p>
-                            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <div class="project-footer">
                                 <small>Team Size: <strong>{{ proj.assigned_members_ids|length }}</strong></small>
-                                <a href="/org/project/{{ proj.id }}" style="color: #007bff; text-decoration: none; font-weight: bold;">View Details →</a>
+                                <a href="/org/project/{{ proj.id }}" class="project-link">View Details →</a>
                             </div>
                         </div>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div style="background: #f9f9f9; padding: 20px; text-align: center; border: 2px dashed #ccc; border-radius: 5px;">
-                        <p style="color: #666;">No active skill gap assessments.</p>
+                    <div class="empty-projects">
+                        <p>No active skill gap assessments.</p>
                     </div>
                 {% endif %}
             </div>

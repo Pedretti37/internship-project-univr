@@ -111,8 +111,9 @@
 .gap-progress-fill {
     height: 100%;
     border-radius: 4px;
-    transition: width 0.6s ease-in-out;
-    width: calc(var(--score, 0) * 1%);
+    transition: width 0.6s ease-in-out, background-color 0.6s ease-in-out;
+    width: var(--score, 0%);
+    background-color: color-mix(in oklch, #28a745 var(--score), #dc3545);
 }
 
 .missing-skills-label {

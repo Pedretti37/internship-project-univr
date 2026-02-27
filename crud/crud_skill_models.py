@@ -9,39 +9,38 @@ EMP_OCCUPATION_DETAIL = "data/cedefop/employees/Employment_occupation_detail.xls
 ED_COURSES_MEC_ENGINEER = "educational_offerings/courses/educational_offerings_esco_tagged.json"
 
 def skill_gap_user(user: User, role_list: List[Role]) -> User:
+    user.skill_gap.clear()
+
     for role in role_list:
         role_id = role.get('id')
 
-        ruolo_gia_calcolato = any(gap.get('role_id') == role_id for gap in user.skill_gap)
+        matching = {}
+        missing = {}
+        
+        essential_skills = role.get('essential_skills', {})
+        
+        for uri, skill in essential_skills.items():
+            if uri in user.current_skills:
+                matching[uri] = skill
+            else:
+                missing[uri] = skill
 
-        if not ruolo_gia_calcolato:
-            matching = {}
-            missing = {}
-            
-            essential_skills = role.get('essential_skills', {})
-            
-            for uri, skill in essential_skills.items():
-                if uri in user.current_skills:
-                    matching[uri] = skill
-                else:
-                    missing[uri] = skill
+        # print(f"Matching: {matching.values()}")
+        # print(f"Missing: {missing.values()}")
 
-            print(f"Matching: {matching.values()}")
-            print(f"Missing: {missing.values()}")
-
-            total_req = len(essential_skills)
-            match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
-            
-            role_gap_info = {
-                'role_id': role_id,
-                'role_title': role.get('title', ''),
-                'match_score': match_pct,
-                'total_required': total_req,
-                'matching_skills': matching,
-                'missing_skills': missing
-            }
-            
-            user.skill_gap.append(role_gap_info)
+        total_req = len(essential_skills)
+        match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
+        
+        role_gap_info = {
+            'role_id': role_id,
+            'role_title': role.get('title', ''),
+            'match_score': match_pct,
+            'total_required': total_req,
+            'matching_skills': matching,
+            'missing_skills': missing
+        }
+        
+        user.skill_gap.append(role_gap_info)
 
     return user
 
@@ -50,7 +49,7 @@ def skill_gap_project(project: Project, members: List[User]) -> Project:
     team_skills = {}
     for user in members:
         if user.current_skills:
-            for uri, skill in user.current_skills:
+            for uri, skill in user.current_skills.items():
                 team_skills[uri] = skill
 
     if hasattr(project, 'skill_gap'):

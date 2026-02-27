@@ -5,31 +5,32 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h1>Login as an Individual User</h1>
+    <div class="page-container">
+        <div class="form-container">
+            <h1>Login as Individual User</h1>
 
-        {% if error %}
-            <div class="error-banner" style="background-color: #ffdddd; color: red; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
-                {{ error }}
+            {% if error %}
+                <div class="error-banner" style="background-color: #ffdddd; color: red; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <form action="/user_login" method="POST" class="auth-form" autocomplete="off">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <hr class="hr">
+
+            <div class="register">
+                <a href="/user_register">Don't have an account? Register here!</a>
             </div>
-        {% endif %}
-
-        <form action="/user_login" method="POST" class="auth-form" autocomplete="off">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-
-            <button type="submit">Login</button>
-        </form>
-
-        <hr class="hr">
-
-        <div class="register">
-            <a href="/user_register">Don't have an account? Register here!</a>
         </div>
-
     </div>
 
     <script>

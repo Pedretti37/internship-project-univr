@@ -1,19 +1,45 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9; 
+}
+
 /* Stile del contenitore principale */
-.container {
-    background-color: #ffffff;
-    padding: 2rem;
-    border-radius: 8px; /* Angoli arrotondati */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Ombreggiatura elegante */
+.page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; 
     width: 100%;
-    max-width: 400px; /* Larghezza massima della scheda */
+}
+
+/* central box */
+.form-container {
+    background-color: white;
+    padding: 3rem;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     text-align: center;
-    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-container h1 {
+    margin: 0 0 1rem 0;
+    color: #333;
+    font-size: 2rem;
 }
 
 .hr {
-    margin: 20px 0; 
-    border: 0; 
-    border-top: 1px solid #eee;
+    width: 100%;
+    border: 0;
+    height: 1px;
+    background: #e0e0e0;
+    margin: 0.5rem 0;
 }
 
 /* Stile del Form e Input */
@@ -23,34 +49,45 @@
     align-items: flex-start; /* Allinea etichette a sinistra */
 }
 
+/* Stile per gli Input */
 input[type="text"],
-input[type="email"],
 input[type="password"] {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 15px; /* Spazio sotto ogni input */
+    padding: 12px;
+    margin-bottom: 15px; 
     border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Assicura che il padding non aumenti la larghezza */
+    border-radius: 6px;
+    box-sizing: border-box; 
     font-size: 1rem;
     transition: border-color 0.3s;
 }
 
+/* Bottone Login */
+.auth-form button {
+    width: 100%;             
+    padding: 12px 0;         
+    background-color: #2c3e50;
+    color: white;
+    border-radius: 6px;     
+    border: none;
+    font-size: 1rem;         
+    font-weight: 600;        
+    cursor: pointer;         
+    margin-top: 15px;
+    transition: all 0.2s ease; 
+    font-family: inherit;
+}
+
 /* Effetto quando clicchi sull'input */
 input:focus {
-    border-color: #007bff;
+    border-color: #2c3e50;
     outline: none;
 }
 
-/* Bottone Login */
-.auth-form button {
-    background-color: #007bff;
-    color: white;
-    margin-top: 10px;
-}
-
 .auth-form button:hover {
-    background-color: #0056b3;
+    background-color: #24466b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(44, 62, 80, 0.3);
 }
 
 .register a {

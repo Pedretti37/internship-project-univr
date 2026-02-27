@@ -12,7 +12,7 @@
 
         <div class="nav-right">
             <a href="/user_profile" class="nav-link">Profile</a>
-            <a href="/user_logout" class="nav-link btn-logout">Logout</a>
+            <a href="/user_logout" class="nav-link logout-btn">Logout</a>
         </div>
     </nav>
 
@@ -28,9 +28,8 @@
 
         <div class="role-container">
             {% if results %}
-                <hr style="width:100%; margin: 20px 0;">
 
-                <h2>Results for <strong>{{ last_search }}</strong></h2>
+                <h2>Results for "<strong>{{ last_search }}</strong>"</h2>
 
                 <div class="roles-list">
                     <ul>
@@ -47,8 +46,8 @@
                                     <input type="hidden" name="uri" value="{{ role.uri }}">
                                     
                                     <h3>
-                                        <button type="submit" style="background:none; border:none; padding:0; color:blue; text-decoration:underline; cursor:pointer; font-size: inherit; font-weight: bold;">
-                                            {{ role.title }}
+                                        <button type="submit" class="role-title">
+                                            {{ role.title | title}}
                                         </button>
                                     </h3>
                                 </form>
@@ -69,7 +68,7 @@
             {% endif %}
         </div>
 
-        <hr style="width:100%; margin-top: 30px;">
+        <hr class="hr">
 
         <h2>Recent Events (new tech, law changes, ecc...)</h2>
         <div class="events-container">

@@ -5,31 +5,32 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h1>Login as an Organization</h1>
+    <div class="page-container">
+        <div class="form-container">
+            <h1>Login as Organization</h1>
 
-        {% if error %}
-            <div class="error-banner" style="background-color: #ffdddd; color: red; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
-                {{ error }}
+            {% if error %}
+                <div class="error-banner" style="background-color: #ffdddd; color: red; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <form action="/org_login" method="POST" class="auth-form" autocomplete="off">
+                <label for="orgname">Orgname:</label>
+                <input type="text" id="orgname" name="orgname" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <hr class="hr">
+
+            <div class="register">
+                <a href="/org_register">Don't have an account? Register here!</a>
             </div>
-        {% endif %}
-
-        <form action="/org_login" method="POST" class="auth-form" autocomplete="off">
-            <label for="orgname">Orgname:</label>
-            <input type="text" id="orgname" name="orgname" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-
-            <button type="submit">Login</button>
-        </form>
-
-        <hr class="hr">
-
-        <div class="register">
-            <a href="/org_register">Don't have an account? Register here!</a>
         </div>
-
     </div>
 
     <script>

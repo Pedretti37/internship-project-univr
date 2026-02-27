@@ -59,3 +59,19 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
+.hr {
+    width:100%; 
+    margin-top: 30px;
+}
+
+.role-title {
+    background:none; 
+    border:none; 
+    padding:0; 
+    text-decoration:underline; 
+    cursor:pointer; 
+    font-size: inherit; 
+    font-weight: bold;
+    text-decoration: none;
+}
