@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
-from crud import crud_project, crud_skill_models, crud_user
+from crud import crud_skill_models, crud_user
 from dependencies import get_current_org
 from esco import escoAPI 
 
@@ -64,14 +64,11 @@ async def org_home(request: Request, org = Depends(get_current_org)):
     # Member list
     members = crud_user.get_users_by_ids(org.members)
 
-    # Project list
-    projects = crud_project.get_org_projects(org.id)
-
     response = templates.TemplateResponse("org/org_home.html", {
         "request": request, 
         "org": org,
         "members": members,
-        "projects": projects
+        "projects": org.projects
     })
 
     # No cache storage headers
@@ -226,7 +223,6 @@ async def create_project_submit(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     new_project = Project(
-        org_id=org.id,
         name=name,
         description=description,
         assigned_members_ids=assigned_members,
@@ -234,8 +230,8 @@ async def create_project_submit(
         skill_gap=[]
     )
 
-    crud_project.create_project(new_project)
     org.projects.append(new_project)
+    crud_org.update_org(org)
 
     return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -249,10 +245,9 @@ async def view_project(
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    project = crud_project.get_project(project_id)
+    project = next((p for p in org.projects if str(p.id) == project_id), None)
     
-    # Security check: ensure the project belongs to the org
-    if not project or project.org_id != org.id:
+    if not project:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
     assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
@@ -275,7 +270,11 @@ async def project_search_role(
 ):
     if not org: return RedirectResponse(url="/", status_code=303)
     
-    project = crud_project.get_project(project_id)
+    project = next((p for p in org.projects if str(p.id) == project_id), None)
+
+    if not project:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+
     assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
 
     # ESCO API Search
@@ -300,16 +299,19 @@ async def project_add_role(
 ):
     if not org: return RedirectResponse(url="/", status_code=303)
 
-    project = crud_project.get_project(project_id)
+    project = next((p for p in org.projects if str(p.id) == project_id), None)
+    
+    if not project:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
     
     language = "en"
-    if project and project.org_id == org.id:
-        role_data = escoAPI.get_single_role_details(uri, language=language)
-        
-        if role_data:
-            crud_project.add_target_role(project, role_data.model_dump())
+    
+    role_data = escoAPI.get_single_role_details(uri, language=language)
+    
+    if role_data:
+        project.target_roles.append(role_data.model_dump())
+        crud_org.update_org(org)
 
-    # Refresh project detail page
     return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Project Calculate Skill Gap POST --- ###
@@ -320,13 +322,16 @@ async def project_calculate_skill_gap(
 ):
     if not org: return RedirectResponse(url="/", status_code=303)
 
-    project = crud_project.get_project(project_id)
+    project = next((p for p in org.projects if str(p.id) == project_id), None)
     
-    if project and project.org_id == org.id:
-        assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
-        
-        updated_project = crud_skill_models.skill_gap_project(project, assigned_members)
-        
-        crud_project.update_project(updated_project)
+    if not project:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+    
+    assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
+    
+    updated_project = crud_skill_models.skill_gap_project(project, assigned_members)
+    
+    org.projects.append(updated_project)
+    crud_org.update_org(org)
 
     return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)

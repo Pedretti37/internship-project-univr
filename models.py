@@ -24,7 +24,6 @@ class Invitation(BaseModel):
 
 class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    org_id: str
     name: str
     description: str
     assigned_members_ids: List[str] = []
