@@ -176,37 +176,25 @@ async def invite_member(
     error_msg = None
     success_msg = None
 
+    members = org.members
+    invited = False
     user_to_invite = crud_user.get_user_by_username(username_to_invite)
-    created = crud_org.create_invitation(org.id, user_to_invite.id)
 
-    if created:
-        success_msg = f"Invitation sent to '{username_to_invite}' successfully!"
+    if not user_to_invite:
+        error_msg = "User not found."
+    elif user_to_invite.id in members:
+        error_msg = "This user is already in your team."
     else:
-        error_msg = "Failed to send invitation. Please try again."
+        invited = crud_org.create_invitation(org.id, user_to_invite.id)
+        if invited:
+            success_msg = f"Invitation sent to '{username_to_invite}' successfully!"
+        else:
+            error_msg = "Failed to send invitation. Please try again."
 
     return templates.TemplateResponse("org/org_home.html", {
         "request": request,
         "org": org,
         "members": crud_user.get_users_by_ids(org.members),
-        "error": error_msg,
-        "success": success_msg
-    })
-
-    if user_to_add:
-        if user_to_add.id in org.members:
-             error_msg = "User is already in your team."
-        else:
-             crud_org.add_member_to_org(org, user_to_add.id)
-             success_msg = f"User '{user_to_add.name} {user_to_add.surname}' added successfully!"
-    else:
-        error_msg = "User not found. Please check the username."
-    # Refresh member list
-    members_objects = crud_user.get_users_by_ids(org.members)
-
-    return templates.TemplateResponse("org/org_home.html", {
-        "request": request,
-        "org": org,
-        "members": members_objects,
         "error": error_msg,
         "success": success_msg
     })
@@ -242,10 +230,12 @@ async def create_project_submit(
         name=name,
         description=description,
         assigned_members_ids=assigned_members,
-        target_roles=[] # Empty for now
+        target_roles=[], # Empty for now
+        skill_gap=[]
     )
 
     crud_project.create_project(new_project)
+    org.projects.append(new_project)
 
     return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 

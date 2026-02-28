@@ -30,7 +30,7 @@
             {% if results %}
                 <hr style="width:100%; margin: 20px 0;">
 
-                <h2>Results for <strong>{{ last_search }}</strong></h2>
+                <h2>Results for "<strong>{{ last_search }}</strong>"</h2>
 
                 <div class="roles-list">
                     <ul>
@@ -38,7 +38,7 @@
                         <li>    
                             <div class="role-card">
                                 <h3>
-                                    <p>{{ role.title }}</p>
+                                    <p>{{ role.title | title }}</p>
                                 </h3>
                                 <div>
                                     <p>{{ role.description }}</p>

@@ -8,5 +8,6 @@
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$8v5fixGCsJZy7r0XYozROg$wvqTJ5shQiT9FuPVN7sHjOVXDyFehCQxeGqm26HdqEA",
     "members": [
         "768c2572-5791-46d6-9c15-4579933ce845"
-    ]
+    ],
+    "projects": []
 }
