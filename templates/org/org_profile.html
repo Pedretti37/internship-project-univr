@@ -70,11 +70,35 @@
 
         <hr style="width:100%; margin-top: 30px;">
 
-        <div>
-            <h2>Skill gap Assessment</h2>
+        {% if error %} <p class="status-err">{{ error }}</p> {% endif %}
+        {% if success %} <p class="status-ok">{{ success }}</p> {% endif %}
 
-            <div class="skill-gap-container">
-                <p>Not available yet.</p>
+        <div class="invitation-container">
+            <div>
+                <h2>My Team ({{ members|length }})</h2>
+
+                {% if members %}
+                    <ul>
+                    {% for member in members %}
+                        <li class="member-item">
+                            <div>
+                                <span><strong>{{ member.name }} {{ member.surname }}</strong></span>
+                                <small class="member-username">({{ member.username }})</small>
+                                <br>
+                                <span class="badge-skill">{{ member.current_skills|length }} Skills</span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No members yet. Invite someone!</p>
+                {% endif %}
+                
+                <p><small>Add users by their username</small></p>
+                <form action="/invite_member" method="post" class="add-form">
+                    <input type="text" name="username_to_invite" placeholder="Username" required>
+                    <button type="submit" class="btn-primary">Invite</button>
+                </form>
             </div>
         </div>
     </div>

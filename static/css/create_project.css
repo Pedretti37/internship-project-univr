@@ -1,12 +1,166 @@
-.wizard-container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.form-group { margin-bottom: 20px; }
-label { display: block; font-weight: bold; margin-bottom: 8px; }
-input[type="text"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9; 
+}
+
+.navbar {
+    display: flex;              
+    justify-content: space-between; 
+    align-items: center;        
+    
+    background-color: #2c3e50;  
+    color: white;
+    
+    height: 60px;             
+    width: 100%;               
+    padding: 0 20px;            
+    box-sizing: border-box;     
+    
+    position: fixed;            
+    top: 0;
+    left: 0;
+    z-index: 1000;              
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+}
+
+.nav-left {
+    font-size: 1.1rem;
+}
+
+.nav-right {
+    display: flex;
+    gap: 20px; 
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #ecf0f1;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #3498db; 
+}
+
+.main-container {
+    margin-top: 80px; 
+    padding: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hr {
+    width: 100%; 
+    margin-top: 30px;
+}
+
+.card { 
+    max-width: 800px; 
+    margin: 40px auto; 
+    background: white; 
+    padding: 30px; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+}
+
+.form-group { 
+    margin-bottom: 20px; 
+}
+
+label { 
+    display: block; 
+    font-weight: bold; 
+    margin-bottom: 8px; 
+}
+
+input[type="text"], textarea { 
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    font-size: 1rem;
+    box-sizing: border-box;
+    max-width: 800px;
+    min-width: 800px;
+}
 
 /* Member Selection */
-.members-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 10px; }
-.member-card-select { border: 1px solid #eee; padding: 10px; border-radius: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s; }
-.member-card-select:hover { background-color: #f9f9f9; border-color: #aaa; }
-.member-card-select input { transform: scale(1.2); }
+.members-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+    gap: 15px;
+    margin-top: 10px; 
+}
+
+.member-card-select { 
+    border: 1px solid #eee; 
+    padding: 10px; 
+    border-radius: 6px; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    cursor: pointer; 
+    transition: 0.2s; 
+}
+
+.member-card-select:hover { 
+    background-color: #f9f9f9; 
+    border-color: #aaa; 
+}
+
+.member-card-select input { 
+    transform: scale(1.2); 
+}
         
-.actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; }
+.actions { 
+    display: flex; 
+    justify-content: flex-end; 
+    gap: 15px; 
+    margin-top: 30px; 
+}
+
+/* Stile universale per i bottoni blu */
+.btn-primary {
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: inherit;
+    text-align: center;
+}
+
+.btn-primary:hover {
+    background-color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(44, 62, 80, 0.3);
+}
+
+.btn-cancel {
+    background-color: #d62828;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: inherit;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn-cancel:hover {
+    background-color: #b51f1f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(214, 40, 40, 0.3);
+}

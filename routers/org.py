@@ -114,10 +114,11 @@ async def org_profile(request: Request, org = Depends(get_current_org)):
         response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
 
-    response = templates.TemplateResponse(
-        "org/org_profile.html", 
-        {"request": request, "org": org}
-    )
+    response = templates.TemplateResponse("org/org_profile.html", {
+        "request": request, 
+        "org": org,
+        "members": crud_user.get_users_by_ids(org.members)
+    })
 
     # No cache storage
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -188,7 +189,7 @@ async def invite_member(
         else:
             error_msg = "Failed to send invitation. Please try again."
 
-    return templates.TemplateResponse("org/org_home.html", {
+    return templates.TemplateResponse("org/org_profile.html", {
         "request": request,
         "org": org,
         "members": crud_user.get_users_by_ids(org.members),
