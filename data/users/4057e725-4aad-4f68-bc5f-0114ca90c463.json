@@ -1,0 +1,12 @@
+{
+    "id": "4057e725-4aad-4f68-bc5f-0114ca90c463",
+    "name": "Luca",
+    "surname": "Quaresima",
+    "username": "d",
+    "email": "lucaquaresima@gmail.com",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$oPRe650TAqD0HgOAsFYqBQ$C6wn98VNMuXw6TAlSdoGBJivThmMZAdRjV5CjWIdI18",
+    "target_roles": [],
+    "current_skills": {},
+    "skill_gap": [],
+    "id_organization": "f4a04924-e747-49f4-b599-2bef2827e4a5"
+}

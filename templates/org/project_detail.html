@@ -149,7 +149,7 @@
 
                 {% else %}
                     <div class="analysis-action-container">
-                        {% if project.target_roles and team %}
+                        {% if current_project.target_roles and team %}
                             <h3>Analysis Ready</h3>
                             <p class="analysis-intro-text">Calculate how well your team covers the required roles.</p>
                             <form action="/org/project/calculate_gap" method="post">

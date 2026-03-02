@@ -1,21 +1,21 @@
 {
-    "id": "24b6b82a-1012-41ff-ab9e-9f8b37b04ea8",
-    "name": "Samsung",
-    "address": "Via Tre Santi 76A",
-    "phone": "4932014592",
-    "email": "samsung@gmail.com",
-    "orgname": "b",
-    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$XyvlfK91zrm39v7/H+Occw$ueECnD9MqWiHORJcOWcVPYokvdkF/nrih+m3O2CLwZw",
+    "id": "f4a04924-e747-49f4-b599-2bef2827e4a5",
+    "name": "Apple",
+    "address": "Via Apple 45",
+    "phone": "3424353252",
+    "email": "apple@apple.com",
+    "orgname": "c",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$e69VypkzRsi519r7v5fS+g$mhokYXDKkuQePCh081QmDDsaDJNGORDTMPnVZZ6DOUM",
     "members": [
-        "768c2572-5791-46d6-9c15-4579933ce845"
+        "4057e725-4aad-4f68-bc5f-0114ca90c463"
     ],
     "projects": [
         {
-            "id": "26d48f6b-3b3b-4929-bd1c-c49272b5eac8",
-            "name": "First try",
+            "id": "33142d97-c4ef-4dec-a90a-55cb139bcd75",
+            "name": "Second Try",
             "description": "Ciao",
             "assigned_members_ids": [
-                "768c2572-5791-46d6-9c15-4579933ce845"
+                "4057e725-4aad-4f68-bc5f-0114ca90c463"
             ],
             "target_roles": [],
             "skill_gap": [],

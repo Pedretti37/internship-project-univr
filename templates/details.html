@@ -14,7 +14,7 @@
             {% if is_user%}
                 <a href="/user_home" class="nav-link">← Back to Search</a>
             {% else %}
-                <a href="//org/project/{project_id}/search" class="nav-link">← Back to Project</a>
+                <a href="/org/project/{project_id}" class="nav-link">← Back to Project</a>
             {% endif %}
         </div>
     </nav>
@@ -56,7 +56,13 @@
         {% else %}
             <div>
                 <form action="/add_to_project_target_roles" method="post">
-                    <input type="hidden" name="project_id" value={{ project_id }}>
+                    <input type="hidden" name="project_id" value="{{ project_id }}">
+                    <input type="hidden" name="role_id" value="{{ role.id }}">
+                    <input type="hidden" name="title" value="{{ role.title }}">
+                    <input type="hidden" name="description" value="{{ role.description }}">
+                    <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
+                    <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
+                    <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
                     <button type="submit" class="btn-primary">

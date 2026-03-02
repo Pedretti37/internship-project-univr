@@ -58,7 +58,7 @@ async def logout():
 
 ### --- Organization Home --- ###
 @router.get("/org_home", response_class=HTMLResponse)
-async def org_home(request: Request, org = Depends(get_current_org)):
+async def org_home(request: Request, org: Organization = Depends(get_current_org)):
 
     if not org:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -112,7 +112,7 @@ async def register_org(
     
 ### --- Organization Profile --- ###
 @router.get("/org_profile", response_class=HTMLResponse)
-async def org_profile(request: Request, org = Depends(get_current_org)):
+async def org_profile(request: Request, org: Organization = Depends(get_current_org)):
     if not org:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
@@ -134,7 +134,7 @@ async def org_profile(request: Request, org = Depends(get_current_org)):
 
 ### --- Password Change --- ###
 @router.post("/change_password_org", response_class=HTMLResponse)
-async def change_password(request: Request, org = Depends(get_current_org), old_pw: str = Form(...), new_pw: str = Form(...)):
+async def change_password(request: Request, org: Organization = Depends(get_current_org), old_pw: str = Form(...), new_pw: str = Form(...)):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
@@ -169,7 +169,7 @@ async def change_password(request: Request, org = Depends(get_current_org), old_
 @router.post("/invite_member", response_class=HTMLResponse)
 async def invite_member(
     request: Request, 
-    org = Depends(get_current_org), 
+    org: Organization = Depends(get_current_org), 
     username_to_invite: str = Form(...)
 ):
     if not org:
@@ -203,7 +203,7 @@ async def invite_member(
 
 ### --- Create Project GET --- ###
 @router.get("/org/create_project", response_class=HTMLResponse)
-async def create_project_form(request: Request, org = Depends(get_current_org)):
+async def create_project_form(request: Request, org: Organization = Depends(get_current_org)):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
@@ -219,7 +219,7 @@ async def create_project_form(request: Request, org = Depends(get_current_org)):
 ### --- Create Project POST --- ###
 @router.post("/org/create_project", response_class=HTMLResponse)
 async def create_project_submit(
-    org = Depends(get_current_org),
+    org: Organization = Depends(get_current_org),
     name: str = Form(...),
     description: str = Form(...),
     assigned_members: list[str] = Form(default=[]) 
@@ -245,12 +245,17 @@ async def create_project_submit(
 async def view_project(
     request: Request, 
     project_id: str, 
-    org = Depends(get_current_org)
+    org: Organization = Depends(get_current_org)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    current_project = next((p for p in org.projects if str(p.id) == project_id), None)
+    current_project: Optional[Project] = next((p for p in org.projects if str(p.id) == project_id), None)
+
+    if not current_project:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+
+    team = crud_user.get_users_by_ids(current_project.assigned_members_ids)
 
     context_results = None
     context_search = ""
@@ -264,28 +269,32 @@ async def view_project(
         "request": request,
         "org": org,
         "current_project": current_project,
-        "search_result": context_results,
-        "last_search": context_search
+        "search_results": context_results,
+        "last_search": context_search,
+        "team": team
     })
 
 ### --- Project Search Role --- ###
 @router.post("/org/project/{project_id}/search", response_class=HTMLResponse)
 async def project_search_role(
     request: Request, 
-    current_project: Project, 
+    project_id: str, 
     search: str = Form(...),
-    org = Depends(get_current_org)
+    org: Organization = Depends(get_current_org)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    role = search.title().strip()
-
-    language = "en"
-    role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
+    current_project: Optional[Project] = next((p for p in org.projects if str(p.id) == project_id), None)
     
     if not current_project:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+            return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+    
+    role = search.title().strip()
+    language = "en"
+    role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
+
+    team = crud_user.get_users_by_ids(current_project.assigned_members_ids)
 
     PROJECT_ROLE_LIST[current_project.id] = {
         "last_search": search,
@@ -296,7 +305,8 @@ async def project_search_role(
         "org": org,
         "current_project": current_project,
         "search_results": role_list,
-        "last_search": search
+        "last_search": search,
+        "team": team
     })
     
 ### --- Role details for Org. projects --- ###
@@ -311,7 +321,7 @@ async def details_page(
     id_full: str = Form(...),
     uri: str = Form(...),
     project_id: str = Form(...),
-    org = Depends(get_current_org)):
+    org: Organization = Depends(get_current_org)):
 
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -354,31 +364,87 @@ async def details_page(
 
     return templates.TemplateResponse("details.html", {
         "request": request,
-        "user": user,
-        "is_user": True,
-        "role": role_object
+        "org": org,
+        "is_user": False,
+        "role": role_object,
+        "project_id": project_id,
+        "updated_target_role": False
     })
 
 ### --- Project Add Role POST --- ###
-# ✅ Cambiato in HTMLResponse
 @router.post("/add_to_project_target_roles", response_class=HTMLResponse) 
 async def project_add_role(
     request: Request,
     project_id: str = Form(...),
+    role_id: str = Form(...),
+    title: str = Form(...),
+    description: Optional[str] = Form(None),
+    essential_skills: Optional[str] = Form(None),
+    optional_skills: Optional[str] = Form(None),
+    id_full: str = Form(...),
     uri: str = Form(...),
-    org = Depends(get_current_org)
+    org: Organization = Depends(get_current_org)
 ):
-    pass
+    if not org: return RedirectResponse(url="/", status_code=303)
+
+    # Manual conversion from string to dict
+    if essential_skills:
+        try:
+            # ast.literal_eval manages {'key': 'value'}
+            e_skills_dict = ast.literal_eval(essential_skills)
+            
+            # Controllo extra: assicuriamoci che sia davvero un dict
+            if not isinstance(e_skills_dict, dict):
+                e_skills_dict = {}
+        except (ValueError, SyntaxError):
+            print(f"Errore nel parsing di essential_skills: {essential_skills}")
+            e_skills_dict = {}
+    else:
+        e_skills_dict = {}
+
+    # Optional Skills
+    if optional_skills:
+        try:
+            o_skills_dict = ast.literal_eval(optional_skills)
+            if not isinstance(o_skills_dict, dict):
+                o_skills_dict = {}
+        except (ValueError, SyntaxError):
+            o_skills_dict = {}
+    else:
+        o_skills_dict = {}
+
+    role_object = Role(
+        id=role_id,
+        title=title,
+        description=description if description else "No description available.",
+        essential_skills=e_skills_dict,
+        optional_skills=o_skills_dict,
+        id_full=id_full,
+        uri=uri
+    )
+
+    org.projects.append(role_object)
+    crud_org.update_org(org)
+
+    return templates.TemplateResponse("details.html", {
+        "request": request,
+        "org": org,
+        "is_user": False,
+        "role": role_object,
+        "project_id": project_id,
+        "updated_target_role": True,
+        "message": f"Role added to Project's Target Roles!"
+    })
 
 ### --- Project Calculate Skill Gap POST --- ###
 @router.post("/org/project/calculate_gap", response_class=RedirectResponse)
 async def project_calculate_skill_gap(
     project_id: str = Form(...),
-    org = Depends(get_current_org)
+    org: Organization = Depends(get_current_org)
 ):
     if not org: return RedirectResponse(url="/", status_code=303)
 
-    project = next((p for p in org.projects if str(p.id) == project_id), None)
+    project: Optional[Project] = next((p for p in org.projects if str(p.id) == project_id), None)
     
     if not project:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
