@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
+from typing import Optional
 from crud import crud_skill_models, crud_user
 from dependencies import get_current_org
 from esco import escoAPI 
+import ast
 
 from config import templates, pwd_context
 import crud.crud_org as crud_org
-from models import Organization, Project
+from models import Organization, Project, Role
 
 router = APIRouter()
 
@@ -291,9 +293,69 @@ async def project_search_role(
         "last_search": search
     })
 
+### --- Role details for Org. projects --- ###
+@router.post("/target_roles_for_project", response_class=HTMLResponse)
+async def details_page(
+    request: Request, 
+    role_id: str = Form(...),
+    title: str = Form(...),
+    description: Optional[str] = Form(None),
+    essential_skills: Optional[str] = Form(None),
+    optional_skills: Optional[str] = Form(None),
+    id_full: str = Form(...),
+    uri: str = Form(...),
+    org = Depends(get_current_org)):
+
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    # Manual conversion from string to dict
+    if essential_skills:
+        try:
+            # ast.literal_eval manages {'key': 'value'}
+            e_skills_dict = ast.literal_eval(essential_skills)
+            
+            # Controllo extra: assicuriamoci che sia davvero un dict
+            if not isinstance(e_skills_dict, dict):
+                e_skills_dict = {}
+        except (ValueError, SyntaxError):
+            print(f"Errore nel parsing di essential_skills: {essential_skills}")
+            e_skills_dict = {}
+    else:
+        e_skills_dict = {}
+
+    # Optional Skills
+    if optional_skills:
+        try:
+            o_skills_dict = ast.literal_eval(optional_skills)
+            if not isinstance(o_skills_dict, dict):
+                o_skills_dict = {}
+        except (ValueError, SyntaxError):
+            o_skills_dict = {}
+    else:
+        o_skills_dict = {}
+
+    role_object = Role(
+        id=role_id,
+        title=title,
+        description=description if description else "No description available.",
+        essential_skills=e_skills_dict,
+        optional_skills=o_skills_dict,
+        id_full=id_full,
+        uri=uri
+    )
+
+    return templates.TemplateResponse("details.html", {
+        "request": request,
+        "org": org,
+        "is_user": False,
+        "role": role_object
+    })
+
 ### --- Project Add Role POST --- ###
-@router.post("/org/project/add_role", response_class=RedirectResponse)
+@router.post("/add_to_project_target_roles", response_class=RedirectResponse)
 async def project_add_role(
+    request: Request,
     project_id: str = Form(...),
     uri: str = Form(...),
     org = Depends(get_current_org)
@@ -309,11 +371,29 @@ async def project_add_role(
     
     role_data = escoAPI.get_single_role_details(uri, language=language)
     
-    if role_data:
-        project.target_roles.append(role_data.model_dump())
+    message_text = "Error: target role not added."
+    updated_target_role = False
+
+    already_exists = any(r['id'] == role_data.id for r in org.projects.target_roles)
+
+    if not already_exists:
+        org.projects.target_roles.append(role_data.model_dump())
+        updated_target_role = True
+        message_text = "Target role added successfully!"
+    else:
+        updated_target_role = True
+        message_text = "This role is already in your target list."
+
+    if updated_target_role:
         crud_org.update_org(org)
 
-    return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
+    return templates.TemplateResponse("details.html", {
+        "request": request,
+        "org": org,
+        "role": role_data,
+        "updated_target_role": updated_target_role,
+        "message": message_text
+    })
 
 ### --- Project Calculate Skill Gap POST --- ###
 @router.post("/org/project/calculate_gap", response_class=RedirectResponse)

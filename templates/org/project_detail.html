@@ -46,19 +46,41 @@
             </form>
 
             {% if search_results %}
-                <div class="search-results-container">
-                    <p><strong>Results for "{{ last_search }}":</strong></p>
-                    {% for res in search_results %}
-                    <div class="result-item">
-                        <span>{{ res.title }}</span>
-                        <form action="/org/project/add_role" method="post">
-                            <input type="hidden" name="project_id" value="{{ project.id }}">
-                            <input type="hidden" name="uri" value="{{ res.uri }}">
-                            <button type="submit" class="btn-add-role">+ Add</button>
-                        </form>
-                    </div>
-                    {% endfor %}
+
+                <h2>Results for "<strong>{{ last_search }}</strong>"</h2>
+
+                <div class="roles-list">
+                    <ul>
+                        {% for role in search_results %}
+                        <li>    
+                            <div class="role-card">
+                                <form action="/target_roles_for_project" method="post" style="display: inline;">
+                                    <input type="hidden" name="role_id" value="{{ role.id }}">
+                                    <input type="hidden" name="title" value="{{ role.title }}">
+                                    <input type="hidden" name="description" value="{{ role.description }}">
+                                    <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
+                                    <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
+                                    <input type="hidden" name="id_full" value="{{ role.id_full }}">
+                                    <input type="hidden" name="uri" value="{{ role.uri }}">
+                                    
+                                    <h3>
+                                        <button type="submit" class="role-title">
+                                            {{ role.title | title}}
+                                        </button>
+                                    </h3>
+                                </form>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
+            {% else %}
+                {% if last_search %}
+                    <div class="no-results">
+                        <p>No roles found for "<strong>{{ last_search }}</strong>".</p>
+                        <p style="font-size: 0.9em; color: #666;">Try checking the spelling or use another term.</p>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
 

@@ -21,8 +21,8 @@
         
         <div class="browsing-input">
             <form action="/role_list" method="post" class="role-form" autocomplete="off">
-                <input type="text" name="search" placeholder="🔍 Role: e.g. Manager" value="{{ last_search }}" required>
-                <button type="submit">Submit</button>
+                <input type="text" name="search" class="input" placeholder="🔍 Role: e.g. Manager" value="{{ last_search }}" required>
+                <button type="submit" class="btn-primary">Search</button>
             </form>
         </div>
 
@@ -66,13 +66,6 @@
                     </div>
                 {% endif %}
             {% endif %}
-        </div>
-
-        <hr class="hr">
-
-        <h2>Recent Events (new tech, law changes, ecc...)</h2>
-        <div class="events-container">
-            <p>No recent events available.</p>
         </div>
     </div>
 {% endblock %}

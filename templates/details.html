@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/details.css">
+{% endblock %}
+
+{% block content %}
+    <nav class="navbar">
+        <div class="nav-left">
+            <span><strong>{{ role.title | title }}</strong></span>
+        </div>
+
+        <div class="nav-right">
+            {% if is_user%}
+                <a href="/user_home" class="nav-link">← Back to Search</a>
+            {% else %}
+                <a href="//org/project/{project_id}/search" class="nav-link">← Back to Project</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="details-box">
+            <div class="meta-badges">
+                <span class="badge" title="Used for CEDEFOP Forecasts">ISCO ID: {{ role.id }}</span>
+                <span class="badge" title="Specific ESCO Code">Full ID: {{ role.id_full }}</span>
+            </div>
+            <h2>Description</h2>
+            <p>{{ role.description }}</p>
+            
+            {% if role.uri %}
+            <p>
+                <small>Official Source: 
+                    <a href="{{ role.uri }}" target="_blank" class="source-link">View on ESCO Portal ↗</a>
+                </small>
+            </p>
+            {% endif %}
+        </div>
+
+        {% if is_user %}
+            <div>
+                <form action="/add_to_user_target_roles" method="post">
+                    <input type="hidden" name="role_id" value="{{ role.id }}">
+                    <input type="hidden" name="title" value="{{ role.title }}">
+                    <input type="hidden" name="description" value="{{ role.description }}">
+                    <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
+                    <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
+                    <input type="hidden" name="id_full" value="{{ role.id_full }}">
+                    <input type="hidden" name="uri" value="{{ role.uri }}">
+
+                    <button type="submit" class="btn-primary">
+                        <span>Add to my Target Roles</span>
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div>
+                <form action="/add_to_project_target_roles" method="post">
+                    <input type="hidden" name="uri" value="{{ role.uri }}">
+
+                    <button type="submit" class="btn-primary">
+                        <span>Add to Project's Target Roles</span>
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+
+        <div>
+            {% if updated_target_role %}
+                <p class="message">{{ message }}</p>
+            {% endif %}
+        </div>
+
+        {% if is_user%}
+            <hr class="hr">
+
+            <div>
+                <h3>Add the Essential Skills of this role to Your Skill Model</h3>
+                <form action="/add_to_user_skills" method="post">
+                    <input type="hidden" name="role_id" value="{{ role.id }}">
+                    <input type="hidden" name="title" value="{{ role.title }}">
+                    <input type="hidden" name="description" value="{{ role.description }}">
+                    <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
+                    <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
+                    <input type="hidden" name="id_full" value="{{ role.id_full }}">
+                    <input type="hidden" name="uri" value="{{ role.uri }}">
+
+                    <button type="submit" class="btn-primary">
+                        <span>Add to my Skill</span>
+                    </button>
+                </form>
+            </div>
+
+            <div>
+                {% if updated_skill %}
+                    <p class="message">{{ message }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <hr class="hr">
+
+        {% if role.essential_skills or role.optional_skills %}
+        <div class="details-box">
+            <h2>Tasks & Responsibilities</h2>
+            {% if role.essential_skills %}
+                <h3>Essential Skills:</h3>
+                <ul>
+                {% for uri, skill in role.essential_skills.items() %}
+                    <li>{{ skill | capitalize }}: <a href="{{ uri }}" target="_blank"> ↗</a></li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% if role.optional_skills %}
+                <h3>Optional Skills:</h3>
+                <ul>
+                {% for uri, skill in role.optional_skills.items() %}
+                    <li>{{ skill | capitalize }}: <a href="{{ uri }}" target="_blank"> ↗</a></li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

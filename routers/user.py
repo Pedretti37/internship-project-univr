@@ -451,9 +451,10 @@ async def details_page(
         uri=uri
     )
 
-    return templates.TemplateResponse("user/details.html", {
+    return templates.TemplateResponse("details.html", {
         "request": request,
         "user": user,
+        "is_user": True,
         "role": role_object
     })
     

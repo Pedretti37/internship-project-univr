@@ -17,7 +17,7 @@
     </nav>
 
     <div class="main-container">
-        <div class="profile_info">
+        <div class="profile_info" translate="no">
             <h2>User information</h2>
             <p><strong>Name</strong>: {{ user.name }}</p>
             <p><strong>Surname</strong>: {{ user.surname }}</p>
@@ -94,7 +94,7 @@
 
         <hr class="hr">
 
-        <div class="user-skills">
+        <div class="user-skills" translate="no">
             <h2>Your current Skill Models</h2>
             <!-- target blank for new tab; rel noopener noreferrer to avoid slowing the main page down -->
             <a href="https://app.muchskills.com/dashboard" class="link-muchskills" target="_blank" rel="noopener noreferrer">Use MuchSkill to manage your skills!</a>
@@ -111,7 +111,7 @@
 
         <hr class="hr">
 
-        <div class="show-target-roles">
+        <div class="show-target-roles" translate="no">
             {% if message %}
                 <div class="alert alert-{{ message_type }}" role="alert">
                     {{ message }}
@@ -142,7 +142,7 @@
             {% endif %}
         </div>
 
-        <div class="card">
+        <div class="card" translate="no">
             <h2>Check Future Employment Trend & Skill Gap Analysis</h2>
             <form action="/occupation_forecast_and_gap" method="post">
                 {% if user.target_roles %}
@@ -218,14 +218,14 @@
                                                     {% if loop.index0 > 0 %}
                                                         {% set prev = item.data.history[loop.index0 - 1].value %}
                                                         {% if row.value > prev %}
-                                                            <span style="color: green;">↗</span>
+                                                            <span style="color: green;" translate="no">↗</span>
                                                         {% elif row.value < prev %}
-                                                            <span style="color: red;">↘</span>
+                                                            <span style="color: red;" translate="no">↘</span>
                                                         {% else %}
-                                                            <span style="color: gray;">=</span>
+                                                            <span style="color: gray;" translate="no">=</span>
                                                         {% endif %}
                                                     {% else %}
-                                                        <span style="color: gray;">-</span>
+                                                        <span style="color: gray;" translate="no">-</span>
                                                     {% endif %}
                                                 </td>
                                             </tr>
@@ -252,7 +252,7 @@
 
         <hr class="hr">
 
-        <div>
+        <div translate="no">
             <h2>Skill gap Assessment</h2>
 
             <div>
@@ -310,6 +310,7 @@
                             <div class="course-card">
                                 <h3>{{ course.title | title }}</h3>
                                 <p>{{ course.description }}</p>
+                                <p translate="no"><small>Ects: {{ course.ects }}</small></p>
                                 <p><small>Skills covered:</small></p>
                                 <ul>
                                     {% for uri, skill in course.skills_covered.items() %}
