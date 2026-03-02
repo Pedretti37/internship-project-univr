@@ -56,6 +56,7 @@
         {% else %}
             <div>
                 <form action="/add_to_project_target_roles" method="post">
+                    <input type="hidden" name="project_id" value={{ project_id }}>
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
                     <button type="submit" class="btn-primary">

@@ -9,8 +9,8 @@
     <a href="/org_home" class="back-link">← Back to Dashboard</a>
     
     <div class="project-header">
-        <h1>Project: {{ project.name }}</h1>
-        <p class="project-description">{{ project.description }}</p>
+        <h1>Project: {{ current_project.name }}</h1>
+        <p class="project-description">{{ current_project.description }}</p>
     </div>
 
     <div class="grid-layout">
@@ -19,15 +19,14 @@
             <h2>1. Define Target Roles</h2>
             <p><small>Search and add the roles required for this project.</small></p>
 
-            {% if project.target_roles %}
+            {% if current_project.target_roles %}
                 <div class="target-roles-container">
-                    {% for role in project.target_roles %}
+                    {% for role in current_project.target_roles %}
                     <div class="role-badge">
                         <div>
                             <strong>{{ role.title }}</strong>
                             <br><small class="esco-id-text">ESCO ID: {{ role.id }}</small>
                         </div>
-                        <span>✅</span>
                     </div>
                     {% endfor %}
                 </div>
@@ -40,7 +39,7 @@
             <hr class="separator-hr">
 
             <h3>Add a Role</h3>
-            <form action="/org/project/{{ project.id }}/search" method="post" class="search-box">
+            <form action="/org/project/{{ current_project.id }}/search" method="post" class="search-box">
                 <input type="text" name="search" placeholder="e.g. Software Engineer" value="{{ last_search }}" required>
                 <button type="submit" class="btn-primary">Search</button>
             </form>
@@ -54,7 +53,7 @@
                         {% for role in search_results %}
                         <li>    
                             <div class="role-card">
-                                <form action="/target_roles_for_project" method="post" style="display: inline;">
+                                <form action="/role_details_for_project" method="post" style="display: inline;">
                                     <input type="hidden" name="role_id" value="{{ role.id }}">
                                     <input type="hidden" name="title" value="{{ role.title }}">
                                     <input type="hidden" name="description" value="{{ role.description }}">
@@ -62,6 +61,7 @@
                                     <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
                                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                                     <input type="hidden" name="uri" value="{{ role.uri }}">
+                                    <input type="hidden" name="project_id" value="{{ current_project.id }}">
                                     
                                     <h3>
                                         <button type="submit" class="role-title">
@@ -100,10 +100,10 @@
             <div class="analysis-section">
                 <hr>
 
-                {% if project.skill_gap %}
+                {% if current_project.skill_gap %}
                     <h3 class="analysis-title">📊 Skill Gap Analysis</h3>
                     
-                    {% for gap in project.skill_gap %}
+                    {% for gap in current_project.skill_gap %}
                         
                         {# Calcolo Classe CSS #}
                         {% if gap.match_score >= 80 %}
@@ -141,7 +141,7 @@
                     {% endfor %}
 
                     <form action="/org/project/calculate_gap" method="post" class="analysis-update-form">
-                        <input type="hidden" name="project_id" value="{{ project.id }}">
+                        <input type="hidden" name="project_id" value="{{ current_project.id }}">
                         <button type="submit" class="btn-text-update">
                             🔄 Data changed? Update Analysis
                         </button>
@@ -153,7 +153,7 @@
                             <h3>Analysis Ready</h3>
                             <p class="analysis-intro-text">Calculate how well your team covers the required roles.</p>
                             <form action="/org/project/calculate_gap" method="post">
-                                <input type="hidden" name="project_id" value="{{ project.id }}">
+                                <input type="hidden" name="project_id" value="{{ current_project.id }}">
                                 <button type="submit" class="btn-primary btn-calculate-gap">
                                     Calculate Skill Gap
                                 </button>

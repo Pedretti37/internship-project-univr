@@ -13,6 +13,8 @@ from models import Organization, Project, Role
 
 router = APIRouter()
 
+PROJECT_ROLE_LIST = {}
+
 ### --- Organization Login GET --- ###
 @router.get("/org_login", response_class=HTMLResponse)
 async def org_login(request: Request):
@@ -247,54 +249,58 @@ async def view_project(
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-
-    project = next((p for p in org.projects if str(p.id) == project_id), None)
     
-    if not project:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+    current_project = next((p for p in org.projects if str(p.id) == project_id), None)
 
-    assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
+    context_results = None
+    context_search = ""
+
+    if current_project.id in PROJECT_ROLE_LIST:
+        session_data = PROJECT_ROLE_LIST[current_project.id]
+        context_results = session_data["results"]
+        context_search = session_data["last_search"]
 
     return templates.TemplateResponse("org/project_detail.html", {
         "request": request,
         "org": org,
-        "project": project,
-        "team": assigned_members,
-        "search_results": None 
+        "current_project": current_project,
+        "search_result": context_results,
+        "last_search": context_search
     })
 
 ### --- Project Search Role --- ###
 @router.post("/org/project/{project_id}/search", response_class=HTMLResponse)
 async def project_search_role(
     request: Request, 
-    project_id: str, 
+    current_project: Project, 
     search: str = Form(...),
     org = Depends(get_current_org)
 ):
-    if not org: return RedirectResponse(url="/", status_code=303)
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    project = next((p for p in org.projects if str(p.id) == project_id), None)
+    role = search.title().strip()
 
-    if not project:
+    language = "en"
+    role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
+    
+    if not current_project:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
-    assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
-
-    # ESCO API Search
-    language = "en"
-    results = escoAPI.get_esco_occupations_list(search, language=language, limit=10)
-
+    PROJECT_ROLE_LIST[current_project.id] = {
+        "last_search": search,
+        "results": role_list
+    }
     return templates.TemplateResponse("org/project_detail.html", {
         "request": request,
         "org": org,
-        "project": project,
-        "team": assigned_members,
-        "search_results": results,
+        "current_project": current_project,
+        "search_results": role_list,
         "last_search": search
     })
-
+    
 ### --- Role details for Org. projects --- ###
-@router.post("/target_roles_for_project", response_class=HTMLResponse)
+@router.post("/role_details_for_project", response_class=HTMLResponse)
 async def details_page(
     request: Request, 
     role_id: str = Form(...),
@@ -304,6 +310,7 @@ async def details_page(
     optional_skills: Optional[str] = Form(None),
     id_full: str = Form(...),
     uri: str = Form(...),
+    project_id: str = Form(...),
     org = Depends(get_current_org)):
 
     if not org:
@@ -347,53 +354,21 @@ async def details_page(
 
     return templates.TemplateResponse("details.html", {
         "request": request,
-        "org": org,
-        "is_user": False,
+        "user": user,
+        "is_user": True,
         "role": role_object
     })
 
 ### --- Project Add Role POST --- ###
-@router.post("/add_to_project_target_roles", response_class=RedirectResponse)
+# ✅ Cambiato in HTMLResponse
+@router.post("/add_to_project_target_roles", response_class=HTMLResponse) 
 async def project_add_role(
     request: Request,
     project_id: str = Form(...),
     uri: str = Form(...),
     org = Depends(get_current_org)
 ):
-    if not org: return RedirectResponse(url="/", status_code=303)
-
-    project = next((p for p in org.projects if str(p.id) == project_id), None)
-    
-    if not project:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
-    
-    language = "en"
-    
-    role_data = escoAPI.get_single_role_details(uri, language=language)
-    
-    message_text = "Error: target role not added."
-    updated_target_role = False
-
-    already_exists = any(r['id'] == role_data.id for r in org.projects.target_roles)
-
-    if not already_exists:
-        org.projects.target_roles.append(role_data.model_dump())
-        updated_target_role = True
-        message_text = "Target role added successfully!"
-    else:
-        updated_target_role = True
-        message_text = "This role is already in your target list."
-
-    if updated_target_role:
-        crud_org.update_org(org)
-
-    return templates.TemplateResponse("details.html", {
-        "request": request,
-        "org": org,
-        "role": role_data,
-        "updated_target_role": updated_target_role,
-        "message": message_text
-    })
+    pass
 
 ### --- Project Calculate Skill Gap POST --- ###
 @router.post("/org/project/calculate_gap", response_class=RedirectResponse)
