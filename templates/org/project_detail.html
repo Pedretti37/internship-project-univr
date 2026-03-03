@@ -44,13 +44,13 @@
                 <button type="submit" class="btn-primary">Search</button>
             </form>
 
-            {% if search_results %}
+            {% if results %}
 
                 <h2>Results for "<strong>{{ last_search }}</strong>"</h2>
 
                 <div class="roles-list">
                     <ul>
-                        {% for role in search_results %}
+                        {% for role in results %}
                         <li>    
                             <div class="role-card">
                                 <form action="/role_details_for_project" method="post" style="display: inline;">

@@ -197,8 +197,8 @@ async def invite_member(
         "request": request,
         "org": org,
         "members": crud_user.get_users_by_ids(org.members),
-        "error": error_msg,
-        "success": success_msg
+        "invite_error": error_msg,
+        "invite_success": success_msg
     })
 
 ### --- Create Project GET --- ###
@@ -269,7 +269,7 @@ async def view_project(
         "request": request,
         "org": org,
         "current_project": current_project,
-        "search_results": context_results,
+        "results": context_results,
         "last_search": context_search,
         "team": team
     })
@@ -304,7 +304,7 @@ async def project_search_role(
         "request": request,
         "org": org,
         "current_project": current_project,
-        "search_results": role_list,
+        "results": role_list,
         "last_search": search,
         "team": team
     })
@@ -423,7 +423,16 @@ async def project_add_role(
         uri=uri
     )
 
-    org.projects.append(role_object)
+    project_found = False
+    for project in org.projects:
+        if str(project.id) == project_id:
+            project.target_roles.append(role_object.model_dump())
+            project_found = True
+            break
+
+    if not project_found:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+    
     crud_org.update_org(org)
 
     return templates.TemplateResponse("details.html", {

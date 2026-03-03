@@ -60,7 +60,7 @@ async def user_login(username: str = Form(...), password: str = Form(...)):
 
 ### --- Logout --- ###
 @router.get("/user_logout")
-async def logout(user = Depends(get_current_user)):
+async def logout(user: User = Depends(get_current_user)):
     response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
     # Delete current session
@@ -76,7 +76,7 @@ async def logout(user = Depends(get_current_user)):
 
 ### --- User Home --- ###
 @router.get("/user_home", response_class=HTMLResponse)
-async def user_home(request: Request, user = Depends(get_current_user)):
+async def user_home(request: Request, user: User = Depends(get_current_user)):
 
     if not user:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -132,7 +132,7 @@ async def register_user(
     
 ### --- User Profile --- ###
 @router.get("/user_profile", response_class=HTMLResponse)
-async def user_profile(request: Request, user = Depends(get_current_user)):
+async def user_profile(request: Request, user: User = Depends(get_current_user)):
     
     if not user:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -187,7 +187,7 @@ async def user_profile(request: Request, user = Depends(get_current_user)):
 
 ### --- Obtain roles from User Input --- ###
 @router.post("/role_list", response_class=HTMLResponse)
-async def role_list(request: Request, search: str = Form(...), user = Depends(get_current_user)):
+async def role_list(request: Request, search: str = Form(...), user: User = Depends(get_current_user)):
     role = search.title().strip()
 
     language = "en"
@@ -211,7 +211,7 @@ async def role_list(request: Request, search: str = Form(...), user = Depends(ge
 @router.post("/add_to_user_target_roles", response_class=HTMLResponse)
 async def add_to_user_target_roles(
     request: Request,
-    user = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     role_id: str = Form(...),
     title: str = Form(...),
     description: Optional[str] = Form(None),
@@ -287,7 +287,7 @@ async def add_to_user_target_roles(
 @router.post("/add_to_user_skills", response_class=HTMLResponse)
 async def add_to_user_skills(
     request: Request,
-    user = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     role_id: str = Form(...),
     title: str = Form(...),
     description: str = Form(...),
@@ -361,7 +361,7 @@ async def add_to_user_skills(
 @router.post("/change_password_user", response_class=HTMLResponse)
 async def change_password(
     request: Request, 
-    user = Depends(get_current_user), 
+    user: User = Depends(get_current_user), 
     old_pw: str = Form(...), 
     new_pw: str = Form(...)
 ):
@@ -410,7 +410,7 @@ async def details_page(
     optional_skills: Optional[str] = Form(None),
     id_full: str = Form(...),
     uri: str = Form(...),
-    user = Depends(get_current_user)):
+    user: User = Depends(get_current_user)):
 
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -461,7 +461,7 @@ async def details_page(
 ### --- Delete Target Role from User --- ###    
 @router.post("/delete_target_role", response_class=RedirectResponse)
 async def delete_target_role(
-    user = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     role_id: str = Form(...)
 ):
     if not user:
@@ -482,7 +482,7 @@ async def delete_target_role(
 @router.post("/occupation_forecast_and_gap", response_class=HTMLResponse)
 async def occupation_forecast_and_gap(
     request: Request,
-    user = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     country: str = Form(...),
 ):
     if not user:
@@ -568,7 +568,7 @@ async def occupation_forecast_and_gap(
 ### --- Accept Invitation --- ###
 @router.post("/accept_invitation", response_class=RedirectResponse)
 async def accept_invitation(
-    user = Depends(get_current_user),
+    user: User = Depends(get_current_user),
     org_id: str = Form(...),
     inv_id: str = Form(...)
 ):
@@ -592,8 +592,8 @@ async def accept_invitation(
 
 ### --- Decline Invitation --- ###
 @router.post("/decline_invitation", response_class=RedirectResponse)
-async def accept_invitation(
-    user = Depends(get_current_user),
+async def decline_invitation(
+    user: User = Depends(get_current_user),
     inv_id: str = Form(...)
 ):
     if not user:

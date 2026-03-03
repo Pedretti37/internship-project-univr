@@ -99,6 +99,9 @@
                     <input type="text" name="username_to_invite" placeholder="Username" required>
                     <button type="submit" class="btn-primary">Invite</button>
                 </form>
+
+                {% if invite_error %} <p class="status-err">{{ invite_error }}</p> {% endif %}
+                {% if invite_success %} <p class="status-ok">{{ invite_success }}</p> {% endif %}
             </div>
         </div>
     </div>
