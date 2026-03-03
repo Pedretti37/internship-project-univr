@@ -8,7 +8,7 @@ os.makedirs(DATA_DIR_ORGS, exist_ok=True)
 INDEX_FILE = "data/organizations/org_index.json"
 os.makedirs(os.path.dirname(INDEX_FILE), exist_ok=True)
 
-DATA_INV_DIR = "data/organizations/invitations"
+DATA_INV_DIR = "data//invitations"
 os.makedirs(DATA_INV_DIR, exist_ok=True)
 
 ### --- Helper: Path --- ###

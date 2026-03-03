@@ -216,7 +216,6 @@ async def add_to_user_target_roles(
     title: str = Form(...),
     description: Optional[str] = Form(None),
     essential_skills: Optional[str] = Form(None),
-    optional_skills: Optional[str] = Form(None),
     id_full: str = Form(...),
     uri: str = Form(...)
 ):
@@ -238,23 +237,11 @@ async def add_to_user_target_roles(
     else:
         e_skills_dict = {}
 
-    # Optional Skills
-    if optional_skills:
-        try:
-            o_skills_dict = ast.literal_eval(optional_skills)
-            if not isinstance(o_skills_dict, dict):
-                o_skills_dict = {}
-        except (ValueError, SyntaxError):
-            o_skills_dict = {}
-    else:
-        o_skills_dict = {}
-
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
         essential_skills=e_skills_dict,
-        optional_skills=o_skills_dict,
         id_full=id_full,
         uri=uri
     )
@@ -275,7 +262,7 @@ async def add_to_user_target_roles(
     if updated_target_role:
         crud_user.update_user(user)
 
-    return templates.TemplateResponse("user/details.html", {
+    return templates.TemplateResponse("details.html", {
         "request": request,
         "user": user,
         "role": role_object,
@@ -292,7 +279,6 @@ async def add_to_user_skills(
     title: str = Form(...),
     description: str = Form(...),
     essential_skills: str = Form(...),
-    optional_skills: str = Form(...),
     id_full: str = Form(...),
     uri: str = Form(...)
 ):
@@ -314,23 +300,11 @@ async def add_to_user_skills(
     else:
         e_skills_dict = {}
 
-    # Optional Skills
-    if optional_skills:
-        try:
-            o_skills_dict = ast.literal_eval(optional_skills)
-            if not isinstance(o_skills_dict, dict):
-                o_skills_dict = {}
-        except (ValueError, SyntaxError):
-            o_skills_dict = {}
-    else:
-        o_skills_dict = {}
-
     role_object = Role(
         id=role_id,
         title=title,
         description=description,
         essential_skills=e_skills_dict,
-        optional_skills=o_skills_dict,
         id_full=id_full,
         uri=uri
     )
@@ -349,7 +323,7 @@ async def add_to_user_skills(
         crud_user.update_user(user)
         message_text = "Skills updated successfully!"
 
-    return templates.TemplateResponse("user/details.html", {
+    return templates.TemplateResponse("details.html", {
         "request": request,
         "user": user,
         "role": role_object,
@@ -407,7 +381,6 @@ async def details_page(
     title: str = Form(...),
     description: Optional[str] = Form(None),
     essential_skills: Optional[str] = Form(None),
-    optional_skills: Optional[str] = Form(None),
     id_full: str = Form(...),
     uri: str = Form(...),
     user: User = Depends(get_current_user)):
@@ -430,23 +403,11 @@ async def details_page(
     else:
         e_skills_dict = {}
 
-    # Optional Skills
-    if optional_skills:
-        try:
-            o_skills_dict = ast.literal_eval(optional_skills)
-            if not isinstance(o_skills_dict, dict):
-                o_skills_dict = {}
-        except (ValueError, SyntaxError):
-            o_skills_dict = {}
-    else:
-        o_skills_dict = {}
-
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
         essential_skills=e_skills_dict,
-        optional_skills=o_skills_dict,
         id_full=id_full,
         uri=uri
     )
@@ -500,24 +461,16 @@ async def occupation_forecast_and_gap(
     forecast_results = []
     role_list = []
     for role in user.target_roles:
-        if isinstance(role, dict):
-            r_id = role.get("id")
-            r_title = role.get("title")
-            r_uri = role.get("uri")
-        else:
-            r_id = role.id
-            r_title = role.title
-            r_uri = role.uri
-
-        role_id_str = str(r_id).strip()
+        # String conversion and cleanup
+        role_id_str = str(role.id).strip()
             
         # CEDEFOP
         data = crud_skill_models.read_emp_occupation(country=country, isco_id=role_id_str)
         
         forecast_results.append({
-            "title": r_title,  
+            "title": role.title,  
             "isco_code": role_id_str,
-            "uri": r_uri,
+            "uri": role.uri,
             "data": data              
         })
 

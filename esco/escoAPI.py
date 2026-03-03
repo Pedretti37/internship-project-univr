@@ -10,22 +10,33 @@ HEADERS = {
 BASE_URL = "https://ec.europa.eu/esco/api"
 
 ### API function to get details
+import requests
+import time
+from models import Role
+
+# Configuration
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0',
+    'Accept': 'application/json'
+}
+BASE_URL = "https://ec.europa.eu/esco/api"
+
+### API function to get details
 def get_single_role_details(uri: str, language: str) -> Role | None:
     if not uri:
         return None
 
     try:
-        # Fetch role details from ESCO API
         details_params = {'uri': uri, 'language': language}
         details_resp = requests.get(f"{BASE_URL}/resource/occupation", params=details_params, headers=HEADERS)
         
         if details_resp.status_code != 200:
             print(f"❌ ESCO API Error: {details_resp.status_code} per URI: {uri}")
             return None
-            
+
+        # Obtain main details    
         d_data = details_resp.json()
         
-        # Title and Description
         title = d_data.get('title', 'Unknown Role')
         desc_obj = d_data.get('description', {}) or d_data.get('definition', {})
 
@@ -35,7 +46,6 @@ def get_single_role_details(uri: str, language: str) -> Role | None:
             if lang_data:
                 definition = lang_data.get('literal', 'No description available.')
 
-        # ISCO Code Extraction
         raw_val = d_data.get('code')
         if raw_val:
             s_code = str(raw_val)
@@ -45,38 +55,34 @@ def get_single_role_details(uri: str, language: str) -> Role | None:
             isco_family = "N/A"
             isco_code_raw = "N/A"
 
-        # Skills Extraction
-        embedded = d_data.get('_embedded', {})
-        links = d_data.get('_links', {})
-
-        def extract_titles(key_name):
-            # Embedded skills (detailed info)
-            source = embedded.get(key_name, [])
-            if not source:
-                # Links only 
-                source = links.get(key_name, [])
+        # Essential Skill and Knowledge
+        essential_skills_titles = {}
+        
+        related_params = {
+            'uri': uri,
+            'relation': 'hasEssentialSkill',# Both Essential Skills and Essential Knowledge
+            'language': language,
+            'limit': 500  # Taking all possible related skills/knowledge
+        }
+        related_resp = requests.get(f"{BASE_URL}/resource/related", params=related_params, headers=HEADERS)
+        
+        if related_resp.status_code == 200:
+            r_data = related_resp.json()
+            embedded_related = r_data.get('_embedded', {})
             
-            titles = {}
-            for item in source:
-                t = item.get('title')
-                u = item.get('uri')
-                if t and u:
-                    titles[u] = t
-            return titles
-
-        essential_titles = extract_titles('hasEssentialSkill')
-        optional_titles = extract_titles('hasOptionalSkill')
-
-        # Up to 40 skills each for now
-        # str_essential = "\n".join([t.capitalize() for t in list(essential_titles.values())[:40]])
-        # str_optional = "\n".join([t.capitalize() for t in list(optional_titles.values())[:40]])
+            for items_list in embedded_related.values():
+                if isinstance(items_list, list):
+                    for item in items_list:
+                        u = item.get('uri')
+                        t = item.get('title')
+                        if u and t:
+                            essential_skills_titles[u] = t
 
         return Role(
             id=str(isco_family),
             title=title,
             description=definition,
-            essential_skills=essential_titles,
-            optional_skills=optional_titles,
+            essential_skills=essential_skills_titles,
             id_full=str(isco_code_raw),
             uri=uri
         )

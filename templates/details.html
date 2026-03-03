@@ -44,7 +44,6 @@
                     <input type="hidden" name="title" value="{{ role.title }}">
                     <input type="hidden" name="description" value="{{ role.description }}">
                     <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
-                    <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
@@ -61,7 +60,6 @@
                     <input type="hidden" name="title" value="{{ role.title }}">
                     <input type="hidden" name="description" value="{{ role.description }}">
                     <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
-                    <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
@@ -88,7 +86,6 @@
                     <input type="hidden" name="title" value="{{ role.title }}">
                     <input type="hidden" name="description" value="{{ role.description }}">
                     <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
-                    <input type="hidden" name="optional_skills" value="{{ role.optional_skills }}">
                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
@@ -107,26 +104,16 @@
 
         <hr class="hr">
 
-        {% if role.essential_skills or role.optional_skills %}
-        <div class="details-box">
-            <h2>Tasks & Responsibilities</h2>
-            {% if role.essential_skills %}
+        {% if role.essential_skills %}
+            <div class="details-box">
+                <h2>Tasks & Responsibilities</h2>
                 <h3>Essential Skills:</h3>
                 <ul>
                 {% for uri, skill in role.essential_skills.items() %}
                     <li>{{ skill | capitalize }}: <a href="{{ uri }}" target="_blank"> ↗</a></li>
                 {% endfor %}
                 </ul>
-            {% endif %}
-            {% if role.optional_skills %}
-                <h3>Optional Skills:</h3>
-                <ul>
-                {% for uri, skill in role.optional_skills.items() %}
-                    <li>{{ skill | capitalize }}: <a href="{{ uri }}" target="_blank"> ↗</a></li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

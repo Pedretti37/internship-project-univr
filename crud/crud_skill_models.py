@@ -12,12 +12,10 @@ def skill_gap_user(user: User, role_list: List[Role]) -> User:
     user.skill_gap.clear()
 
     for role in role_list:
-        role_id = role.get('id')
-
         matching = {}
         missing = {}
         
-        essential_skills = role.get('essential_skills', {})
+        essential_skills = role.essential_skills
         
         for uri, skill in essential_skills.items():
             if uri in user.current_skills:
@@ -32,8 +30,8 @@ def skill_gap_user(user: User, role_list: List[Role]) -> User:
         match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
         
         role_gap_info = {
-            'role_id': role_id,
-            'role_title': role.get('title', ''),
+            'role_id': role.id,
+            'role_title': role.title,
             'match_score': match_pct,
             'total_required': total_req,
             'matching_skills': matching,
@@ -58,7 +56,7 @@ def skill_gap_project(project: Project, members: List[User]) -> Project:
         project.skill_gap = []
 
     for role in project.target_roles:
-        required_skills = role.get('essential_skills')
+        required_skills = role.essential_skills
 
         matching = {}
         missing = {}
@@ -74,8 +72,8 @@ def skill_gap_project(project: Project, members: List[User]) -> Project:
         match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
         
         role_gap_info = {
-            'role_id': role.get('id', ''),
-            'role_title': role.get('title', ''),
+            'role_id': role.id,
+            'role_title': role.title,
             'match_score': match_pct,
             'total_required': total_req,
             'matching_skills': matching,

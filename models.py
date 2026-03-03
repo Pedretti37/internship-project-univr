@@ -8,7 +8,6 @@ class Role(BaseModel):
     title: str
     description: Optional[str] = None
     essential_skills: Dict[str, str] = {}
-    optional_skills: Dict[str, str] = {}
     id_full: Optional[str] = None
     uri: Optional[str] = None
 

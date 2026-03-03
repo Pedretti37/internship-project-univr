@@ -317,7 +317,6 @@ async def details_page(
     title: str = Form(...),
     description: Optional[str] = Form(None),
     essential_skills: Optional[str] = Form(None),
-    optional_skills: Optional[str] = Form(None),
     id_full: str = Form(...),
     uri: str = Form(...),
     project_id: str = Form(...),
@@ -340,24 +339,12 @@ async def details_page(
             e_skills_dict = {}
     else:
         e_skills_dict = {}
-
-    # Optional Skills
-    if optional_skills:
-        try:
-            o_skills_dict = ast.literal_eval(optional_skills)
-            if not isinstance(o_skills_dict, dict):
-                o_skills_dict = {}
-        except (ValueError, SyntaxError):
-            o_skills_dict = {}
-    else:
-        o_skills_dict = {}
-
+    
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
         essential_skills=e_skills_dict,
-        optional_skills=o_skills_dict,
         id_full=id_full,
         uri=uri
     )
@@ -380,7 +367,6 @@ async def project_add_role(
     title: str = Form(...),
     description: Optional[str] = Form(None),
     essential_skills: Optional[str] = Form(None),
-    optional_skills: Optional[str] = Form(None),
     id_full: str = Form(...),
     uri: str = Form(...),
     org: Organization = Depends(get_current_org)
@@ -402,23 +388,11 @@ async def project_add_role(
     else:
         e_skills_dict = {}
 
-    # Optional Skills
-    if optional_skills:
-        try:
-            o_skills_dict = ast.literal_eval(optional_skills)
-            if not isinstance(o_skills_dict, dict):
-                o_skills_dict = {}
-        except (ValueError, SyntaxError):
-            o_skills_dict = {}
-    else:
-        o_skills_dict = {}
-
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
         essential_skills=e_skills_dict,
-        optional_skills=o_skills_dict,
         id_full=id_full,
         uri=uri
     )
