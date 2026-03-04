@@ -25,6 +25,34 @@
 
         <hr class="hr">
 
+        <div>
+            <h2>Assigned Team</h2>
+            <p>Employees involved in this assessment.</p>
+            
+            <ul>
+            {% for member in team %}
+                <li>
+                    <strong>{{ member.name }} {{ member.surname }}</strong>
+                    <br><small class="member-details-text">@{{ member.username }} • {{ member.current_skills|length }} skills mapped</small>
+                </li>
+            {% endfor %}
+            </ul>
+
+            <div>
+                <p>Add members to the team:</p>
+                <form action="/org/project/{{ current_project.id }}/add_member" method="post" class="add-member-form">
+                    <input type="text" name="username_to_add" class="input" placeholder="Employee username" required>
+                    <input type="hidden" name="project_id" value="{{ current_project.id }}">
+                    <button type="submit" class="btn-primary">Add Member</button>
+                </form>
+
+                {% if member_error %} <p class="status-err">{{ member_error }}</p> {% endif %}
+                {% if member_success %} <p class="status-ok">{{ member_success }}</p> {% endif %}
+            </div>
+        </div>
+
+        <hr class="hr">
+
         <div class="show-target-roles" translate="no">
             <h2>Current Target Roles</h2>
             {% if current_project.target_roles %}
@@ -97,22 +125,6 @@
                     {% endif %}
                 {% endif %}
             </div>
-        </div>
-
-        <hr class="hr">
-
-        <div>
-            <h2>Assigned Team</h2>
-            <p><small>Employees involved in this assessment.</small></p>
-            
-            <ul>
-            {% for member in team %}
-                <li>
-                    <strong>{{ member.name }} {{ member.surname }}</strong>
-                    <br><small class="member-details-text">@{{ member.username }} • {{ member.current_skills|length }} skills mapped</small>
-                </li>
-            {% endfor %}
-            </ul>
         </div>
 
         <div class="card" translate="no">

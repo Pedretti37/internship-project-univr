@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Request, Form, status, Depends
+from fastapi import APIRouter, Query, Request, Form, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
 from typing import Optional
+
+import urllib
 from crud import crud_skill_models, crud_user
 from dependencies import get_current_org
 from esco import escoAPI 
@@ -266,7 +268,9 @@ async def create_project_submit(
 async def view_project(
     request: Request, 
     project_id: str, 
-    org: Organization = Depends(get_current_org)
+    org: Organization = Depends(get_current_org),
+    error: str = Query(None), 
+    success: str = Query(None)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -310,7 +314,9 @@ async def view_project(
         "countries_list": EU_COUNTRIES,
         "recommended_courses": recommended_courses,
         "forecast_results": forecast_results,
-        "country": country
+        "country": country,
+        "member_error": error,    
+        "member_success": success
     })
 
 ### --- Project Search Role --- ###
@@ -493,6 +499,38 @@ async def delete_project_target_role(
 
     return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
 
+### --- Add Member to Project POST --- ###
+@router.post("/org/project/{project_id}/add_member", response_class=HTMLResponse)
+async def add_member_to_project(
+    request: Request,
+    project_id: str,
+    username_to_add: str = Form(...),
+    org: Organization = Depends(get_current_org)
+):
+    if not org: return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    project = next((p for p in org.projects if str(p.id) == project_id), None)
+
+    if project is None:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+    
+    user_in_org = next((u for u in org.members if u == username_to_add), None)
+    redirect_url = f"/org/project/{project_id}"
+
+    if not user_in_org:
+        error_msg = urllib.parse.quote(f"User '{username_to_add}' is not a member of your organization.")
+        return RedirectResponse(url=f"{redirect_url}?error={error_msg}", status_code=status.HTTP_303_SEE_OTHER)
+    
+    if username_to_add in project.assigned_members:
+        error_msg = urllib.parse.quote(f"User '{username_to_add}' is already assigned to this project.")
+        return RedirectResponse(url=f"{redirect_url}?error={error_msg}", status_code=status.HTTP_303_SEE_OTHER)
+    
+    project.assigned_members.append(username_to_add)
+    crud_org.update_org(org)
+       
+    success_msg = urllib.parse.quote(f"User '{username_to_add}' added to the project successfully!")
+    return RedirectResponse(url=f"{redirect_url}?success={success_msg}", status_code=status.HTTP_303_SEE_OTHER)
+
 ### --- Project Calculate Skill Gap POST --- ###
 @router.post("/org/project/calculate_forecast_and_gap")
 async def project_calculate_skill_gap(
@@ -518,7 +556,7 @@ async def project_calculate_skill_gap(
             "error": error,
             "countries_list": EU_COUNTRIES,
             "current_project": project,
-            "team": assigned_members,  
+            "team": crud_user.get_users_by_usernames(project.assigned_members),  
             "current_year": datetime.now().year,
             "forecast_results": None,
             "recommended_courses": None

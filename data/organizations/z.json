@@ -15,7 +15,8 @@
             "name": "A",
             "description": "a",
             "assigned_members": [
-                "a"
+                "a",
+                "b"
             ],
             "target_roles": [
                 {
