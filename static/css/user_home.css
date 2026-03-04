@@ -75,6 +75,9 @@ body {
     font-weight: bold;
     text-decoration: none;
 }
+.role-title:hover {
+    color: #3498db;
+}
 
 /* Stile universale per i bottoni blu */
 .btn-primary {

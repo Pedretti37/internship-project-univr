@@ -45,6 +45,13 @@ body {
     color: #3498db; 
 }
 
+.logout-btn {
+    color: #e74c3c;
+}
+.logout-btn:hover {
+    color: #ff6b6b;
+}
+
 .main-container {
     margin-top: 80px; 
     padding: 20px;

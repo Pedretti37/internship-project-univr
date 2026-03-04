@@ -469,6 +469,30 @@ async def project_add_role(
         "message": message_text
     })
 
+### --- Delete Target Role from Project --- ###    
+@router.post("/delete_project_target_role", response_class=RedirectResponse)
+async def delete_project_target_role(
+    org: Organization = Depends(get_current_org),
+    role_id: str = Form(...),
+    project_id: str = Form(...)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    role_removed = False
+    for project in org.projects:
+        if str(project.id) == project_id:
+            for role in project.target_roles:
+                if role.id == role_id:
+                    project.target_roles.remove(role)
+                    role_removed = True
+                    break
+
+    if role_removed:
+        crud_org.update_org(org)
+
+    return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
+
 ### --- Project Calculate Skill Gap POST --- ###
 @router.post("/org/project/calculate_forecast_and_gap")
 async def project_calculate_skill_gap(
