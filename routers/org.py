@@ -13,7 +13,9 @@ from models import Organization, Project, Role
 
 router = APIRouter()
 
-PROJECT_ROLE_LIST = {}
+PROJECT_ROLES_LIST = {}
+PROJECT_COURSES_LIST = {}
+PROJECT_FORECAST_RESULTS = {}
 
 ### --- Organization Login GET --- ###
 @router.get("/org_login", response_class=HTMLResponse)
@@ -260,8 +262,8 @@ async def view_project(
     context_results = None
     context_search = ""
 
-    if current_project.id in PROJECT_ROLE_LIST:
-        session_data = PROJECT_ROLE_LIST[current_project.id]
+    if current_project.id in PROJECT_ROLES_LIST:
+        session_data = PROJECT_ROLES_LIST[current_project.id]
         context_results = session_data["results"]
         context_search = session_data["last_search"]
 
@@ -296,7 +298,7 @@ async def project_search_role(
 
     team = crud_user.get_users_by_ids(current_project.assigned_members_ids)
 
-    PROJECT_ROLE_LIST[current_project.id] = {
+    PROJECT_ROLES_LIST[current_project.id] = {
         "last_search": search,
         "results": role_list
     }
