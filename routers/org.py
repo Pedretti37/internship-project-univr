@@ -43,19 +43,27 @@ async def org_login(orgname: str = Form(...), password: str = Form(...)):
 
     response = RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
-    response.set_cookie(key="session_token", value=org.id, path="/", httponly=True, max_age=1800)  # 30 minutes session
+    response.set_cookie(key="session_token", value=org.orgname, path="/", httponly=True, max_age=1800)  # 30 minutes session
     response.delete_cookie(key="flash_error")
 
     return response
 
 ### --- Logout --- ###
 @router.get("/org_logout")
-async def logout():
+async def logout(org: Organization = Depends(get_current_org)):
     response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
     # Delete current session
     response.set_cookie(key="session_token", value="", path="/", httponly=True, max_age=0)
 
+    for project in org.projects:
+        if project.id in PROJECT_ROLES_LIST:
+            del PROJECT_ROLES_LIST[project.id]
+        if project.id in PROJECT_COURSES_LIST:
+            del PROJECT_COURSES_LIST[project.id]
+        if project.id in PROJECT_FORECAST_RESULTS:
+            del PROJECT_FORECAST_RESULTS[project.id]
+        del PROJECT_FORECAST_RESULTS[org.id]
     return response
 
 ### --- Organization Home --- ###
@@ -68,7 +76,7 @@ async def org_home(request: Request, org: Organization = Depends(get_current_org
         return response
     
     # Member list
-    members = crud_user.get_users_by_ids(org.members)
+    members = crud_user.get_users_by_usernames(org.members)
 
     response = templates.TemplateResponse("org/org_home.html", {
         "request": request, 
@@ -123,7 +131,7 @@ async def org_profile(request: Request, org: Organization = Depends(get_current_
     response = templates.TemplateResponse("org/org_profile.html", {
         "request": request, 
         "org": org,
-        "members": crud_user.get_users_by_ids(org.members)
+        "members": crud_user.get_users_by_usernames(org.members)
     })
 
     # No cache storage
@@ -186,10 +194,10 @@ async def invite_member(
 
     if not user_to_invite:
         error_msg = "User not found."
-    elif user_to_invite.id in members:
+    elif user_to_invite.username in members:
         error_msg = "This user is already in your team."
     else:
-        invited = crud_org.create_invitation(org.id, user_to_invite.id)
+        invited = crud_org.create_invitation(org.orgname, user_to_invite.username)
         if invited:
             success_msg = f"Invitation sent to '{username_to_invite}' successfully!"
         else:
@@ -198,7 +206,7 @@ async def invite_member(
     return templates.TemplateResponse("org/org_profile.html", {
         "request": request,
         "org": org,
-        "members": crud_user.get_users_by_ids(org.members),
+        "members": crud_user.get_users_by_usernames(org.members),
         "invite_error": error_msg,
         "invite_success": success_msg
     })
@@ -210,7 +218,7 @@ async def create_project_form(request: Request, org: Organization = Depends(get_
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
     # member list for assignment with checkboxes
-    members = crud_user.get_users_by_ids(org.members)
+    members = crud_user.get_users_by_usernames(org.members)
 
     return templates.TemplateResponse("org/create_project.html", {
         "request": request,
@@ -232,7 +240,7 @@ async def create_project_submit(
     new_project = Project(
         name=name,
         description=description,
-        assigned_members_ids=assigned_members,
+        assigned_members=assigned_members,
         target_roles=[], # Empty for now
         skill_gap=[]
     )
@@ -257,7 +265,7 @@ async def view_project(
     if not current_project:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
-    team = crud_user.get_users_by_ids(current_project.assigned_members_ids)
+    team = crud_user.get_users_by_usernames(current_project.assigned_members)
 
     context_results = None
     context_search = ""
@@ -296,7 +304,7 @@ async def project_search_role(
     language = "en"
     role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
 
-    team = crud_user.get_users_by_ids(current_project.assigned_members_ids)
+    team = crud_user.get_users_by_usernames(current_project.assigned_members)
 
     PROJECT_ROLES_LIST[current_project.id] = {
         "last_search": search,
@@ -434,7 +442,7 @@ async def project_calculate_skill_gap(
     if not project:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
     
-    assigned_members = crud_user.get_users_by_ids(project.assigned_members_ids)
+    assigned_members = crud_user.get_users_by_usernames(project.assigned_members)
     
     updated_project = crud_skill_models.skill_gap_project(project, assigned_members)
     

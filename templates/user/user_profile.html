@@ -72,11 +72,11 @@
                     <ul>
                         {% for inv in invitations %}
                             <li>
-                                Organization: {{ inv.name }} 
+                                Organization: {{ inv.orgname }} 
                                 <small><p>({{ inv.created_at }})</p></small>
                                 <form action="/accept_invitation" method="post" style="display:inline;">
-                                    <input type="hidden" name="inv_id" value="{{ inv.raw_id }}">
-                                    <input type="hidden" name="org_id" value="{{ inv.org_id }}">
+                                    <input type="hidden" name="inv_id" value="{{ inv.id }}">
+                                    <input type="hidden" name="orgname" value="{{ inv.orgname }}">
 
                                     <button type="submit" title="accept_invitation">
                                         ✅
@@ -289,7 +289,7 @@
                 {% else %}
                     <div class="no-skill-gap">
                         <h4>Not available yet</h4>
-                        <p>Add 1-5 target roles above, select a country and click <strong>"Analyze"</strong>.</p>
+                        <p>Add 1-5 target roles above, select a country and click <strong>Analyze</strong>.</p>
                     </div>
                 {% endif %}
 

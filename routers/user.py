@@ -53,7 +53,7 @@ async def user_login(username: str = Form(...), password: str = Form(...)):
 
     response = RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 
-    response.set_cookie(key="session_token", value=user.id, path="/", httponly=True, max_age=1800)  # 30 minutes session
+    response.set_cookie(key="session_token", value=user.username, path="/", httponly=True, max_age=1800)  # 30 minutes session
     response.delete_cookie(key="flash_error")
 
     return response
@@ -66,12 +66,12 @@ async def logout(user: User = Depends(get_current_user)):
     # Delete current session
     response.set_cookie(key="session_token", value="", path="/", httponly=True, max_age=0)
 
-    if user.id in USER_ROLES_LIST:
-        del USER_ROLES_LIST[user.id]
-    if user.id in USER_COURSES_LIST:
-        del USER_COURSES_LIST[user.id]
-    if user.id in USER_FORECAST_RESULTS:
-        del USER_FORECAST_RESULTS[user.id]
+    if user.username in USER_ROLES_LIST:
+        del USER_ROLES_LIST[user.username]
+    if user.username in USER_COURSES_LIST:
+        del USER_COURSES_LIST[user.username]
+    if user.username in USER_FORECAST_RESULTS:
+        del USER_FORECAST_RESULTS[user.username]
     return response
 
 ### --- User Home --- ###
@@ -86,15 +86,17 @@ async def user_home(request: Request, user: User = Depends(get_current_user)):
     context_results = None
     context_search = ""
 
-    if user.id in USER_ROLES_LIST:
-        session_data = USER_ROLES_LIST[user.id]
+    if user.username in USER_ROLES_LIST:
+        session_data = USER_ROLES_LIST[user.username]
         context_results = session_data["results"]
         context_search = session_data["last_search"]
 
-    response = templates.TemplateResponse(
-        "user/user_home.html", 
-        {"request": request, "user": user, "results": context_results, "last_search": context_search}
-    )
+    response = templates.TemplateResponse("user/user_home.html", {
+        "request": request, 
+        "user": user, 
+        "results": context_results, 
+        "last_search": context_search
+    })
 
     # No cache storage
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
@@ -139,26 +141,16 @@ async def user_profile(request: Request, user: User = Depends(get_current_user))
         response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
 
-    raw_invitations = crud_user.get_pending_invitations_for_user(user.id)
-    clean_invitations = []
-    if raw_invitations:
-        for raw in raw_invitations:
-            clean = {}
-            org = crud_org.get_org_by_id(raw.org_id)
-            clean["name"] = org.orgname          
-            clean["created_at"] = raw.created_at
-            clean["raw_id"] = raw.id          
-            clean["org_id"] = raw.org_id
-            clean_invitations.append(clean)
+    invitations = crud_user.get_pending_invitations_for_user(user.username)
         
-    if user.id in USER_COURSES_LIST:
-        session_data = USER_COURSES_LIST[user.id]
+    if user.username in USER_COURSES_LIST:
+        session_data = USER_COURSES_LIST[user.username]
         recommended_courses = session_data["results"]
     else:
         recommended_courses = None
 
-    if user.id in USER_FORECAST_RESULTS:
-        session_data = USER_FORECAST_RESULTS[user.id]
+    if user.username in USER_FORECAST_RESULTS:
+        session_data = USER_FORECAST_RESULTS[user.username]
         forecast_results = session_data["results"]
         country = session_data["country"]
     else:
@@ -170,7 +162,7 @@ async def user_profile(request: Request, user: User = Depends(get_current_user))
             "request": request, 
             "user": user, 
             "countries_list": EU_COUNTRIES,
-            "invitations": clean_invitations,
+            "invitations": invitations,
             "recommended_courses": recommended_courses,
             "forecast_results": forecast_results,
             "country": country
@@ -194,7 +186,7 @@ async def role_list(request: Request, search: str = Form(...), user: User = Depe
     role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
     
     if user:
-        USER_ROLES_LIST[user.id] = {
+        USER_ROLES_LIST[user.username] = {
             "last_search": search,
             "results": role_list
         }
@@ -482,7 +474,7 @@ async def occupation_forecast_and_gap(
     updated_user = crud_skill_models.skill_gap_user(user, role_list)
     crud_user.update_user(updated_user)
 
-    USER_FORECAST_RESULTS[user.id] = {
+    USER_FORECAST_RESULTS[updated_user.username] = {
         "country": country,
         "results": forecast_results
     }
@@ -505,7 +497,7 @@ async def occupation_forecast_and_gap(
     # assuming "Mechanical Engineer" and similar role as default role type
     recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills)
 
-    USER_COURSES_LIST[user.id] = {
+    USER_COURSES_LIST[updated_user.username] = {
         "results": recommended_courses
     }
 
@@ -524,18 +516,18 @@ async def occupation_forecast_and_gap(
 @router.post("/accept_invitation", response_class=RedirectResponse)
 async def accept_invitation(
     user: User = Depends(get_current_user),
-    org_id: str = Form(...),
+    orgname: str = Form(...),
     inv_id: str = Form(...)
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    user.id_organization = org_id
+    user.organization = orgname
     crud_user.update_user(user)
 
-    org = crud_org.get_org_by_id(org_id)
+    org = crud_org.get_org_by_orgname(orgname)
     if org:
-        org.members.append(user.id)
+        org.members.append(user.username)
         crud_org.update_org(org)
 
     inv = crud_org.get_inv_by_id(inv_id)

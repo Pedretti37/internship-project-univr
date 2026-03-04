@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, Dict, List, Any
@@ -12,7 +12,6 @@ class Role(BaseModel):
     uri: Optional[str] = None
 
 class User(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     surname: str
     username: str
@@ -21,26 +20,25 @@ class User(BaseModel):
     target_roles: List[Role] = []
     current_skills: Dict[str, str] = {}
     skill_gap: List[Dict[str, Any]] = []
-    id_organization: Optional[str] = None
+    organization: Optional[str] = None
 
 class Invitation(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    org_id: str
-    user_id: str
+    orgname: str
+    username: str
     status: str  # e.g., "pending", "accepted", "declined"
-    created_at: datetime = Field(default_factory=lambda: datetime.now())
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: str
-    assigned_members_ids: List[str] = []
+    assigned_members: List[str] = []
     target_roles: List[Role] = []
     skill_gap: List[Dict[str, Any]] = []
-    created_at: datetime = Field(default_factory=lambda: datetime.now())
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Organization(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     address: str
     phone: str
