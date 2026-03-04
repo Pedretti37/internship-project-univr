@@ -109,8 +109,6 @@
             {% endif %}
         </div>
 
-        <hr class="hr">
-
         <div class="show-target-roles" translate="no">
             {% if message %}
                 <div class="alert alert-{{ message_type }}" role="alert">
@@ -138,119 +136,121 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <p><strong>You don't have any target roles yet.</strong></p>
+                <p><strong>You don't have any target roles yet. Go back to the home page to add one!</strong></p>
             {% endif %}
         </div>
 
         <div class="card" translate="no">
-            <h2>Check Future Employment Trend & Skill Gap Analysis</h2>
-            <form action="/occupation_forecast_and_gap" method="post">
-                {% if user.target_roles %}
-                    <div class="country-selection">
-                        <label>Choose a Country to see future trends:</label>
-                        <br>
-                        <select class="selection" name="country" id="country" required>
-                            <option value="" disabled {% if not country %}selected{% endif %}>Select a country</option>
-                            {% for c in countries_list %}
-                                <option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c }}</option>
-                            {% endfor %}
-                        </select>
-                        <span><button type="submit" class="btn-primary">Analyze</button></span>
+            {% if user.target_roles %}
+                <hr class="hr">
+
+                <h2>Check Future Employment Trend & Skill Gap Analysis</h2>
+                <form action="/occupation_forecast_and_gap" method="post">
+                    {% if user.target_roles %}
+                        <div class="country-selection">
+                            <label>Choose a Country to see future trends:</label>
+                            <br>
+                            <select class="selection" name="country" id="country" required>
+                                <option value="" disabled {% if not country %}selected{% endif %}>Select a country</option>
+                                {% for c in countries_list %}
+                                    <option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                            <span><button type="submit" class="btn-primary">Analyze</button></span>
+                        </div>
+                    {% endif %}
+                </form>
+
+                {% if forecast_results %}
+                    <h3 style="margin-top: 30px;">🇪🇺 Forecast Results for {{ country }}</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 20px; margin-top: 15px;">
+                        
+                        {% for item in forecast_results %}
+                            
+                            {% if not item.data.error %}
+                            <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                                    <div>
+                                        <h4 style="margin: 0; color: #333;">{{ item.title | title }}</h4>
+                                        <small style="color: #666; font-family: monospace;">ISCO: {{ item.isco_code }}</small>
+                                    </div>
+                                    
+                                    <div style="text-align: right;">
+                                        <span>
+                                            {{ item.data.trend }} ({{ item.data.growth_pct }}%)
+                                        </span>
+                                        <br>
+                                        <small style="font-size: 0.8em; color: #888;">Change {{ current_year }}-2035</small>
+                                    </div>
+                                </div>
+
+                                <p style="font-size: 0.9em; color: #555; margin-bottom: 15px;">
+                                    {% if item.data.trend == "Growing" %}
+                                        🚀 This occupation is projected to grow. Excellent opportunity for upskilling!
+                                    {% elif item.data.trend == "Declining" %}
+                                        ⚠️ Employment is projected to decline. Consider diversifying your skills.
+                                    {% else %}
+                                        ⚖️ Employment is expected to remain stable.
+                                    {% endif %}
+                                </p>
+
+                                <div style="max-height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 4px;">
+                                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9em;">
+                                        <thead style="background-color: #f8f9fa; position: sticky; top: 0;">
+                                            <tr>
+                                                <th style="padding: 8px;">Year</th>
+                                                <th style="padding: 8px;">Employees</th>
+                                                <th style="padding: 8px;">Trend</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in item.data.history %}
+                                                <tr style="border-bottom: 1px solid #f0f0f0;">
+                                                    <td style="padding: 8px;">
+                                                        <strong>{{ row.year }}</strong>
+                                                        {% if row.year == "2035" %} <span style="font-size: 0.7em; background: #e3f2fd; padding: 1px 4px; border-radius: 3px;">End</span> {% endif %}
+                                                    </td>
+                                                    <td style="padding: 8px; font-family: monospace;">
+                                                        {{ row.value }}
+                                                    </td>
+                                                    <td style="padding: 8px;">
+                                                        {% if loop.index0 > 0 %}
+                                                            {% set prev = item.data.history[loop.index0 - 1].value %}
+                                                            {% if row.value > prev %}
+                                                                <span style="color: green;" translate="no">↗</span>
+                                                            {% elif row.value < prev %}
+                                                                <span style="color: red;" translate="no">↘</span>
+                                                            {% else %}
+                                                                <span style="color: gray;" translate="no">=</span>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            <span style="color: gray;" translate="no">-</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            {% else %}
+                            <div class="alert alert-danger">
+                                <strong>{{ item.title | title }} ({{ item.isco_code }}):</strong> {{ item.data.error }}
+                            </div>
+                            {% endif %}
+
+                        {% endfor %}
+                        
+                        <p style="margin-top: 10px; font-size: 0.8em; color: #888; text-align: center;">
+                            Source: CEDEFOP Skills Forecast | Baseline Year: {{ current_year }}
+                        </p>
                     </div>
                 {% endif %}
-            </form>
-
-            {% if forecast_results %}
-                <h3 style="margin-top: 30px;">🇪🇺 Forecast Results for {{ country }}</h3>
-                
-                <div style="display: flex; flex-direction: column; gap: 20px; margin-top: 15px;">
-                    
-                    {% for item in forecast_results %}
-                        
-                        {% if not item.data.error %}
-                        <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                            
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                                <div>
-                                    <h4 style="margin: 0; color: #333;">{{ item.title | title }}</h4>
-                                    <small style="color: #666; font-family: monospace;">ISCO: {{ item.isco_code }}</small>
-                                </div>
-                                
-                                <div style="text-align: right;">
-                                    <span>
-                                        {{ item.data.trend }} ({{ item.data.growth_pct }}%)
-                                    </span>
-                                    <br>
-                                    <small style="font-size: 0.8em; color: #888;">Change {{ current_year }}-2035</small>
-                                </div>
-                            </div>
-
-                            <p style="font-size: 0.9em; color: #555; margin-bottom: 15px;">
-                                {% if item.data.trend == "Growing" %}
-                                    🚀 This occupation is projected to grow. Excellent opportunity for upskilling!
-                                {% elif item.data.trend == "Declining" %}
-                                    ⚠️ Employment is projected to decline. Consider diversifying your skills.
-                                {% else %}
-                                    ⚖️ Employment is expected to remain stable.
-                                {% endif %}
-                            </p>
-
-                            <div style="max-height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 4px;">
-                                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9em;">
-                                    <thead style="background-color: #f8f9fa; position: sticky; top: 0;">
-                                        <tr>
-                                            <th style="padding: 8px;">Year</th>
-                                            <th style="padding: 8px;">Employees</th>
-                                            <th style="padding: 8px;">Trend</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for row in item.data.history %}
-                                            <tr style="border-bottom: 1px solid #f0f0f0;">
-                                                <td style="padding: 8px;">
-                                                    <strong>{{ row.year }}</strong>
-                                                    {% if row.year == "2035" %} <span style="font-size: 0.7em; background: #e3f2fd; padding: 1px 4px; border-radius: 3px;">End</span> {% endif %}
-                                                </td>
-                                                <td style="padding: 8px; font-family: monospace;">
-                                                    {{ row.value }}
-                                                </td>
-                                                <td style="padding: 8px;">
-                                                    {% if loop.index0 > 0 %}
-                                                        {% set prev = item.data.history[loop.index0 - 1].value %}
-                                                        {% if row.value > prev %}
-                                                            <span style="color: green;" translate="no">↗</span>
-                                                        {% elif row.value < prev %}
-                                                            <span style="color: red;" translate="no">↘</span>
-                                                        {% else %}
-                                                            <span style="color: gray;" translate="no">=</span>
-                                                        {% endif %}
-                                                    {% else %}
-                                                        <span style="color: gray;" translate="no">-</span>
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        {% else %}
-                        <div class="alert alert-danger">
-                            <strong>{{ item.title | title }} ({{ item.isco_code }}):</strong> {{ item.data.error }}
-                        </div>
-                        {% endif %}
-
-                    {% endfor %}
-                    
-                    <p style="margin-top: 10px; font-size: 0.8em; color: #888; text-align: center;">
-                        Source: CEDEFOP Skills Forecast | Baseline Year: {{ current_year }}
-                    </p>
-                </div>
             {% endif %}
         </div>
-
-        <hr class="hr">
 
         <div translate="no">
             <h2>Skill gap Assessment</h2>
@@ -287,11 +287,9 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    <div class="empty-state text-center p-5">
-                        <div class="mb-3" style="font-size: 3rem;">🤷‍♂️</div>
+                    <div class="no-skill-gap">
                         <h4>Not available yet</h4>
-                        <p class="text-muted">You haven't calculated your skill gap yet.</p>
-                        <p class="mb-0">Select your target roles above and click <strong>"Calculate Skill Gap"</strong>.</p>
+                        <p>Add 1-5 target roles above, select a country and click <strong>"Analyze"</strong>.</p>
                     </div>
                 {% endif %}
 

@@ -144,11 +144,11 @@ async def user_profile(request: Request, user: User = Depends(get_current_user))
     if raw_invitations:
         for raw in raw_invitations:
             clean = {}
-            org = crud_org.get_org_by_id(raw["org_id"])
+            org = crud_org.get_org_by_id(raw.org_id)
             clean["name"] = org.orgname          
-            clean["created_at"] = raw["created_at"]
-            clean["raw_id"] = raw["id"]          
-            clean["org_id"] = raw["org_id"]
+            clean["created_at"] = raw.created_at
+            clean["raw_id"] = raw.id          
+            clean["org_id"] = raw.org_id
             clean_invitations.append(clean)
         
     if user.id in USER_COURSES_LIST:
@@ -249,7 +249,7 @@ async def add_to_user_target_roles(
     message_text = "Error: target role not added."
     updated_target_role = False
 
-    already_exists = any(r['id'] == role_id for r in user.target_roles)
+    already_exists = any(r.id == role_id for r in user.target_roles)
 
     if not already_exists:
         user.target_roles.append(role_object.model_dump())
@@ -267,7 +267,8 @@ async def add_to_user_target_roles(
         "user": user,
         "role": role_object,
         "updated_target_role": updated_target_role,
-        "message": message_text
+        "message": message_text,
+        "is_user": True
     })
 
 ### --- Add User Skills --- ###
@@ -328,7 +329,8 @@ async def add_to_user_skills(
         "user": user,
         "role": role_object,
         "updated_skill": updated_skill,
-        "message": message_text
+        "message": message_text,
+        "is_user": True
     })
 
 ### --- Password Change --- ###
@@ -430,7 +432,7 @@ async def delete_target_role(
 
     new_target_list = [
         role for role in user.target_roles 
-        if role.get('id') != role_id
+        if role.id != role_id
     ]
     
     user.target_roles = new_target_list

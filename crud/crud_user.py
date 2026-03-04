@@ -1,6 +1,8 @@
 import json
 import os
-from models import User
+
+from pydantic_core import ValidationError
+from models import User, Invitation
 
 DATA_DIR_USERS = "data/users"
 os.makedirs(DATA_DIR_USERS, exist_ok=True)
@@ -8,7 +10,7 @@ os.makedirs(DATA_DIR_USERS, exist_ok=True)
 INDEX_FILE = "data/users/user_index.json"
 os.makedirs(os.path.dirname(INDEX_FILE), exist_ok=True)
 
-DATA_INV_DIR = "data/organizations/invitations"
+DATA_INV_DIR = "data/invitations"
 
 ### --- User GET path --- ###
 def get_json_path(id: str) -> str:
@@ -78,11 +80,11 @@ def _save_index(index_data):
         json.dump(index_data, f, indent=4)
 
 ### --- Get USER --- ###
-def get_user_by_id(user_id: str) -> User | None:
+def get_user_by_id(user_id: str) -> User:
     """Recupera l'utente direttamente tramite ID (veloce)"""
     path = os.path.join(DATA_DIR_USERS, f"{user_id}.json")
     if not os.path.exists(path):
-        return None
+        raise ValueError(f"User with ID {user_id} not found")
     
     with open(path, "r") as f:
         data = json.load(f)
@@ -113,7 +115,7 @@ def get_user_by_username(username: str) -> User | None:
     return get_user_by_id(user_id)
 
 ### --- Get Pending Invitations for User --- ###
-def get_pending_invitations_for_user(user_id: str) -> list:
+def get_pending_invitations_for_user(user_id: str) -> list[Invitation]:
     invitations = []
     
     if not os.path.exists(DATA_INV_DIR):
@@ -122,9 +124,17 @@ def get_pending_invitations_for_user(user_id: str) -> list:
     for filename in os.listdir(DATA_INV_DIR):
         if filename.endswith(".json"):
             path = os.path.join(DATA_INV_DIR, filename)
-            with open(path, "r") as f:
-                data = json.load(f)
-                if data.get("user_id") == user_id and data.get("status") == "pending":
-                    invitations.append(data)
-    
+            
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    
+                    if data.get("user_id") == user_id and data.get("status") == "pending":
+                        invitation_obj = Invitation(**data) 
+                        invitations.append(invitation_obj)
+                        
+            except (json.JSONDecodeError, ValidationError) as e:
+                print(f"Errore nella lettura del file {filename}: {e}")
+                continue # Salta il file corrotto e passa al prossimo
+                
     return invitations

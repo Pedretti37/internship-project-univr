@@ -96,3 +96,10 @@ input:focus {
     font-weight: 600;
     color: #555;
 }
+
+.back-link a {
+    text-decoration: none;     /* Via la sottolineatura */
+    text-align: center;        /* Testo al centro */
+    font-weight: 600;
+    color: #555;
+}

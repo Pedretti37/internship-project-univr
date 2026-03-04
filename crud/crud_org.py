@@ -57,7 +57,7 @@ def update_org(org: Organization):
 
     try:
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(org.model_dump(), f, indent=4)
+            f.write(org.model_dump_json(indent=4))
     except Exception as e:
         print(f"Error updating organization: {e}")
 
@@ -88,10 +88,10 @@ def change_password_org(org: Organization, new_pw: str) -> bool:
         return False
 
 ### --- CRUD: Getters --- ###
-def get_org_by_id(org_id: str) -> Organization | None:
+def get_org_by_id(org_id: str) -> Organization:
     path = get_json_path(org_id)
     if not os.path.exists(path):
-        return None
+        raise ValueError(f"Organization with ID {org_id} not found")
     
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -120,7 +120,7 @@ def create_invitation(org_id: str, user_id: str) -> bool:
 
     inv_path = os.path.join(DATA_INV_DIR, f"{invitation.id}.json")
     with open(inv_path, "w", encoding="utf-8") as f:
-        f.write(json.dumps(invitation.model_dump(), indent=4))
+        f.write(invitation.model_dump_json(indent=4))
         return True 
     
     return False

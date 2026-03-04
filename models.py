@@ -28,7 +28,7 @@ class Invitation(BaseModel):
     org_id: str
     user_id: str
     status: str  # e.g., "pending", "accepted", "declined"
-    created_at: datetime = Field(default_factory=datetime.now)
+    created_at: datetime = Field(default_factory=lambda: datetime.now())
 
 class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -37,7 +37,7 @@ class Project(BaseModel):
     assigned_members_ids: List[str] = []
     target_roles: List[Role] = []
     skill_gap: List[Dict[str, Any]] = []
-    created_at: datetime = Field(default_factory=datetime.now)
+    created_at: datetime = Field(default_factory=lambda: datetime.now())
 
 class Organization(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
