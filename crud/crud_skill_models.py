@@ -62,7 +62,7 @@ def skill_gap_project(project: Project, members: List[User]) -> Project:
         missing = {}
         
         for uri, req_skill in required_skills.items():
-            if uri and req_skill in team_skills:
+            if uri in team_skills:
                 matching[uri] = req_skill
             else:
                 missing[uri] = req_skill

@@ -410,7 +410,7 @@ async def project_add_role(
     project_found = False
     for project in org.projects:
         if str(project.id) == project_id:
-            project.target_roles.append(role_object.model_dump())
+            project.target_roles.append(role_object)
             project_found = True
             break
 

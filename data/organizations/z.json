@@ -4,45 +4,310 @@
     "phone": "4932014592",
     "email": "samsung@gmail.com",
     "orgname": "z",
-    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$ulfq/T/nvBeCUCqFcK7V2g$eqAmQFLK5fM/NHQX2GhRqVnGb9/rPdNP0VJkf07FsiA",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$9l5LyRkjpBRiLCWE8L4Xgg$UF4WJXel/5gm0tIYoCU9NQB0lNo1w/jNKyX17Pk72E8",
     "members": [
         "a",
         "b"
     ],
     "projects": [
         {
-            "id": "39aa6b1b-50f7-4c3d-b110-d4b120f46e3b",
+            "id": "32301222-dd29-4dc1-903b-e6dad296246e",
             "name": "A",
             "description": "a",
             "assigned_members": [
                 "a"
             ],
-            "target_roles": [],
-            "skill_gap": [],
-            "created_at": "2026-03-04T11:27:11.935205Z"
+            "target_roles": [
+                {
+                    "id": "2144",
+                    "title": "mechanical engineer",
+                    "description": "Mechanical engineers research, plan and design mechanical products and systems and supervise the fabrication, operation, application, installation and repair of systems and products. They research and analyse data.",
+                    "essential_skills": {
+                        "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": "perform scientific research",
+                        "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": "approve engineering design",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": "adjust engineering designs",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919": "engineering processes",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78": "engineering principles"
+                    },
+                    "id_full": "2144.1",
+                    "uri": "http://data.europa.eu/esco/occupation/579254cf-6d69-4889-9000-9c79dc568644"
+                },
+                {
+                    "id": "3118",
+                    "title": "mechanical engineering drafter",
+                    "description": "Mechanical engineering drafters convert mechanical engineers' designs and sketches into technical drawings detailing dimensions, fastening and assembling methods and other specifications used for example in manufacturing processes.",
+                    "essential_skills": {
+                        "http://data.europa.eu/esco/skill/ae0f2a15-ba82-4a88-817c-431c58c70167": "manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/5c98825f-146d-4d35-97cf-207b2afd9ae2": "create technical plans",
+                        "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1": "CAD software",
+                        "http://data.europa.eu/esco/skill/4339176e-3acd-4f7f-a5d9-445bee3d23f2": "mathematics",
+                        "http://data.europa.eu/esco/skill/03b9b491-fc9b-4868-914a-bf7cd47b5041": "create solutions to problems",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/b34e2ba1-9080-48c9-9b42-ee9192a4d3f1": "use CAD software",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/3c333552-8d89-43f5-90bd-856e15bec433": "design drawings",
+                        "http://data.europa.eu/esco/skill/432ab648-aece-4237-969f-8bca94fe181c": "use manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c": "principles of mechanical engineering",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/c5c51528-ccfc-4c53-b409-c200aaa44222": "liaise with engineers"
+                    },
+                    "id_full": "3118.3.11",
+                    "uri": "http://data.europa.eu/esco/occupation/38240cc5-d1d9-4de9-9480-29c51da291eb"
+                }
+            ],
+            "skill_gap": [
+                {
+                    "role_id": "2144",
+                    "role_title": "mechanical engineer",
+                    "match_score": 100,
+                    "total_required": 9,
+                    "matching_skills": {
+                        "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": "perform scientific research",
+                        "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": "approve engineering design",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": "adjust engineering designs",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919": "engineering processes",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78": "engineering principles"
+                    },
+                    "missing_skills": {}
+                },
+                {
+                    "role_id": "3118",
+                    "role_title": "mechanical engineering drafter",
+                    "match_score": 28,
+                    "total_required": 14,
+                    "matching_skills": {
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics"
+                    },
+                    "missing_skills": {
+                        "http://data.europa.eu/esco/skill/ae0f2a15-ba82-4a88-817c-431c58c70167": "manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/5c98825f-146d-4d35-97cf-207b2afd9ae2": "create technical plans",
+                        "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1": "CAD software",
+                        "http://data.europa.eu/esco/skill/4339176e-3acd-4f7f-a5d9-445bee3d23f2": "mathematics",
+                        "http://data.europa.eu/esco/skill/03b9b491-fc9b-4868-914a-bf7cd47b5041": "create solutions to problems",
+                        "http://data.europa.eu/esco/skill/b34e2ba1-9080-48c9-9b42-ee9192a4d3f1": "use CAD software",
+                        "http://data.europa.eu/esco/skill/3c333552-8d89-43f5-90bd-856e15bec433": "design drawings",
+                        "http://data.europa.eu/esco/skill/432ab648-aece-4237-969f-8bca94fe181c": "use manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c": "principles of mechanical engineering",
+                        "http://data.europa.eu/esco/skill/c5c51528-ccfc-4c53-b409-c200aaa44222": "liaise with engineers"
+                    }
+                }
+            ],
+            "created_at": "2026-03-04T11:56:07.900009Z"
         },
         {
-            "id": "784d6951-80f7-4ab7-a730-745226cdee18",
+            "id": "4ada7a3d-a72b-454a-949b-ba58674432ac",
             "name": "B",
             "description": "b",
             "assigned_members": [
                 "b"
             ],
-            "target_roles": [],
+            "target_roles": [
+                {
+                    "id": "2144",
+                    "title": "mechanical engineer",
+                    "description": "Mechanical engineers research, plan and design mechanical products and systems and supervise the fabrication, operation, application, installation and repair of systems and products. They research and analyse data.",
+                    "essential_skills": {
+                        "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": "perform scientific research",
+                        "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": "approve engineering design",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": "adjust engineering designs",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919": "engineering processes",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78": "engineering principles"
+                    },
+                    "id_full": "2144.1",
+                    "uri": "http://data.europa.eu/esco/occupation/579254cf-6d69-4889-9000-9c79dc568644"
+                },
+                {
+                    "id": "3118",
+                    "title": "mechanical engineering drafter",
+                    "description": "Mechanical engineering drafters convert mechanical engineers' designs and sketches into technical drawings detailing dimensions, fastening and assembling methods and other specifications used for example in manufacturing processes.",
+                    "essential_skills": {
+                        "http://data.europa.eu/esco/skill/ae0f2a15-ba82-4a88-817c-431c58c70167": "manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/5c98825f-146d-4d35-97cf-207b2afd9ae2": "create technical plans",
+                        "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1": "CAD software",
+                        "http://data.europa.eu/esco/skill/4339176e-3acd-4f7f-a5d9-445bee3d23f2": "mathematics",
+                        "http://data.europa.eu/esco/skill/03b9b491-fc9b-4868-914a-bf7cd47b5041": "create solutions to problems",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/b34e2ba1-9080-48c9-9b42-ee9192a4d3f1": "use CAD software",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/3c333552-8d89-43f5-90bd-856e15bec433": "design drawings",
+                        "http://data.europa.eu/esco/skill/432ab648-aece-4237-969f-8bca94fe181c": "use manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c": "principles of mechanical engineering",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/c5c51528-ccfc-4c53-b409-c200aaa44222": "liaise with engineers"
+                    },
+                    "id_full": "3118.3.11",
+                    "uri": "http://data.europa.eu/esco/occupation/38240cc5-d1d9-4de9-9480-29c51da291eb"
+                }
+            ],
             "skill_gap": [],
-            "created_at": "2026-03-04T11:27:17.631459Z"
+            "created_at": "2026-03-04T11:56:12.183968Z"
         },
         {
-            "id": "3cb4027d-3112-4135-a404-3d2cac717a1f",
+            "id": "397e4a29-3389-429c-be7b-c7b097f71f4d",
             "name": "AB",
             "description": "ab",
             "assigned_members": [
                 "a",
                 "b"
             ],
-            "target_roles": [],
+            "target_roles": [
+                {
+                    "id": "2144",
+                    "title": "mechanical engineer",
+                    "description": "Mechanical engineers research, plan and design mechanical products and systems and supervise the fabrication, operation, application, installation and repair of systems and products. They research and analyse data.",
+                    "essential_skills": {
+                        "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": "perform scientific research",
+                        "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": "approve engineering design",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": "adjust engineering designs",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919": "engineering processes",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78": "engineering principles"
+                    },
+                    "id_full": "2144.1",
+                    "uri": "http://data.europa.eu/esco/occupation/579254cf-6d69-4889-9000-9c79dc568644"
+                },
+                {
+                    "id": "3118",
+                    "title": "mechanical engineering drafter",
+                    "description": "Mechanical engineering drafters convert mechanical engineers' designs and sketches into technical drawings detailing dimensions, fastening and assembling methods and other specifications used for example in manufacturing processes.",
+                    "essential_skills": {
+                        "http://data.europa.eu/esco/skill/ae0f2a15-ba82-4a88-817c-431c58c70167": "manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/5c98825f-146d-4d35-97cf-207b2afd9ae2": "create technical plans",
+                        "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1": "CAD software",
+                        "http://data.europa.eu/esco/skill/4339176e-3acd-4f7f-a5d9-445bee3d23f2": "mathematics",
+                        "http://data.europa.eu/esco/skill/03b9b491-fc9b-4868-914a-bf7cd47b5041": "create solutions to problems",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/b34e2ba1-9080-48c9-9b42-ee9192a4d3f1": "use CAD software",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/3c333552-8d89-43f5-90bd-856e15bec433": "design drawings",
+                        "http://data.europa.eu/esco/skill/432ab648-aece-4237-969f-8bca94fe181c": "use manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c": "principles of mechanical engineering",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/c5c51528-ccfc-4c53-b409-c200aaa44222": "liaise with engineers"
+                    },
+                    "id_full": "3118.3.11",
+                    "uri": "http://data.europa.eu/esco/occupation/38240cc5-d1d9-4de9-9480-29c51da291eb"
+                }
+            ],
             "skill_gap": [],
-            "created_at": "2026-03-04T11:27:23.827805Z"
+            "created_at": "2026-03-04T11:56:17.316631Z"
+        },
+        {
+            "id": "32301222-dd29-4dc1-903b-e6dad296246e",
+            "name": "A",
+            "description": "a",
+            "assigned_members": [
+                "a"
+            ],
+            "target_roles": [
+                {
+                    "id": "2144",
+                    "title": "mechanical engineer",
+                    "description": "Mechanical engineers research, plan and design mechanical products and systems and supervise the fabrication, operation, application, installation and repair of systems and products. They research and analyse data.",
+                    "essential_skills": {
+                        "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": "perform scientific research",
+                        "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": "approve engineering design",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": "adjust engineering designs",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919": "engineering processes",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78": "engineering principles"
+                    },
+                    "id_full": "2144.1",
+                    "uri": "http://data.europa.eu/esco/occupation/579254cf-6d69-4889-9000-9c79dc568644"
+                },
+                {
+                    "id": "3118",
+                    "title": "mechanical engineering drafter",
+                    "description": "Mechanical engineering drafters convert mechanical engineers' designs and sketches into technical drawings detailing dimensions, fastening and assembling methods and other specifications used for example in manufacturing processes.",
+                    "essential_skills": {
+                        "http://data.europa.eu/esco/skill/ae0f2a15-ba82-4a88-817c-431c58c70167": "manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/5c98825f-146d-4d35-97cf-207b2afd9ae2": "create technical plans",
+                        "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1": "CAD software",
+                        "http://data.europa.eu/esco/skill/4339176e-3acd-4f7f-a5d9-445bee3d23f2": "mathematics",
+                        "http://data.europa.eu/esco/skill/03b9b491-fc9b-4868-914a-bf7cd47b5041": "create solutions to problems",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/b34e2ba1-9080-48c9-9b42-ee9192a4d3f1": "use CAD software",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/3c333552-8d89-43f5-90bd-856e15bec433": "design drawings",
+                        "http://data.europa.eu/esco/skill/432ab648-aece-4237-969f-8bca94fe181c": "use manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c": "principles of mechanical engineering",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/c5c51528-ccfc-4c53-b409-c200aaa44222": "liaise with engineers"
+                    },
+                    "id_full": "3118.3.11",
+                    "uri": "http://data.europa.eu/esco/occupation/38240cc5-d1d9-4de9-9480-29c51da291eb"
+                }
+            ],
+            "skill_gap": [
+                {
+                    "role_id": "2144",
+                    "role_title": "mechanical engineer",
+                    "match_score": 100,
+                    "total_required": 9,
+                    "matching_skills": {
+                        "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": "perform scientific research",
+                        "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": "approve engineering design",
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": "adjust engineering designs",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919": "engineering processes",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics",
+                        "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78": "engineering principles"
+                    },
+                    "missing_skills": {}
+                },
+                {
+                    "role_id": "3118",
+                    "role_title": "mechanical engineering drafter",
+                    "match_score": 28,
+                    "total_required": 14,
+                    "matching_skills": {
+                        "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": "technical drawings",
+                        "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": "use technical drawing software",
+                        "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": "mechanical engineering",
+                        "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": "mechanics"
+                    },
+                    "missing_skills": {
+                        "http://data.europa.eu/esco/skill/ae0f2a15-ba82-4a88-817c-431c58c70167": "manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/5c98825f-146d-4d35-97cf-207b2afd9ae2": "create technical plans",
+                        "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1": "CAD software",
+                        "http://data.europa.eu/esco/skill/4339176e-3acd-4f7f-a5d9-445bee3d23f2": "mathematics",
+                        "http://data.europa.eu/esco/skill/03b9b491-fc9b-4868-914a-bf7cd47b5041": "create solutions to problems",
+                        "http://data.europa.eu/esco/skill/b34e2ba1-9080-48c9-9b42-ee9192a4d3f1": "use CAD software",
+                        "http://data.europa.eu/esco/skill/3c333552-8d89-43f5-90bd-856e15bec433": "design drawings",
+                        "http://data.europa.eu/esco/skill/432ab648-aece-4237-969f-8bca94fe181c": "use manual draughting techniques",
+                        "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c": "principles of mechanical engineering",
+                        "http://data.europa.eu/esco/skill/c5c51528-ccfc-4c53-b409-c200aaa44222": "liaise with engineers"
+                    }
+                }
+            ],
+            "created_at": "2026-03-04T11:56:07.900009Z"
         }
     ]
 }
