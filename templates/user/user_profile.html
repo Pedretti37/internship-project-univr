@@ -146,19 +146,17 @@
 
                 <h2>Check Future Employment Trend & Skill Gap Analysis</h2>
                 <form action="/occupation_forecast_and_gap" method="post">
-                    {% if user.target_roles %}
-                        <div class="country-selection">
-                            <label>Choose a Country to see future trends:</label>
-                            <br>
-                            <select class="selection" name="country" id="country" required>
-                                <option value="" disabled {% if not country %}selected{% endif %}>Select a country</option>
-                                {% for c in countries_list %}
-                                    <option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c }}</option>
-                                {% endfor %}
-                            </select>
-                            <span><button type="submit" class="btn-primary">Analyze</button></span>
-                        </div>
-                    {% endif %}
+                    <div class="country-selection">
+                        <label>Choose a Country to see future trends:</label>
+                        <br>
+                        <select class="selection" name="country" id="country" required>
+                            <option value="" disabled {% if not country %}selected{% endif %}>Select a country</option>
+                            {% for c in countries_list %}
+                                <option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                        <span><button type="submit" class="btn-primary">Analyze</button></span>
+                    </div>
                 </form>
 
                 {% if forecast_results %}
@@ -292,7 +290,6 @@
                         <p>Add 1-5 target roles above, select a country and click <strong>Analyze</strong>.</p>
                     </div>
                 {% endif %}
-
             </div>
         </div>
 

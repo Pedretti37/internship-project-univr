@@ -501,7 +501,6 @@ async def occupation_forecast_and_gap(
         "results": recommended_courses
     }
 
-
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
         "user": updated_user,

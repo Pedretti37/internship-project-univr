@@ -6,7 +6,7 @@ from crud import crud_skill_models, crud_user
 from dependencies import get_current_org
 from esco import escoAPI 
 import ast
-
+from datetime import datetime
 from config import templates, pwd_context
 import crud.crud_org as crud_org
 from models import Organization, Project, Role
@@ -16,6 +16,15 @@ router = APIRouter()
 PROJECT_ROLES_LIST = {}
 PROJECT_COURSES_LIST = {}
 PROJECT_FORECAST_RESULTS = {}
+
+EU_COUNTRIES = [
+    "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", 
+    "Denmark", "EU-27", "Estonia", "Finland", "France", "Germany", "Greece", 
+    "Hungary", "Iceland", "Ireland", "Italy", "Latvia", "Lithuania", 
+    "Luxembourg", "Malta", "Netherlands", "Norway", "Poland", "Portugal", 
+    "Republic of North Macedonia", "Romania", "Slovakia", "Slovenia", 
+    "Spain", "Sweden", "Switzerland", "Turkey"
+]
 
 ### --- Organization Login GET --- ###
 @router.get("/org_login", response_class=HTMLResponse)
@@ -63,7 +72,6 @@ async def logout(org: Organization = Depends(get_current_org)):
             del PROJECT_COURSES_LIST[project.id]
         if project.id in PROJECT_FORECAST_RESULTS:
             del PROJECT_FORECAST_RESULTS[project.id]
-        del PROJECT_FORECAST_RESULTS[org.id]
     return response
 
 ### --- Organization Home --- ###
@@ -153,7 +161,8 @@ async def change_password(request: Request, org: Organization = Depends(get_curr
         return templates.TemplateResponse("org/org_profile.html", {
             "request": request,
             "org": org,
-            "wrong_pw": error
+            "wrong_pw": error,
+            "countries_list": EU_COUNTRIES
         })
     
     new_pw_hashed = pwd_context.hash(new_pw)
@@ -165,14 +174,16 @@ async def change_password(request: Request, org: Organization = Depends(get_curr
         return templates.TemplateResponse("org/org_profile.html", {
             "request": request,
             "org": org,
-            "success": msg
+            "success": msg,
+            "countries_list": EU_COUNTRIES
         })
     else:
         failed = "Failed to update your password."
         return templates.TemplateResponse("org/org_profile.html", {
             "request": request,
             "org": org,
-            "failed": failed
+            "failed": failed,
+            "countries_list": EU_COUNTRIES
         })
     
 ### --- Invite Member --- ###
@@ -275,13 +286,31 @@ async def view_project(
         context_results = session_data["results"]
         context_search = session_data["last_search"]
 
+    if current_project.id in PROJECT_COURSES_LIST:
+        session_data = PROJECT_COURSES_LIST[current_project.id]
+        recommended_courses = session_data["results"]
+    else:
+        recommended_courses = None
+
+    if current_project.id in PROJECT_FORECAST_RESULTS:
+        session_data = PROJECT_FORECAST_RESULTS[current_project.id]
+        forecast_results = session_data["results"]
+        country = session_data["country"]
+    else:
+        forecast_results = None
+        country = None
+
     return templates.TemplateResponse("org/project_detail.html", {
         "request": request,
         "org": org,
         "current_project": current_project,
         "results": context_results,
         "last_search": context_search,
-        "team": team
+        "team": team,
+        "countries_list": EU_COUNTRIES,
+        "recommended_courses": recommended_courses,
+        "forecast_results": forecast_results,
+        "country": country
     })
 
 ### --- Project Search Role --- ###
@@ -407,17 +436,28 @@ async def project_add_role(
         uri=uri
     )
 
+    message_text = "Error: target role not added."
+    updated_target_role = False
+
     project_found = False
     for project in org.projects:
         if str(project.id) == project_id:
-            project.target_roles.append(role_object)
             project_found = True
-            break
+            already_exists = any(r.id == role_id for r in project.target_roles)
+            if not already_exists:
+                project.target_roles.append(role_object)
+                updated_target_role = True
+                message_text = "Target role added successfully!"
+                break
+            else:
+                updated_target_role = True
+                message_text = "This role is already in your target list."
 
     if not project_found:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
     
-    crud_org.update_org(org)
+    if updated_target_role:
+        crud_org.update_org(org)
 
     return templates.TemplateResponse("details.html", {
         "request": request,
@@ -425,28 +465,102 @@ async def project_add_role(
         "is_user": False,
         "role": role_object,
         "project_id": project_id,
-        "updated_target_role": True,
-        "message": f"Role added to Project's Target Roles!"
+        "updated_target_role": updated_target_role,
+        "message": message_text
     })
 
 ### --- Project Calculate Skill Gap POST --- ###
-@router.post("/org/project/calculate_gap", response_class=RedirectResponse)
+@router.post("/org/project/calculate_forecast_and_gap")
 async def project_calculate_skill_gap(
+    request: Request,
     project_id: str = Form(...),
-    org: Organization = Depends(get_current_org)
+    org: Organization = Depends(get_current_org),
+    country: str = Form(...)
 ):
     if not org: return RedirectResponse(url="/", status_code=303)
 
-    project: Optional[Project] = next((p for p in org.projects if str(p.id) == project_id), None)
+    project_index = next((i for i, p in enumerate(org.projects) if str(p.id) == project_id), None)
     
-    if not project:
+    if project_index is None:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
     
-    assigned_members = crud_user.get_users_by_usernames(project.assigned_members)
+    project = org.projects[project_index]
+
+    if len(project.target_roles) > 5:
+        error = "You can analyze up to 5 target roles at a time."
+        return templates.TemplateResponse("org/project_detail.html", {
+            "request": request,
+            "org": org,
+            "error": error,
+            "countries_list": EU_COUNTRIES,
+            "current_project": project,
+            "team": assigned_members,  
+            "current_year": datetime.now().year,
+            "forecast_results": None,
+            "recommended_courses": None
+        })
     
+    forecast_results = []
+    role_list = []
+    for role in project.target_roles:
+        # String conversion and cleanup
+        role_id_str = str(role.id).strip()
+            
+        # CEDEFOP
+        data = crud_skill_models.read_emp_occupation(country=country, isco_id=role_id_str)
+        
+        forecast_results.append({
+            "title": role.title,  
+            "isco_code": role_id_str,
+            "uri": role.uri,
+            "data": data              
+        })
+
+        if data['growth_pct'] >= -5:
+            role_list.append(role)
+
+
+    assigned_members = crud_user.get_users_by_usernames(project.assigned_members)
     updated_project = crud_skill_models.skill_gap_project(project, assigned_members)
     
-    org.projects.append(updated_project)
+    org.projects[project_index] = updated_project
     crud_org.update_org(org)
 
-    return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
+    PROJECT_FORECAST_RESULTS[updated_project.id] = {
+        "country": country,
+        "results": forecast_results
+    }
+
+    # Course recommendation
+    missing_skills = {}
+    for role in updated_project.skill_gap:
+        if 0 <= role["match_score"] < 100:
+            for result in forecast_results:
+                data = result["data"]
+                if data["growth_pct"] >= -5:
+                    # Role is expected to grow or remain stable --> provide educational courses and training opportunities
+                    for skill_uri, skill_name in role["missing_skills"].items():
+                        missing_skills[skill_uri] = skill_name
+
+    # List of recommended courses for the missing skills
+    # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
+    # assuming "Mechanical Engineer" and similar role as default role type
+    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills)
+
+    PROJECT_COURSES_LIST[updated_project.id] = {
+        "results": recommended_courses
+    }
+
+    return templates.TemplateResponse("org/project_detail.html", {
+        "request": request,
+        "org": org,
+        "forecast_results": forecast_results, 
+        "recommended_courses": recommended_courses,
+        "country": country,
+        "countries_list": EU_COUNTRIES,
+        "current_project": updated_project,
+        "team": assigned_members,
+        "error": None,
+        "current_year": datetime.now().year
+    })
+
