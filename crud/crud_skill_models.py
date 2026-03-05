@@ -229,7 +229,7 @@ def recommend_courses_for_skill_gap(missing_skills_uri: Dict[str, str]) -> List[
                 title=row.title_de,
                 ects=row.ects,
                 description=row.learning_outcomes_de,
-                skills_covered=matched_skills
+                skills_covered=matched_skills.values()
             )
             recommended_courses.append(new_course)
 

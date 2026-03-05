@@ -85,21 +85,70 @@
             "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
             "name": "engineering principles",
             "level": 8
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
+            "name": "perform scientific research",
+            "level": 2
         }
     ],
     "skill_gap": [
         {
             "role_id": "2144",
             "role_title": "mechanical engineer",
-            "match_score": 0,
+            "match_score": 45,
             "total_required": 9,
-            "matching_skills": {},
-            "missing_skills": {
-                "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": {
-                    "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
-                    "name": "perform scientific research",
-                    "level": 5
+            "matching_skills": {
+                "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": {
+                    "uri": "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b",
+                    "name": "adjust engineering designs",
+                    "level": 2
                 },
+                "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": {
+                    "uri": "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462",
+                    "name": "use technical drawing software",
+                    "level": 4
+                }
+            },
+            "partially_matching_skills": {
+                "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc": {
+                    "skill": {
+                        "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
+                        "name": "perform scientific research",
+                        "level": 5
+                    },
+                    "user_level": 2,
+                    "req_level": 5
+                },
+                "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": {
+                    "skill": {
+                        "uri": "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9",
+                        "name": "mechanical engineering",
+                        "level": 8
+                    },
+                    "user_level": 5,
+                    "req_level": 8
+                },
+                "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": {
+                    "skill": {
+                        "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
+                        "name": "mechanics",
+                        "level": 6
+                    },
+                    "user_level": 1,
+                    "req_level": 6
+                },
+                "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78": {
+                    "skill": {
+                        "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
+                        "name": "engineering principles",
+                        "level": 9
+                    },
+                    "user_level": 8,
+                    "req_level": 9
+                }
+            },
+            "missing_skills": {
                 "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": {
                     "uri": "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12",
                     "name": "approve engineering design",
@@ -110,35 +159,10 @@
                     "name": "technical drawings",
                     "level": 5
                 },
-                "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": {
-                    "uri": "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b",
-                    "name": "adjust engineering designs",
-                    "level": 2
-                },
-                "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462": {
-                    "uri": "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462",
-                    "name": "use technical drawing software",
-                    "level": 4
-                },
-                "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9": {
-                    "uri": "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9",
-                    "name": "mechanical engineering",
-                    "level": 8
-                },
                 "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919": {
                     "uri": "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919",
                     "name": "engineering processes",
                     "level": 7
-                },
-                "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669": {
-                    "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
-                    "name": "mechanics",
-                    "level": 6
-                },
-                "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78": {
-                    "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
-                    "name": "engineering principles",
-                    "level": 9
                 }
             }
         }

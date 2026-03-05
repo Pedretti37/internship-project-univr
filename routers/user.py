@@ -165,7 +165,8 @@ async def user_profile(request: Request, user: User = Depends(get_current_user))
             "invitations": invitations,
             "recommended_courses": recommended_courses,
             "forecast_results": forecast_results,
-            "country": country
+            "country": country,
+            "current_year": datetime.now().year
         }
     )
 
