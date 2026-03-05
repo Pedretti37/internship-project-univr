@@ -10,7 +10,7 @@ from dependencies import get_current_user
 from config import templates, pwd_context
 import crud.crud_skill_models as crud_skill_models
 from esco import escoAPI
-from models import Role, User
+from models import Role, Skill, User
 
 USER_ROLES_LIST = {}
 USER_COURSES_LIST = {}
@@ -214,26 +214,31 @@ async def add_to_user_target_roles(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    # Manual conversion from string to dict
+    e_skills_list = []
+
+    # Manual conversion from string to list[Skill]
     if essential_skills:
         try:
-            # ast.literal_eval manages {'key': 'value'}
-            e_skills_dict = ast.literal_eval(essential_skills)
+            parsed_data = ast.literal_eval(essential_skills)
             
-            # Controllo extra: assicuriamoci che sia davvero un dict
-            if not isinstance(e_skills_dict, dict):
-                e_skills_dict = {}
-        except (ValueError, SyntaxError):
-            print(f"Errore nel parsing di essential_skills: {essential_skills}")
-            e_skills_dict = {}
+            # Check
+            if isinstance(parsed_data, list):
+                e_skills_list = parsed_data
+            else:
+                print(f"Parsed_data not a valid list. Found type: {type(parsed_data)}")
+                e_skills_list = []
+
+        except (ValueError, SyntaxError) as e:
+            print(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
+            e_skills_list = []
     else:
-        e_skills_dict = {}
+        e_skills_list = []
 
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
-        essential_skills=e_skills_dict,
+        essential_skills=e_skills_list,
         id_full=id_full,
         uri=uri
     )
@@ -278,26 +283,31 @@ async def add_to_user_skills(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    # Manual conversion from string to dict
+    e_skills_list = []
+
+    # Manual conversion from string to list[Skill]
     if essential_skills:
         try:
-            # ast.literal_eval manages {'key': 'value'}
-            e_skills_dict = ast.literal_eval(essential_skills)
+            parsed_data = ast.literal_eval(essential_skills)
             
-            # Controllo extra: assicuriamoci che sia davvero un dict
-            if not isinstance(e_skills_dict, dict):
-                e_skills_dict = {}
-        except (ValueError, SyntaxError):
-            print(f"Errore nel parsing di essential_skills: {essential_skills}")
-            e_skills_dict = {}
+            # Check
+            if isinstance(parsed_data, list):
+                e_skills_list = parsed_data
+            else:
+                print(f"Parsed_data not a valid list. Found type: {type(parsed_data)}")
+                e_skills_list = []
+
+        except (ValueError, SyntaxError) as e:
+            print(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
+            e_skills_list = []
     else:
-        e_skills_dict = {}
+        e_skills_list = []
 
     role_object = Role(
         id=role_id,
         title=title,
-        description=description,
-        essential_skills=e_skills_dict,
+        description=description if description else "No description available.",
+        essential_skills=e_skills_list,
         id_full=id_full,
         uri=uri
     )
@@ -305,16 +315,28 @@ async def add_to_user_skills(
     message_text = "Error: No skills were added."
     updated_skill = False
 
-    if e_skills_dict:
-        for uri, skill in e_skills_dict.items():
-            skill_clean = skill.strip()
-            if skill_clean and len(skill_clean) > 1:
-                user.current_skills[uri] = skill_clean
+    existing_uris = {s.uri for s in user.current_skills}
+
+    if role_object.essential_skills:
+        for esco_skill in role_object.essential_skills:
+            
+            if esco_skill.uri not in existing_uris:
+                
+                new_user_skill = Skill(
+                    uri=esco_skill.uri,
+                    name=esco_skill.name, 
+                    level=1 # Default level
+                )
+                
+                user.current_skills.append(new_user_skill)
+                existing_uris.add(esco_skill.uri) 
                 updated_skill = True
 
     if updated_skill:
         crud_user.update_user(user)
-        message_text = "Skills updated successfully!"
+        message_text = "Role skills added to your profile!"
+    elif role_object.essential_skills:
+        message_text = "You already have all the skills for this role."
 
     return templates.TemplateResponse("details.html", {
         "request": request,
@@ -382,26 +404,31 @@ async def details_page(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    # Manual conversion from string to dict
+    e_skills_list = []
+
+    # Manual conversion from string to list[Skill]
     if essential_skills:
         try:
-            # ast.literal_eval manages {'key': 'value'}
-            e_skills_dict = ast.literal_eval(essential_skills)
+            parsed_data = ast.literal_eval(essential_skills)
             
-            # Controllo extra: assicuriamoci che sia davvero un dict
-            if not isinstance(e_skills_dict, dict):
-                e_skills_dict = {}
-        except (ValueError, SyntaxError):
-            print(f"Errore nel parsing di essential_skills: {essential_skills}")
-            e_skills_dict = {}
+            # Check
+            if isinstance(parsed_data, list):
+                e_skills_list = parsed_data
+            else:
+                print(f"Parsed_data not a valid list. Found type: {type(parsed_data)}")
+                e_skills_list = []
+
+        except (ValueError, SyntaxError) as e:
+            print(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
+            e_skills_list = []
     else:
-        e_skills_dict = {}
+        e_skills_list = []
 
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
-        essential_skills=e_skills_dict,
+        essential_skills=e_skills_list,
         id_full=id_full,
         uri=uri
     )

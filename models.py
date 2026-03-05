@@ -3,11 +3,16 @@ import uuid
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, Dict, List, Any
 
+class Skill(BaseModel):
+    uri: str
+    name: str
+    level: int
+
 class Role(BaseModel):
     id: str
     title: str
     description: Optional[str] = None
-    essential_skills: Dict[str, str] = {}
+    essential_skills: List[Skill] = []
     id_full: Optional[str] = None
     uri: Optional[str] = None
 
@@ -18,7 +23,7 @@ class User(BaseModel):
     email: EmailStr
     hashed_password: str
     target_roles: List[Role] = []
-    current_skills: Dict[str, str] = {}
+    current_skills: List[Skill] = []
     skill_gap: List[Dict[str, Any]] = []
     organization: Optional[str] = None
 
@@ -53,4 +58,4 @@ class Course(BaseModel):
     title: str
     ects: int
     description: Optional[str] = None
-    skills_covered: Dict[str, str] = {}
+    skills_covered: List[Skill] = []

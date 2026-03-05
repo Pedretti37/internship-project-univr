@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Query, Request, Form, status, Depends
+import codecs
+import csv
+
+from fastapi import APIRouter, File, Query, Request, Form, UploadFile, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
 from typing import Optional
@@ -9,9 +12,10 @@ from dependencies import get_current_org
 from esco import escoAPI 
 import ast
 from datetime import datetime
+from time import sleep
 from config import templates, pwd_context
 import crud.crud_org as crud_org
-from models import Organization, Project, Role
+from models import Organization, Project, Role, Skill
 
 router = APIRouter()
 
@@ -242,19 +246,75 @@ async def create_project_form(request: Request, org: Organization = Depends(get_
 ### --- Create Project POST --- ###
 @router.post("/org/create_project", response_class=HTMLResponse)
 async def create_project_submit(
+    request: Request,
     org: Organization = Depends(get_current_org),
     name: str = Form(...),
     description: str = Form(...),
-    assigned_members: list[str] = Form(default=[]) 
+    assigned_members: list[str] = Form(default=[]), 
+    file: UploadFile = File(None)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
+    final_assigned_members = set(assigned_members)
+
+    if file and file.filename and file.filename.endswith('.csv'):
+        csvReader = csv.DictReader(codecs.iterdecode(file.file, 'utf-8'))
+        extracted_skills = {}
+        
+        for row in csvReader:
+            username = row.get("Username")
+            skill_name = row.get("Skill_Name")
+            level_str = row.get("Proficiency_Level")
+            
+            if not username or not skill_name:
+                continue
+                
+            try:
+                level = int(level_str)
+            except ValueError:
+                level = 1
+
+            skill_uri = escoAPI.get_esco_skill_uri_by_name(skill_name, language="en")
+            
+            if not skill_uri:
+                print(f"⚠️ Skill ignorata: ESCO non ha trovato '{skill_name}'")
+                continue 
+                
+            sleep(0.05) # Rate limiting
+            
+            if username not in extracted_skills:
+                extracted_skills[username] = []
+                
+            extracted_skills[username].append({
+                "name": skill_name,
+                "uri": skill_uri, 
+                "level": level
+            })
+
+        for username, skills in extracted_skills.items():
+            user = crud_user.get_user_by_username(username)
+
+            if user:
+                if username in org.members:
+                    validated_skills = [Skill(**skill_dict) for skill_dict in skills]
+                    user.current_skills = validated_skills
+                    crud_user.update_user(user) 
+                    
+                    final_assigned_members.add(username)
+                
+                else:
+                    crud_org.create_invitation(org.orgname, username)
+                    print(f"📩 Inviata richiesta di iscrizione all'utente '{username}'.")
+                    
+            else:
+                print(f"⚠️ Utente {username} dal CSV non trovato nel database.")
+
     new_project = Project(
         name=name,
         description=description,
-        assigned_members=assigned_members,
-        target_roles=[], # Empty for now
+        assigned_members=list(final_assigned_members),
+        target_roles=[], 
         skill_gap=[]
     )
 

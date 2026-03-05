@@ -100,8 +100,8 @@
             <a href="https://app.muchskills.com/dashboard" class="link-muchskills" target="_blank" rel="noopener noreferrer">Use MuchSkill to manage your skills!</a>
             {% if user.current_skills %}
                 <ul>
-                    {% for uri, skill in user.current_skills.items() %}
-                        <li>{{ skill | capitalize }}<a href="{{ uri }}" target="_blank"> ↗</a></li>
+                    {% for skill in user.current_skills %}
+                        <li>{{ skill.name | capitalize }} (Level: {{ skill.level }}/9)<a href="{{ skill.uri }}" target="_blank"> ↗</a></li>
                     {% endfor %}
                 </ul>
             {% else %}

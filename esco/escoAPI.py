@@ -1,6 +1,6 @@
 import requests
 import time
-from models import Role
+from models import Role, Skill
 
 # Configuration
 HEADERS = {
@@ -56,7 +56,7 @@ def get_single_role_details(uri: str, language: str) -> Role | None:
             isco_code_raw = "N/A"
 
         # Essential Skill and Knowledge
-        essential_skills_titles = {}
+        essential_skills = []
         
         related_params = {
             'uri': uri,
@@ -73,16 +73,19 @@ def get_single_role_details(uri: str, language: str) -> Role | None:
             for items_list in embedded_related.values():
                 if isinstance(items_list, list):
                     for item in items_list:
-                        u = item.get('uri')
-                        t = item.get('title')
-                        if u and t:
-                            essential_skills_titles[u] = t
+                        s = Skill(
+                            uri=item.get('uri'),
+                            name=item.get('title'),
+                            level=1  # ESCO doesn't provide a skill level in this endpoint -> defaulting to 1 for now
+                        )
+                        if s.uri and s.name:
+                            essential_skills.append(s)
 
         return Role(
             id=str(isco_family),
             title=title,
             description=definition,
-            essential_skills=essential_skills_titles,
+            essential_skills=essential_skills,
             id_full=str(isco_code_raw),
             uri=uri
         )
@@ -123,3 +126,30 @@ def get_esco_occupations_list(keyword, language, limit=10):
         time.sleep(0.05) 
 
     return output_list
+
+###--- API function to get skill URI by name ---###
+def get_esco_skill_uri_by_name(skill_name: str, language: str = 'en') -> str | None:
+    """
+    Cerca una skill per nome sull'API di ESCO e restituisce il suo URI.
+    Prende il primo risultato (il più rilevante).
+    """
+    search_params = {
+        'text': skill_name, 
+        'type': 'skill',      
+        'language': language, 
+        'limit': 1            
+    }
+    
+    try:
+        search_resp = requests.get(f"{BASE_URL}/search", params=search_params, headers=HEADERS)
+        search_resp.raise_for_status()
+        
+        results = search_resp.json().get('_embedded', {}).get('results', [])
+        
+        if results:
+            return results[0].get('uri')
+            
+    except Exception as e:
+        print(f"Errore durante la ricerca della skill '{skill_name}': {e}")
+        
+    return None 

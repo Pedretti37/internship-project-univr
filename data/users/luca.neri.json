@@ -1,0 +1,27 @@
+{
+    "name": "Luca",
+    "surname": "Neri",
+    "username": "luca.neri",
+    "email": "luca.neri@gmail.com",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$uJeS0tr7/1/LGQMAgHAu5Q$vIxHNzUw2fuA2Cc2Xw3EHb72Ws5wEkhZ4bzh8ZCYZOo",
+    "target_roles": [],
+    "current_skills": [
+        {
+            "name": "Quality control systems",
+            "uri": "http://data.europa.eu/esco/skill/d56358e4-3bcc-4b5d-981d-ea15b2743e9e",
+            "level": 7
+        },
+        {
+            "name": "Computer-aided design (CAD) software",
+            "uri": "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1",
+            "level": 6
+        },
+        {
+            "name": "Process engineering",
+            "uri": "http://data.europa.eu/esco/skill/8b9d609a-6d62-4d5c-9133-01d41979cfac",
+            "level": 8
+        }
+    ],
+    "skill_gap": [],
+    "organization": "simone.pedretti"
+}

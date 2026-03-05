@@ -45,7 +45,7 @@
                     <input type="hidden" name="role_id" value="{{ role.id }}">
                     <input type="hidden" name="title" value="{{ role.title }}">
                     <input type="hidden" name="description" value="{{ role.description }}">
-                    <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
+                    <input type="hidden" name="essential_skills" value="{{ role.model_dump()['essential_skills'] }}">
                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
@@ -61,7 +61,7 @@
                     <input type="hidden" name="role_id" value="{{ role.id }}">
                     <input type="hidden" name="title" value="{{ role.title }}">
                     <input type="hidden" name="description" value="{{ role.description }}">
-                    <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
+                    <input type="hidden" name="essential_skills" value="{{ role.model_dump()['essential_skills'] }}">
                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
@@ -87,7 +87,7 @@
                     <input type="hidden" name="role_id" value="{{ role.id }}">
                     <input type="hidden" name="title" value="{{ role.title }}">
                     <input type="hidden" name="description" value="{{ role.description }}">
-                    <input type="hidden" name="essential_skills" value="{{ role.essential_skills }}">
+                    <input type="hidden" name="essential_skills" value="{{ role.model_dump()['essential_skills'] }}">
                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
@@ -111,8 +111,8 @@
                 <h2>Tasks & Responsibilities</h2>
                 <h3>Essential Skills:</h3>
                 <ul>
-                {% for uri, skill in role.essential_skills.items() %}
-                    <li>{{ skill | capitalize }}: <a href="{{ uri }}" target="_blank"> ↗</a></li>
+                {% for skill in role.essential_skills %}
+                    <li>{{ skill.name | capitalize }}: <a href="{{ skill.uri }}" target="_blank"> ↗</a></li>
                 {% endfor %}
                 </ul>
             </div>

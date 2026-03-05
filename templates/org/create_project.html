@@ -25,7 +25,7 @@
 
             <hr class="hr">
 
-            <form action="/org/create_project" method="post">
+            <form action="/org/create_project" method="post" enctype="multipart/form-data">
                 
                 <div class="form-group">
                     <label for="name">Project Name</label>
@@ -35,6 +35,16 @@
                 <div class="form-group">
                     <label for="description">Description</label>
                     <textarea name="description" id="description" rows="3" placeholder="Brief description of your project..."></textarea>
+                </div>
+
+                <div class="upload-section" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px;">
+                    <h3>Carica Skill Model (da MuchSkills)</h3>
+                    <p>Seleziona il file CSV esportato per aggiornare le competenze del tuo team.</p>
+                    <div style="margin-bottom: 15px;">
+                        <label for="csv_file" style="display: block; font-weight: bold; margin-bottom: 5px;">Seleziona file CSV:</label>
+                        
+                        <input type="file" id="csv_file" name="file" accept=".csv" required style="padding: 5px;">
+                    </div>
                 </div>
 
                 <div class="form-group">

@@ -1,0 +1,32 @@
+{
+    "name": "Luigi",
+    "surname": "Verdi",
+    "username": "luigi.verdi",
+    "email": "luigi.verdi@gmail.com",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$vXcuZWytlRLCOAdgjLFWKg$C72pLJRlTnru4PIu8NIrsOHKqfd+E2QAEtU9fCHNStA",
+    "target_roles": [],
+    "current_skills": [
+        {
+            "name": "Mechanical engineering",
+            "uri": "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c",
+            "level": 4
+        },
+        {
+            "name": "Computer-aided design (CAD) software",
+            "uri": "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1",
+            "level": 5
+        },
+        {
+            "name": "Thermodynamics",
+            "uri": "http://data.europa.eu/esco/skill/857e8624-4db0-4725-a758-5914bd8cc350",
+            "level": 3
+        },
+        {
+            "name": "Robotics",
+            "uri": "http://data.europa.eu/esco/skill/e87ec79a-c9ff-46f5-84fa-7a0f394cdf40",
+            "level": 2
+        }
+    ],
+    "skill_gap": [],
+    "organization": "simone.pedretti"
+}
