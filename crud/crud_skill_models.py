@@ -11,23 +11,43 @@ ED_COURSES_MEC_ENGINEER = "educational_offerings/courses/educational_offerings_e
 def skill_gap_user(user: User, role_list: List[Role]) -> User:
     user.skill_gap.clear()
 
+    # Create a dictionary for quick lookup of user's current skills by URI
+    user_skills_dict = {s.uri: s.level for s in user.current_skills}
+
     for role in role_list:
         matching = {}
+        partially_matching = {}
         missing = {}
         
         essential_skills = role.essential_skills
-        
-        for skill in essential_skills:
-            if skill.uri in user.current_skills:
-                matching[skill.uri] = skill
-            else:
-                missing[skill.uri] = skill
-
-        # print(f"Matching: {matching.values()}")
-        # print(f"Missing: {missing.values()}")
-
         total_req = len(essential_skills)
-        match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
+
+        score = 0.0
+        # 1 point for each fully matched skill
+        # level_user / level_required for partially matched skills
+        # no points for missing skills
+        
+        for req_skill in essential_skills:
+            req_uri = req_skill.uri
+            req_level = req_skill.level
+            
+            if req_skill.uri in user_skills_dict:
+                user_level = user_skills_dict[req_uri]
+                if user_level >= req_level:
+                    matching[req_skill.uri] = req_skill
+                    score += 1.0
+                else:
+                    partial_score = user_level / req_level
+                    score += partial_score
+                    partially_matching[req_uri] = {
+                        "skill": req_skill,
+                        "user_level": user_level,
+                        "req_level": req_level
+                    }
+            else:
+                missing[req_skill.uri] = req_skill
+
+        match_pct = int((score / total_req) * 100) if total_req > 0 else 0
         
         role_gap_info = {
             'role_id': role.id,
@@ -35,6 +55,7 @@ def skill_gap_user(user: User, role_list: List[Role]) -> User:
             'match_score': match_pct,
             'total_required': total_req,
             'matching_skills': matching,
+            'partially_matching_skills': partially_matching,
             'missing_skills': missing
         }
         

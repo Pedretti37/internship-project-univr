@@ -7,9 +7,8 @@
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$Z6x1LgWAsPZeS2nNWQsBwA$BST2YWW+Kbf/WziynmLiupqZxsUJ9WR78M81h0Oc5dA",
     "members": [
         "mario.rossi",
-        "luigi.verdi",
-        "giulia.bianchi",
-        "luca.neri"
+        "luca.neri",
+        "giulia.bianchi"
     ],
     "projects": [
         {
@@ -18,9 +17,7 @@
             "description": "a",
             "assigned_members": [
                 "luca.neri",
-                "luigi.verdi",
-                "mario.rossi",
-                "giulia.bianchi"
+                "mario.rossi"
             ],
             "target_roles": [],
             "skill_gap": [],
@@ -31,14 +28,25 @@
             "name": "b",
             "description": "b",
             "assigned_members": [
-                "giulia.bianchi",
-                "luigi.verdi",
                 "mario.rossi",
                 "luca.neri"
             ],
             "target_roles": [],
             "skill_gap": [],
             "created_at": "2026-03-05T10:48:04.933687Z"
+        },
+        {
+            "id": "372dbdd8-bb33-4ee2-8671-c362c2b0c850",
+            "name": "Invitation",
+            "description": "a",
+            "assigned_members": [
+                "luca.neri",
+                "mario.rossi",
+                "giulia.bianchi"
+            ],
+            "target_roles": [],
+            "skill_gap": [],
+            "created_at": "2026-03-05T13:33:30.439360Z"
         }
     ]
 }

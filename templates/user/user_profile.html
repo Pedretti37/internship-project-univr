@@ -97,11 +97,22 @@
         <div class="user-skills" translate="no">
             <h2>Your current Skill Models</h2>
             <!-- target blank for new tab; rel noopener noreferrer to avoid slowing the main page down -->
-            <a href="https://app.muchskills.com/dashboard" class="link-muchskills" target="_blank" rel="noopener noreferrer">Use MuchSkill to manage your skills!</a>
+            <p>Use <a href="https://app.muchskills.com/login" class="link-muchskills" target="_blank" rel="noopener noreferrer">MuchSkills</a> to manage your skills, 
+                or go back to the home page and search for a role or a particular skill.</p>
+
             {% if user.current_skills %}
                 <ul>
                     {% for skill in user.current_skills %}
-                        <li>{{ skill.name | capitalize }} (Level: {{ skill.level }}/9)<a href="{{ skill.uri }}" target="_blank"> ↗</a></li>
+                        <li>
+                            <span>{{ skill.name | capitalize }} (Level: {{ skill.level }}/9)<a href="{{ skill.uri }}" target="_blank"> ↗</a></span>
+                            <form action="/delete_user_skill" method="post" style="display:inline;">
+                                <input type="hidden" name="skill_uri" value="{{ skill.uri }}">
+
+                                <button type="submit" title="Remove skill">
+                                    🗑️
+                                </button>
+                            </form>
+                        </li>
                     {% endfor %}
                 </ul>
             {% else %}

@@ -76,7 +76,7 @@ def get_single_role_details(uri: str, language: str) -> Role | None:
                         s = Skill(
                             uri=item.get('uri'),
                             name=item.get('title'),
-                            level=1  # ESCO doesn't provide a skill level in this endpoint -> defaulting to 1 for now
+                            level=5 # ESCO doesn't provide a skill level in this endpoint -> defaulting to 5 for now
                         )
                         if s.uri and s.name:
                             essential_skills.append(s)

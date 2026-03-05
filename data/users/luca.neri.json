@@ -7,18 +7,18 @@
     "target_roles": [],
     "current_skills": [
         {
-            "name": "Quality control systems",
             "uri": "http://data.europa.eu/esco/skill/d56358e4-3bcc-4b5d-981d-ea15b2743e9e",
+            "name": "Quality control systems",
             "level": 7
         },
         {
-            "name": "Computer-aided design (CAD) software",
             "uri": "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1",
+            "name": "Computer-aided design (CAD) software",
             "level": 6
         },
         {
-            "name": "Process engineering",
             "uri": "http://data.europa.eu/esco/skill/8b9d609a-6d62-4d5c-9133-01d41979cfac",
+            "name": "Process engineering",
             "level": 8
         }
     ],

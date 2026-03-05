@@ -40,8 +40,11 @@
         </div>
 
         {% if is_user %}
-            <div>
-                <form action="/add_to_user_target_roles" method="post">
+            <div class="details-box mt-4">
+                <h2>Tasks & Responsibilities</h2>
+                <h3>Essential Skills:</h3>
+                
+                <form method="post">
                     <input type="hidden" name="role_id" value="{{ role.id }}">
                     <input type="hidden" name="title" value="{{ role.title }}">
                     <input type="hidden" name="description" value="{{ role.description }}">
@@ -49,10 +52,47 @@
                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
-                    <button type="submit" class="btn-primary">
-                        <span>Add to my Target Roles</span>
-                    </button>
+                    {% if role.essential_skills %}
+                        <ul class="list-group mb-4">
+                            {% for skill in role.essential_skills %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ skill.name }}</span>
+                                
+                                <select name="level_{{ skill.uri }}" class="form-select form-select-sm" style="width: auto;">
+                                    <option value="">-- Seleziona Livello --</option>
+                                    <option value="1">1 - Principiante</option>
+                                    <option value="2">2 - Base</option>
+                                    <option value="3">3 - Intermedio-basso</option>
+                                    <option value="4">4 - Buono</option>
+                                    <option value="5">5 - Intermedio</option>
+                                    <option value="6">6 - Avanzato</option>
+                                    <option value="7">7 - Esperto</option>
+                                    <option value="8">8 - Master</option>
+                                    <option value="9">9 - Guru</option>
+                                </select>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" formaction="/add_to_user_skills" class="btn btn-primary">
+                            Add to my Skills
+                        </button>
+
+                        <button type="submit" formaction="/add_to_user_target_roles" class="btn btn-primary">
+                            Add to my Target Roles
+                        </button>
+                    </div>
                 </form>
+            </div>
+
+            <div class="mt-3">
+                {% if updated_target_role or updated_skill %}
+                    <p class="message alert alert-success">{{ message }}</p>
+                {% elif message %}
+                    <p class="message alert alert-info">{{ message }}</p>
+                {% endif %}
             </div>
         {% else %}
             <div>
@@ -69,52 +109,6 @@
                         <span>Add to Project's Target Roles</span>
                     </button>
                 </form>
-            </div>
-        {% endif %}
-
-        <div>
-            {% if updated_target_role %}
-                <p class="message">{{ message }}</p>
-            {% endif %}
-        </div>
-
-        {% if is_user%}
-            <hr class="hr">
-
-            <div>
-                <h3>Add to Your Skill Model</h3>
-                <form action="/add_to_user_skills" method="post">
-                    <input type="hidden" name="role_id" value="{{ role.id }}">
-                    <input type="hidden" name="title" value="{{ role.title }}">
-                    <input type="hidden" name="description" value="{{ role.description }}">
-                    <input type="hidden" name="essential_skills" value="{{ role.model_dump()['essential_skills'] }}">
-                    <input type="hidden" name="id_full" value="{{ role.id_full }}">
-                    <input type="hidden" name="uri" value="{{ role.uri }}">
-
-                    <button type="submit" class="btn-primary">
-                        <span>Add to my Skill</span>
-                    </button>
-                </form>
-            </div>
-
-            <div>
-                {% if updated_skill %}
-                    <p class="message">{{ message }}</p>
-                {% endif %}
-            </div>
-        {% endif %}
-
-        <hr class="hr">
-
-        {% if role.essential_skills %}
-            <div class="details-box">
-                <h2>Tasks & Responsibilities</h2>
-                <h3>Essential Skills:</h3>
-                <ul>
-                {% for skill in role.essential_skills %}
-                    <li>{{ skill.name | capitalize }}: <a href="{{ skill.uri }}" target="_blank"> ↗</a></li>
-                {% endfor %}
-                </ul>
             </div>
         {% endif %}
     </div>

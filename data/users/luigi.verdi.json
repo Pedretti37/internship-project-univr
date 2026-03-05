@@ -7,23 +7,23 @@
     "target_roles": [],
     "current_skills": [
         {
-            "name": "Mechanical engineering",
             "uri": "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c",
+            "name": "Mechanical engineering",
             "level": 4
         },
         {
-            "name": "Computer-aided design (CAD) software",
             "uri": "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1",
+            "name": "Computer-aided design (CAD) software",
             "level": 5
         },
         {
-            "name": "Thermodynamics",
             "uri": "http://data.europa.eu/esco/skill/857e8624-4db0-4725-a758-5914bd8cc350",
+            "name": "Thermodynamics",
             "level": 3
         },
         {
-            "name": "Robotics",
             "uri": "http://data.europa.eu/esco/skill/e87ec79a-c9ff-46f5-84fa-7a0f394cdf40",
+            "name": "Robotics",
             "level": 2
         }
     ],

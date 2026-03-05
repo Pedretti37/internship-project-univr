@@ -214,42 +214,58 @@ async def add_to_user_target_roles(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    e_skills_list = []
+    form_data = await request.form()
+
+    skills_list = []
 
     # Manual conversion from string to list[Skill]
     if essential_skills:
         try:
-            parsed_data = ast.literal_eval(essential_skills)
+            skills_list = ast.literal_eval(essential_skills)
             
             # Check
-            if isinstance(parsed_data, list):
-                e_skills_list = parsed_data
+            if isinstance(skills_list, list):
+                skills_list = skills_list
             else:
-                print(f"Parsed_data not a valid list. Found type: {type(parsed_data)}")
-                e_skills_list = []
+                print(f"Parsed_data not a valid list. Found type: {type(skills_list)}")
+                skills_list = []
 
         except (ValueError, SyntaxError) as e:
             print(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
-            e_skills_list = []
+            skills_list = []
     else:
-        e_skills_list = []
+        skills_list = []
+
+
+    final_skills_list = []
+
+    for skill_dict in skills_list:
+        skill_uri = skill_dict.get("uri")
+        
+        selected_level = form_data.get(f"level_{skill_uri}")
+        
+        if selected_level:
+            skill_dict["level"] = int(selected_level)
+        else:
+            skill_dict["level"] = 5  # Default level if not selected, can be adjusted as needed
+            
+        final_skills_list.append(Skill(**skill_dict))
 
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
-        essential_skills=e_skills_list,
+        essential_skills=final_skills_list,
         id_full=id_full,
         uri=uri
     )
 
-    message_text = "Error: target role not added."
     updated_target_role = False
-
     already_exists = any(r.id == role_id for r in user.target_roles)
 
+
     if not already_exists:
-        user.target_roles.append(role_object.model_dump())
+        user.target_roles.append(role_object)
         updated_target_role = True
         message_text = "Target role added successfully!"
     else:
@@ -283,65 +299,54 @@ async def add_to_user_skills(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    e_skills_list = []
+    form_data = await request.form()
+
+    skills_list = []
 
     # Manual conversion from string to list[Skill]
-    if essential_skills:
-        try:
-            parsed_data = ast.literal_eval(essential_skills)
-            
-            # Check
-            if isinstance(parsed_data, list):
-                e_skills_list = parsed_data
-            else:
-                print(f"Parsed_data not a valid list. Found type: {type(parsed_data)}")
-                e_skills_list = []
+    try:
+        skills_list = ast.literal_eval(essential_skills)
+        # Check
+        if isinstance(skills_list, list):
+            skills_list = skills_list
+        else:
+            print(f"Parsed_data not a valid list. Found type: {type(skills_list)}")
+            skills_list = []
+    except (ValueError, SyntaxError):
+        skills_list = []
 
-        except (ValueError, SyntaxError) as e:
-            print(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
-            e_skills_list = []
-    else:
-        e_skills_list = []
-
-    role_object = Role(
-        id=role_id,
-        title=title,
-        description=description if description else "No description available.",
-        essential_skills=e_skills_list,
-        id_full=id_full,
-        uri=uri
-    )
-
-    message_text = "Error: No skills were added."
     updated_skill = False
-
     existing_uris = {s.uri for s in user.current_skills}
 
-    if role_object.essential_skills:
-        for esco_skill in role_object.essential_skills:
+    for skill_dict in skills_list:
+        skill_uri = skill_dict.get("uri")
+        
+        selected_level = form_data.get(f"level_{skill_uri}")
+        
+        if selected_level and skill_uri not in existing_uris:
+            skill_dict["level"] = int(selected_level)
             
-            if esco_skill.uri not in existing_uris:
-                
-                new_user_skill = Skill(
-                    uri=esco_skill.uri,
-                    name=esco_skill.name, 
-                    level=1 # Default level
-                )
-                
-                user.current_skills.append(new_user_skill)
-                existing_uris.add(esco_skill.uri) 
-                updated_skill = True
+            user.current_skills.append(Skill(**skill_dict))
+            existing_uris.add(skill_uri)
+            updated_skill = True
 
     if updated_skill:
         crud_user.update_user(user)
         message_text = "Role skills added to your profile!"
-    elif role_object.essential_skills:
-        message_text = "You already have all the skills for this role."
+    else:
+        message_text = "No new skills were added. They might already be in your profile or no level was selected."
 
     return templates.TemplateResponse("details.html", {
         "request": request,
         "user": user,
-        "role": role_object,
+        "role": Role(
+            id=role_id,
+            title=title,
+            description=description if description else "No description available.",
+            essential_skills=skills_list,
+            id_full=id_full,
+            uri=uri
+        ),
         "updated_skill": updated_skill,
         "message": message_text,
         "is_user": True
@@ -449,12 +454,34 @@ async def delete_target_role(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
+    # new list excluding the role to be deleted
     new_target_list = [
         role for role in user.target_roles 
         if role.id != role_id
     ]
     
     user.target_roles = new_target_list
+
+    crud_user.update_user(user)
+
+    return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- Delete Skill from User --- ###
+@router.post("/delete_user_skill", response_class=RedirectResponse)
+async def delete_user_skill(
+    user: User = Depends(get_current_user),
+    skill_uri: str = Form(...)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    # new list excluding the skill to be deleted
+    new_skills_list = [
+        skill for skill in user.current_skills 
+        if skill.uri != skill_uri
+    ]
+    
+    user.current_skills = new_skills_list
 
     crud_user.update_user(user)
 

@@ -7,18 +7,18 @@
     "target_roles": [],
     "current_skills": [
         {
-            "name": "Project management",
             "uri": "http://data.europa.eu/esco/skill/7111b95d-0ce3-441a-9d92-4c75d05c4388",
+            "name": "Project management",
             "level": 8
         },
         {
-            "name": "Risk management",
             "uri": "http://data.europa.eu/esco/skill/6eff134b-e34f-4d6e-a6e8-5e47cf2228d0",
+            "name": "Risk management",
             "level": 7
         },
         {
-            "name": "Mechanical engineering",
             "uri": "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c",
+            "name": "Mechanical engineering",
             "level": 2
         }
     ],
