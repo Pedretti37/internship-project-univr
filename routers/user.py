@@ -1,11 +1,13 @@
 import ast
 from datetime import datetime
-from fastapi import APIRouter, Request, Form, status, Depends
+from fastapi import APIRouter, Request, Form, UploadFile, File, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
 from typing import Optional
 from crud import crud_user, crud_org
 from dependencies import get_current_user
+import csv
+import io
 
 from config import templates, pwd_context
 import crud.crud_skill_models as crud_skill_models
@@ -688,6 +690,59 @@ async def decline_invitation(
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
 
+### --- Upload Skill via CSV ---###
+@router.post("/upload_skills_csv", response_class=RedirectResponse)
+async def upload_skills_csv(
+    request: Request,
+    user: User = Depends(get_current_user),
+    file: UploadFile = File(...)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
+    content = await file.read()
+    
+    decoded_content = content.decode('utf-8')
+    csv_reader = csv.DictReader(io.StringIO(decoded_content))
 
+    updated = False
+    existing_skills_dict = {s.uri: s for s in user.current_skills}
+
+    for row in csv_reader:
+        skill_name = row.get("skill_name")
+        level_str = row.get("level")
+
+        if not skill_name or not level_str:
+            continue # Skipping rows with missing data
+            
+        try:
+            skill_level = int(level_str)
+            skill_level = max(1, min(9, skill_level)) # Forcing level to be between 1 and 9
+        except ValueError:
+            continue # Skipping rows where the level is not a valid integer
+
+        # API search to get the official ESCO skill URI and name based on the provided skill name in the CSV
+        search_results = escoAPI.get_esco_skills_list(skill_name, language="en", limit=1)
+        
+        if search_results:
+            # First official result is the most relevant one, we take it as the match for the uploaded skill
+            official_skill = search_results[0]
+            skill_uri = official_skill.uri
+            official_name = official_skill.name # Using official ESCO names
+
+            # If skill already present, update level if different
+            if skill_uri in existing_skills_dict:
+                if existing_skills_dict[skill_uri].level != skill_level:
+                    existing_skills_dict[skill_uri].level = skill_level
+                    updated = True
+            else:
+                new_skill = Skill(uri=skill_uri, name=official_name, level=skill_level)
+                user.current_skills.append(new_skill)
+                existing_skills_dict[skill_uri] = new_skill
+                updated = True
+
+    if updated:
+        crud_user.update_user(user)
+
+    return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 

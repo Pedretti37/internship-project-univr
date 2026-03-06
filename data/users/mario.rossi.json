@@ -95,6 +95,16 @@
             "uri": "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12",
             "name": "approve engineering design",
             "level": 5
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d",
+            "name": "Python (computer programming)",
+            "level": 7
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/7111b95d-0ce3-441a-9d92-4c75d05c4388",
+            "name": "project management",
+            "level": 4
         }
     ],
     "skill_gap": [
