@@ -44,7 +44,7 @@
                 <h2>Tasks & Responsibilities</h2>
                 <h3>Essential Skills:</h3>
                 
-                <form method="post">
+                <form action="/add_to_user_target_roles" method="post">
                     <input type="hidden" name="role_id" value="{{ role.id }}">
                     <input type="hidden" name="title" value="{{ role.title }}">
                     <input type="hidden" name="description" value="{{ role.description }}">
@@ -56,7 +56,7 @@
                         <ul class="list-group mb-4">
                             {% for skill in role.essential_skills %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>{{ skill.name }}</span>
+                                <span>{{ skill.name | capitalize }}</span>
                                 
                                 <select name="level_{{ skill.uri }}" class="form-select form-select-sm" style="width: auto;">
                                     <option value="">-- Seleziona Livello --</option>
@@ -95,7 +95,20 @@
                 {% endif %}
             </div>
         {% else %}
-            <div>
+            <div class="details-box">
+                <h2>Tasks & Responsibilities</h2>
+                <h3>Essential Skills:</h3>
+                
+                {% if role.essential_skills %}
+                    <ul class="list-group">
+                        {% for skill in role.essential_skills %}
+                        <li class="list-group-item">
+                            <span>{{ skill.name }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
                 <form action="/add_to_project_target_roles" method="post">
                     <input type="hidden" name="project_id" value="{{ project_id }}">
                     <input type="hidden" name="role_id" value="{{ role.id }}">
@@ -105,10 +118,18 @@
                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
-                    <button type="submit" class="btn-primary">
+                    <button type="submit" class="btn btn-primary">
                         <span>Add to Project's Target Roles</span>
                     </button>
                 </form>
+                
+                <div>
+                    {% if updated_target_role %}
+                        <p class="message alert alert-success">{{ message }}</p>
+                    {% elif message %}
+                        <p class="message alert alert-info">{{ message }}</p>
+                    {% endif %}
+                </div>
             </div>
         {% endif %}
     </div>

@@ -350,25 +350,36 @@ async def add_to_user_skills(
         skills_list = []
 
     updated_skill = False
-    existing_uris = {s.uri for s in user.current_skills}
+    
+    existing_skills_dict = {s.uri: s for s in user.current_skills}
 
     for skill_dict in skills_list:
         skill_uri = skill_dict.get("uri")
-        
         selected_level = form_data.get(f"level_{skill_uri}")
         
-        if selected_level and skill_uri not in existing_uris:
-            skill_dict["level"] = int(selected_level)
+        if selected_level:
+            skill_level = int(selected_level)
             
-            user.current_skills.append(Skill(**skill_dict))
-            existing_uris.add(skill_uri)
-            updated_skill = True
+            if skill_uri in existing_skills_dict:
+                existing_skill = existing_skills_dict[skill_uri]
+                
+                if existing_skill.level != skill_level:
+                    existing_skill.level = skill_level
+                    updated_skill = True
+            
+            else:
+                skill_dict["level"] = skill_level
+                new_skill = Skill(**skill_dict)
+                user.current_skills.append(new_skill)
+                
+                existing_skills_dict[skill_uri] = new_skill
+                updated_skill = True
 
     if updated_skill:
         crud_user.update_user(user)
-        message_text = "Role skills added to your profile!"
+        message_text = "Role skills successfully added or updated in your profile!"
     else:
-        message_text = "No new skills were added. They might already be in your profile or no level was selected."
+        message_text = "No changes were made. Skills are already at the selected levels or no level was selected."
 
     return templates.TemplateResponse("details.html", {
         "request": request,
@@ -451,7 +462,6 @@ async def add_single_skill(
         "last_skill_search": last_skill_search
     })
 
-
 ### --- Password Change --- ###
 @router.post("/change_password_user", response_class=HTMLResponse)
 async def change_password(
@@ -498,51 +508,23 @@ async def change_password(
 @router.post("/details", response_class=HTMLResponse)
 async def details_page(
     request: Request, 
-    role_id: str = Form(...),
-    title: str = Form(...),
-    description: Optional[str] = Form(None),
-    essential_skills: Optional[str] = Form(None),
-    id_full: str = Form(...),
     uri: str = Form(...),
     user: User = Depends(get_current_user)):
 
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    e_skills_list = []
+    selected_role = escoAPI.get_single_role_details(uri, language="en")
 
-    # Manual conversion from string to list[Skill]
-    if essential_skills:
-        try:
-            parsed_data = ast.literal_eval(essential_skills)
-            
-            # Check
-            if isinstance(parsed_data, list):
-                e_skills_list = parsed_data
-            else:
-                print(f"Parsed_data not a valid list. Found type: {type(parsed_data)}")
-                e_skills_list = []
-
-        except (ValueError, SyntaxError) as e:
-            print(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
-            e_skills_list = []
-    else:
-        e_skills_list = []
-
-    role_object = Role(
-        id=role_id,
-        title=title,
-        description=description if description else "No description available.",
-        essential_skills=e_skills_list,
-        id_full=id_full,
-        uri=uri
-    )
+    if not selected_role:
+        error_msg = "Impossibile caricare i dettagli da ESCO in questo momento."
+        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 
     return templates.TemplateResponse("details.html", {
         "request": request,
         "user": user,
         "is_user": True,
-        "role": role_object
+        "role": selected_role,
     })
     
 ### --- Delete Target Role from User --- ###    

@@ -37,11 +37,6 @@
                         <li>    
                             <div class="role-card">
                                 <form action="/details" method="post" style="display: inline;">
-                                    <input type="hidden" name="role_id" value="{{ role.id }}">
-                                    <input type="hidden" name="title" value="{{ role.title }}">
-                                    <input type="hidden" name="description" value="{{ role.description }}">
-                                    <input type="hidden" name="essential_skills" value="{{ role.model_dump()['essential_skills'] }}">
-                                    <input type="hidden" name="id_full" value="{{ role.id_full }}">
                                     <input type="hidden" name="uri" value="{{ role.uri }}">
                                     
                                     <h3>
@@ -50,8 +45,6 @@
                                         </button>
                                     </h3>
                                 </form>
-                                <div>
-                                    <p>{{ role.description }}</p> </div>
                             </div>
                         </li>
                         {% endfor %}

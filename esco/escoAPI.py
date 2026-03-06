@@ -114,17 +114,14 @@ def get_esco_occupations_list(keyword, language, limit=10):
     output_list = []
 
     for hit in results:
-        uri = hit['uri']
-
-        # Calling the single details function
-        role_data = get_single_role_details(uri, language=language)
+        uri = hit.get('uri')
+        title = hit.get('title')
+        if uri and title:
+            output_list.append({
+                "uri": uri,
+                "title": title
+            })
         
-        if role_data:
-            output_list.append(role_data)
-        
-        # Sleep to avoid rate limiting
-        time.sleep(0.05) 
-
     return output_list
 
 ### API function to get skill URI by name 

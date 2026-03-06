@@ -90,15 +90,25 @@
             "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
             "name": "perform scientific research",
             "level": 2
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12",
+            "name": "approve engineering design",
+            "level": 5
         }
     ],
     "skill_gap": [
         {
             "role_id": "2144",
             "role_title": "mechanical engineer",
-            "match_score": 45,
+            "match_score": 56,
             "total_required": 9,
             "matching_skills": {
+                "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": {
+                    "uri": "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12",
+                    "name": "approve engineering design",
+                    "level": 5
+                },
                 "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b": {
                     "uri": "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b",
                     "name": "adjust engineering designs",
@@ -149,11 +159,6 @@
                 }
             },
             "missing_skills": {
-                "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12": {
-                    "uri": "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12",
-                    "name": "approve engineering design",
-                    "level": 5
-                },
                 "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532": {
                     "uri": "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532",
                     "name": "technical drawings",
