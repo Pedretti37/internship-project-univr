@@ -6,9 +6,7 @@
     "orgname": "simone.pedretti",
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$Z6x1LgWAsPZeS2nNWQsBwA$BST2YWW+Kbf/WziynmLiupqZxsUJ9WR78M81h0Oc5dA",
     "members": [
-        "mario.rossi",
-        "luca.neri",
-        "giulia.bianchi"
+        "mario.rossi"
     ],
     "projects": [
         {
@@ -16,7 +14,6 @@
             "name": "a",
             "description": "a",
             "assigned_members": [
-                "luca.neri",
                 "mario.rossi"
             ],
             "target_roles": [],
@@ -28,8 +25,7 @@
             "name": "b",
             "description": "b",
             "assigned_members": [
-                "mario.rossi",
-                "luca.neri"
+                "mario.rossi"
             ],
             "target_roles": [],
             "skill_gap": [],
@@ -40,9 +36,7 @@
             "name": "Invitation",
             "description": "a",
             "assigned_members": [
-                "luca.neri",
-                "mario.rossi",
-                "giulia.bianchi"
+                "mario.rossi"
             ],
             "target_roles": [],
             "skill_gap": [],

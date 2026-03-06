@@ -291,13 +291,13 @@
                             {% if gap.partially_matching_skills %}
                                 <h4 style="color: #f57f17; margin-top: 10px;">⚠️ Skills to Improve:</h4>
                                 <ul>
-                                    {% for uri, data in gap.partially_matching_skills.items() %}
+                                    {% for data in gap.partially_matching_skills %}
                                         <li style="margin-bottom: 5px;">
                                             <strong>{{ data.skill.name | title }}</strong>
                                             <span style="font-size: 0.85em; color: #555;">
-                                                (Your level: <b>{{ data.user_level }}</b> / Target: <b>{{ data.req_level }}</b>)
+                                                (Your level: <b>{{ data.user_level }}</b> / Target: <b>{{ data.skill.level }}</b>)
                                             </span>
-                                            <a href="{{ uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
+                                            <a href="{{ data.skill.uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
                                         </li>
                                     {% endfor %}
                                 </ul>
@@ -306,17 +306,17 @@
                             {% if gap.missing_skills %}
                                 <h4 style="color: #d32f2f; margin-top: 10px;">❌ Missing Skills:</h4>
                                 <ul>
-                                    {% for uri, skill in gap.missing_skills.items() %}
+                                    {% for skill in gap.missing_skills %}
                                         <li style="margin-bottom: 5px;">
                                             <strong>{{ skill.name | title }}</strong> 
                                             <span style="font-size: 0.85em; color: #555;">(Target level: {{ skill.level }})</span>
-                                            <a href="{{ uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
+                                            <a href="{{ skill.uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
                                         </li>
                                     {% endfor %}
                                 </ul>
                             {% endif %}
 
-                            {% if not gap.missing_skills and not gap.partial_skills %}
+                            {% if not gap.missing_skills and not gap.partially_matching_skills %}
                                 <p style="color: green; font-weight: bold; margin-top: 15px;">
                                     ✅ You have all the required skills for this role!
                                 </p>

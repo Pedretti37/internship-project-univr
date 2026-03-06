@@ -622,11 +622,16 @@ async def occupation_forecast_and_gap(
     for role in updated_user.skill_gap:
         if 0 <= role["match_score"] < 100:
             for result in forecast_results:
-                data = result["data"]
-                if data["growth_pct"] >= -5:
-                    # Role is expected to grow or remain stable --> provide educational courses and training opportunities
-                    for skill_uri, skill_name in role["missing_skills"].items():
-                        missing_skills[skill_uri] = skill_name
+                if result["isco_code"] == str(role["role_id"]):
+                    data = result["data"]
+                    if data["growth_pct"] >= -5:
+                        # Role is expected to grow or remain stable --> provide educational courses and training opportunities
+                        for skill in role.get("missing_skills", []):
+                            missing_skills[skill.uri] = skill.name
+                        for skill in role.get("partially_matching_skills", []):
+                            skill_obj = skill["skill"]
+                            missing_skills[skill_obj.uri] = skill_obj.name
+                    break
 
     # print(len(missing_skills))
 
@@ -700,13 +705,21 @@ async def upload_skills_csv(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
+    if not file.filename.lower().endswith('.csv'):
+        # Opzionale: puoi salvare un messaggio di errore nei cookie prima del redirect
+        print(f"Errore: Il file {file.filename} non è un CSV.")
+        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
+
     content = await file.read()
-    
-    decoded_content = content.decode('utf-8')
+    try:
+        decoded_content = content.decode('utf-8')
+    except UnicodeDecodeError:
+        return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
+
     csv_reader = csv.DictReader(io.StringIO(decoded_content))
 
-    updated = False
-    existing_skills_dict = {s.uri: s for s in user.current_skills}
+    skills_to_review = []
+    skills_not_found = []
 
     for row in csv_reader:
         skill_name = row.get("skill_name")
@@ -722,24 +735,72 @@ async def upload_skills_csv(
             continue # Skipping rows where the level is not a valid integer
 
         # API search to get the official ESCO skill URI and name based on the provided skill name in the CSV
-        search_results = escoAPI.get_esco_skills_list(skill_name, language="en", limit=1)
+        search_results = escoAPI.get_esco_skills_list(skill_name, language="en", limit=10)
         
         if search_results:
-            # First official result is the most relevant one, we take it as the match for the uploaded skill
-            official_skill = search_results[0]
-            skill_uri = official_skill.uri
-            official_name = official_skill.name # Using official ESCO names
+            skills_to_review.append({
+            "raw_name": skill_name.capitalize(),
+            "level": skill_level,
+            "options": search_results # First 10 results from ESCO, user can choose the most relevant one in the review step
+        })
+        else:
+            skills_not_found.append(skill_name)
 
-            # If skill already present, update level if different
-            if skill_uri in existing_skills_dict:
-                if existing_skills_dict[skill_uri].level != skill_level:
-                    existing_skills_dict[skill_uri].level = skill_level
-                    updated = True
-            else:
-                new_skill = Skill(uri=skill_uri, name=official_name, level=skill_level)
-                user.current_skills.append(new_skill)
-                existing_skills_dict[skill_uri] = new_skill
+    return templates.TemplateResponse("review_skills.html", {
+        "request": request,
+        "user": user,
+        "skills_to_review": skills_to_review,
+        "skills_not_found": skills_not_found
+    })
+
+### --- Confirm and Save CSV Skills (Fase 2: Salvataggio) --- ###
+@router.post("/confirm_skills_csv", response_class=RedirectResponse)
+async def confirm_skills_csv(
+    request: Request,
+    user: User = Depends(get_current_user)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    form_data = await request.form()
+    
+    # Obtain number of rows = number of skills to review, which we had saved in a hidden input in the HTML form
+    total_rows_str = form_data.get("total_rows")
+    if not total_rows_str:
+        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
+        
+    total_rows = int(total_rows_str)
+    
+    existing_skills_dict = {s.uri: s for s in user.current_skills}
+    updated = False
+
+    for i in range(1, total_rows + 1):
+        uri_and_name = form_data.get(f"uri_name_{i}")
+        level_str = form_data.get(f"level_{i}")
+        
+        # If user decides to skip a skill
+        if not uri_and_name or uri_and_name == "SKIP":
+            continue
+            
+        # Splitting URI and offical name, connected by "|||", which we had set in a hidden input in the HTML form for each skill option
+        parts = uri_and_name.split("|||")
+        if len(parts) != 2:
+            continue
+            
+        skill_uri = parts[0]
+        official_name = parts[1]
+        skill_level = int(level_str)
+
+        # Update logic
+        if skill_uri in existing_skills_dict:
+            if existing_skills_dict[skill_uri].level != skill_level:
+                existing_skills_dict[skill_uri].level = skill_level
                 updated = True
+        else:
+            new_skill = Skill(uri=skill_uri, name=official_name, level=skill_level)
+            user.current_skills.append(new_skill)
+            existing_skills_dict[skill_uri] = new_skill
+            updated = True
 
     if updated:
         crud_user.update_user(user)

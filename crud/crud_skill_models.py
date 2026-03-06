@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from typing import Dict, List
-from models import Project, User, Course, Role
+from models import Project, Skill, User, Course, Role
 from datetime import datetime
 
 EMP_OCCUPATION = "data/cedefop/employees/Employment_occupation.xlsx"
@@ -15,9 +15,9 @@ def skill_gap_user(user: User, role_list: List[Role]) -> User:
     user_skills_dict = {s.uri: s.level for s in user.current_skills}
 
     for role in role_list:
-        matching = {}
-        partially_matching = {}
-        missing = {}
+        matching = []
+        partially_matching = []
+        missing = []
         
         essential_skills = role.essential_skills
         total_req = len(essential_skills)
@@ -34,18 +34,17 @@ def skill_gap_user(user: User, role_list: List[Role]) -> User:
             if req_skill.uri in user_skills_dict:
                 user_level = user_skills_dict[req_uri]
                 if user_level >= req_level:
-                    matching[req_skill.uri] = req_skill
+                    matching.append(req_skill)
                     score += 1.0
                 else:
                     partial_score = user_level / req_level
                     score += partial_score
-                    partially_matching[req_uri] = {
+                    partially_matching.append({
                         "skill": req_skill,
-                        "user_level": user_level,
-                        "req_level": req_level
-                    }
+                        "user_level": user_level
+                    })
             else:
-                missing[req_skill.uri] = req_skill
+                missing.append(req_skill)
 
         match_pct = int((score / total_req) * 100) if total_req > 0 else 0
         
@@ -218,18 +217,20 @@ def recommend_courses_for_skill_gap(missing_skills_uri: Dict[str, str]) -> List[
     # print(courses_df.head())  # Debug: Check the structure of the DataFrame
 
     for row in courses_df.itertuples():
-        matched_skills = {
-            uri: missing_skills_uri[uri] 
-            for uri in row.esco_skills_match.keys() 
-            if uri in missing_skills_uri
-        }
+        covered_skills_list = []
+        
+        for uri in row.esco_skills_match.keys():
+            if uri in missing_skills_uri:
+                skill_name = missing_skills_uri[uri]
+                skill_obj = Skill(uri=uri, name=skill_name, level=1) # Level is set to 1 as a placeholder 
+                covered_skills_list.append(skill_obj)
 
-        if matched_skills:
+        if covered_skills_list:
             new_course = Course(
                 title=row.title_de,
                 ects=row.ects,
                 description=row.learning_outcomes_de,
-                skills_covered=matched_skills.values()
+                skills_covered=covered_skills_list
             )
             recommended_courses.append(new_course)
 
