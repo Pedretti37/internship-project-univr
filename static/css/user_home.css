@@ -121,3 +121,17 @@ body {
     outline: none;
     background-color: white;
 }
+
+.selection {
+    flex: 1; 
+    margin: 0px; 
+    padding: 10px 15px;
+    border: 1px solid #ccc; 
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-sizing: border-box;
+    outline: none;
+    background-color: white;
+}

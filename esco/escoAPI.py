@@ -127,7 +127,7 @@ def get_esco_occupations_list(keyword, language, limit=10):
 
     return output_list
 
-###--- API function to get skill URI by name ---###
+### API function to get skill URI by name 
 def get_esco_skill_uri_by_name(skill_name: str, language: str = 'en') -> str | None:
     """
     Cerca una skill per nome sull'API di ESCO e restituisce il suo URI.
@@ -153,3 +153,36 @@ def get_esco_skill_uri_by_name(skill_name: str, language: str = 'en') -> str | N
         print(f"Errore durante la ricerca della skill '{skill_name}': {e}")
         
     return None 
+
+### Main function to search for skills based on user input
+def get_esco_skills_list(keyword, language, limit=10):
+    search_params = {'text': keyword, 'type': 'skill', 'language': language, 'limit': limit}
+    
+    try:
+        # print(f"🔍 Searching ESCO for: {keyword}...")
+        search_resp = requests.get(f"{BASE_URL}/search", params=search_params, headers=HEADERS)
+        search_resp.raise_for_status()
+        
+        results = search_resp.json().get('_embedded', {}).get('results', [])
+    except Exception as e:
+        print(f"Connection error during search: {e}")
+        return []
+
+    if not results:
+        return []
+
+    output_list = []
+
+    for hit in results:
+        uri = hit.get('uri')
+        title = hit.get('title')
+
+        if uri and title:
+            skill = Skill(
+                uri=uri,
+                name=title,
+                level=0 # ESCO doesn't provide a skill level in this endpoint -> defaulting to 0 for now
+            )
+            output_list.append(skill)
+
+    return output_list

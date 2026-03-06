@@ -13,6 +13,7 @@ from esco import escoAPI
 from models import Role, Skill, User
 
 USER_ROLES_LIST = {}
+USER_SKILLS_LIST = {}
 USER_COURSES_LIST = {}
 USER_FORECAST_RESULTS = {}
 
@@ -83,19 +84,21 @@ async def user_home(request: Request, user: User = Depends(get_current_user)):
         response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
 
-    context_results = None
-    context_search = ""
+    saved_roles = USER_ROLES_LIST.get(user.username, {})
+    results = saved_roles.get("results")
+    last_search = saved_roles.get("last_search") or ""
 
-    if user.username in USER_ROLES_LIST:
-        session_data = USER_ROLES_LIST[user.username]
-        context_results = session_data["results"]
-        context_search = session_data["last_search"]
+    saved_skills = USER_SKILLS_LIST.get(user.username, {})
+    skill_results = saved_skills.get("results")
+    last_skill_search = saved_skills.get("last_search") or ""
 
     response = templates.TemplateResponse("user/user_home.html", {
         "request": request, 
         "user": user, 
-        "results": context_results, 
-        "last_search": context_search
+        "results": results, 
+        "last_search": last_search,
+        "skill_results": skill_results,
+        "last_skill_search": last_skill_search
     })
 
     # No cache storage
@@ -181,25 +184,55 @@ async def user_profile(request: Request, user: User = Depends(get_current_user))
 ### --- Obtain roles from User Input --- ###
 @router.post("/role_list", response_class=HTMLResponse)
 async def role_list(request: Request, search: str = Form(...), user: User = Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
     role = search.title().strip()
-
     language = "en"
     role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
     
-    if user:
-        USER_ROLES_LIST[user.username] = {
-            "last_search": search,
-            "results": role_list
-        }
-        return templates.TemplateResponse("user/user_home.html", {
-            "request": request,
-            "user": user,
-            "results": role_list,
-            "last_search": search
-        })
-    else:
+    USER_ROLES_LIST[user.username] = {
+        "last_search": search,
+        "results": role_list
+    }
+    
+    saved_skills = USER_SKILLS_LIST.get(user.username, {})
+
+    return templates.TemplateResponse("user/user_home.html", {
+        "request": request,
+        "user": user,
+        "results": role_list,
+        "last_search": search,
+        "skill_results": saved_skills.get("results"),
+        "last_skill_search": saved_skills.get("last_search") or ""
+    })
+
+### --- Obtain skill list from user input --- ###
+@router.post("/skill_list", response_class=HTMLResponse)
+async def skill_list(request: Request, search: str = Form(...), user: User = Depends(get_current_user)):
+    if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
+    skill = search.title().strip()
+    language = "en"
+    skill_list = escoAPI.get_esco_skills_list(skill, language=language, limit=10)
+    
+    USER_SKILLS_LIST[user.username] = {
+        "last_search": search,
+        "results": skill_list
+    }
+
+    saved_roles = USER_ROLES_LIST.get(user.username, {})
+
+    return templates.TemplateResponse("user/user_home.html", {
+        "request": request,
+        "user": user,
+        "skill_results": skill_list,
+        "last_skill_search": search,
+        "results": saved_roles.get("results"),
+        "last_search": saved_roles.get("last_search") or ""
+    })
+
 ### --- Set User Target Roles --- ###
 @router.post("/add_to_user_target_roles", response_class=HTMLResponse)
 async def add_to_user_target_roles(
@@ -352,6 +385,72 @@ async def add_to_user_skills(
         "message": message_text,
         "is_user": True
     })
+
+### --- Add Single Skill to User --- ###
+@router.post("/add_single_skill", response_class=HTMLResponse)
+async def add_single_skill(
+    request: Request,
+    user: User = Depends(get_current_user),
+    uri: str = Form(...),
+    name: str = Form(...)
+):
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    saved_roles = USER_ROLES_LIST.get(user.username, {})
+    saved_skills = USER_SKILLS_LIST.get(user.username, {})
+    
+    results = saved_roles.get("results") or []
+    last_search = saved_roles.get("last_search") or ""
+    skill_results = saved_skills.get("results") or []
+    last_skill_search = saved_skills.get("last_search") or ""
+
+    form_data = await request.form()
+    selected_level = form_data.get(f"level_{uri}")
+
+    if not selected_level:
+        return templates.TemplateResponse("user/user_home.html", {
+            "request": request,
+            "user": user,
+            "skill_message": "⚠️ Please select a proficiency level first.",
+            "uri_skill_selected": uri,
+            "results": results,
+            "last_search": last_search,
+            "skill_results": skill_results,
+            "last_skill_search": last_skill_search
+        })
+
+    skill_level = int(selected_level)
+    skill_found = False
+
+    for existing_skill in user.current_skills:
+        if existing_skill.uri == uri:
+            skill_found = True
+            if existing_skill.level == skill_level:
+                message_text = "You already have this skill at this exact level."
+            else:
+                existing_skill.level = skill_level
+                message_text = f"Skill updated to level {skill_level}!"
+            break
+
+    if not skill_found:
+        new_skill = Skill(uri=uri, name=name, level=skill_level)
+        user.current_skills.append(new_skill)
+        message_text = "Skill added to your profile!"
+
+    crud_user.update_user(user)
+
+    return templates.TemplateResponse("user/user_home.html", {
+        "request": request,
+        "user": user,
+        "skill_message": message_text,
+        "uri_skill_selected": uri,
+        "results": results,
+        "last_search": last_search,
+        "skill_results": skill_results,
+        "last_skill_search": last_skill_search
+    })
+
 
 ### --- Password Change --- ###
 @router.post("/change_password_user", response_class=HTMLResponse)
