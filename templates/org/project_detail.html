@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block css %}
+    <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/project_detail.css">
 {% endblock %}
 
@@ -45,9 +46,6 @@
                     <input type="hidden" name="project_id" value="{{ current_project.id }}">
                     <button type="submit" class="btn-primary">Add Member</button>
                 </form>
-
-                {% if member_error %} <p class="status-err">{{ member_error }}</p> {% endif %}
-                {% if member_success %} <p class="status-ok">{{ member_success }}</p> {% endif %}
             </div>
 
             <div class="upload-section" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px;">
@@ -248,14 +246,6 @@
 
         <div translate="no">
             <h2>Skill gap Assessment</h2>
-
-            <div>
-                {% if error %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
-                {% endif %}
-            </div>
 
             <div class="skill-gap-container">
                 {% if current_project.skill_gap %}

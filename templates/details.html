@@ -13,10 +13,10 @@
 
         <div class="nav-right">
             {% if is_user%}
-                <a href="/user_home" class="nav-link">← Back to Search</a>
+                <a href="javascript:history.back()" class="nav-link">← Back to Search</a>
                 <a href="/user_logout" class="nav-link logout-btn">Logout</a>
             {% else %}
-                <a href="/org/project/{{ project_id }}" class="nav-link">← Back to Project</a>
+                <a href="javascript:history.back()" class="nav-link">← Back to Project</a>
                 <a href="/org_logout" class="nav-link logout-btn">Logout</a>
             {% endif %}
         </div>

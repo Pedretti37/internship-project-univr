@@ -21,40 +21,37 @@
         <h1>Roles & Skill Models</h1>
         
         <div class="browsing-input">
-            <form action="/role_list" method="post" class="role-form" autocomplete="off">
-                <input type="text" name="search" class="input" placeholder="🔍 Role: e.g. Manager" value="{{ last_search or '' }}" required>
+            <form action="/user_home" method="get" class="role-form" autocomplete="off">
+                <input type="text" name="role_search" class="input" placeholder="🔍 Role: e.g. Manager" value="{{ role_search or '' }}" required>
                 <button type="submit" class="btn-primary">Search</button>
             </form>
         </div>
 
         <div class="role-container">
-            {% if results %}
+            {% if role_list %}
 
-                <h2>Results for "<strong>{{ last_search }}</strong>"</h2>
+                <h2>Results for "<strong>{{ role_search }}</strong>"</h2>
 
                 <div class="roles-list">
                     <ul>
-                        {% for role in results %}
+                        {% for role in role_list %}
                         <li>    
                             <div class="role-card">
-                                <form action="/details" method="post" style="display: inline;">
-                                    <input type="hidden" name="uri" value="{{ role.uri }}">
-                                    
-                                    <h3>
-                                        <button type="submit" class="role-title">
-                                            {{ role.title | title}}
-                                        </button>
-                                    </h3>
-                                </form>
+                                <h3>
+                                    <!-- Use urlencode to handle special characters in the URI -->
+                                    <a href="/details?uri={{ role.uri | urlencode }}" class="role-title" style="text-decoration: none;">
+                                        {{ role.title | title }}
+                                    </a>
+                                </h3>
                             </div>
                         </li>
                         {% endfor %}
                     </ul>
                 </div>
             {% else %}
-                {% if last_search %}
+                {% if role_search %}
                     <div class="no-results">
-                        <p>No roles found for "<strong>{{ last_search }}</strong>".</p>
+                        <p>No roles found for "<strong>{{ role_search }}</strong>".</p>
                         <p style="font-size: 0.9em; color: #666;">Try checking the spelling or use another term.</p>
                     </div>
                 {% endif %}
@@ -65,25 +62,26 @@
 
         <h1>Specific Skill</h1>
         <div class="browsing-input">
-            <form action="/skill_list" method="post" class="role-form" autocomplete="off">
-                <input type="text" name="search" class="input" placeholder="🔍 Skill: e.g. Communication" value="{{ last_skill_search or '' }}" required>
+            <form action="/user_home" method="get" class="role-form" autocomplete="off">
+                <input type="text" name="skill_search" class="input" placeholder="🔍 Skill: e.g. Communication" value="{{ skill_search or '' }}" required>
                 <button type="submit" class="btn-primary">Search</button>
             </form>
         </div>
 
         <div class="skill-container">
-            {% if skill_results %}
+            {% if skill_list %}
 
-                <h2>Results for "<strong>{{ last_skill_search }}</strong>"</h2>
+                <h2>Results for "<strong>{{ skill_search }}</strong>"</h2>
 
                 <div class="skills-list">
                     <ul>
-                        {% for skill in skill_results %}
+                        {% for skill in skill_list %}
                         <li>    
                             <div class="skill-card">
                                 <form action="/add_single_skill" method="post">
                                     <input type="hidden" name="uri" value="{{ skill.uri }}">
                                     <input type="hidden" name="name" value="{{ skill.name }}">
+                                    <input type="hidden" name="skill_search" value="{{ skill_search }}">
                                     
                                     <h3>{{ skill.name | title}}</h3>
 
@@ -110,9 +108,9 @@
                     </ul>
                 </div>
             {% else %}
-                {% if last_skill_search %}
+                {% if skill_search %}
                     <div class="no-results">
-                        <p>No skills found for "<strong>{{ last_skill_search }}</strong>".</p>
+                        <p>No skills found for "<strong>{{ skill_search }}</strong>".</p>
                         <p style="font-size: 0.9em; color: #666;">Try checking the spelling or use another term.</p>
                     </div>
                 {% endif %}

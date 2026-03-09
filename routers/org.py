@@ -162,11 +162,12 @@ async def change_password(request: Request, org: Organization = Depends(get_curr
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
     if not pwd_context.verify(old_pw, org.hashed_password):
-        error = "Your old password is not correct."
+        warning = "Your old password is not correct."
         return templates.TemplateResponse("org/org_profile.html", {
             "request": request,
             "org": org,
-            "wrong_pw": error,
+            "toast_msg": warning,
+            "toast_type": "warning",
             "countries_list": EU_COUNTRIES
         })
     
@@ -174,22 +175,13 @@ async def change_password(request: Request, org: Organization = Depends(get_curr
 
     success = crud_org.change_password_org(org, new_pw_hashed)
 
-    if success:
-        msg = "Password updated successfully!"
-        return templates.TemplateResponse("org/org_profile.html", {
-            "request": request,
-            "org": org,
-            "success": msg,
-            "countries_list": EU_COUNTRIES
-        })
-    else:
-        failed = "Failed to update your password."
-        return templates.TemplateResponse("org/org_profile.html", {
-            "request": request,
-            "org": org,
-            "failed": failed,
-            "countries_list": EU_COUNTRIES
-        })
+    return templates.TemplateResponse("org/org_profile.html", {
+        "request": request,
+        "org": org,
+        "members": crud_user.get_users_by_usernames(org.members),
+        "toast_msg": "Password updated successfully!" if success else "Failed to update your password.",
+        "toast_type": "success" if success else "error"
+    })
     
 ### --- Invite Member --- ###
 @router.post("/invite_member", response_class=HTMLResponse)
@@ -201,30 +193,33 @@ async def invite_member(
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    error_msg = None
-    success_msg = None
+    msg = None
 
     members = org.members
     invited = False
     user_to_invite = crud_user.get_user_by_username(username_to_invite)
 
     if not user_to_invite:
-        error_msg = "User not found."
+        msg = "User not found."
+        type = "error"
     elif user_to_invite.username in members:
-        error_msg = "This user is already in your team."
+        msg = "This user is already in your team."
+        type = "warning"
     else:
         invited = crud_org.create_invitation(org.orgname, user_to_invite.username)
         if invited:
-            success_msg = f"Invitation sent to '{username_to_invite}' successfully!"
+            msg = f"Invitation sent to '{username_to_invite}' successfully!"
+            type = "success"
         else:
-            error_msg = "Failed to send invitation. Please try again."
+            msg = "Failed to send invitation. Please try again."
+            type = "error"
 
     return templates.TemplateResponse("org/org_profile.html", {
         "request": request,
         "org": org,
         "members": crud_user.get_users_by_usernames(org.members),
-        "invite_error": error_msg,
-        "invite_success": success_msg
+        "toast_msg": msg,
+        "toast_type": type
     })
 
 ### --- Create Project GET --- ###
@@ -254,12 +249,10 @@ async def create_project_submit(
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    final_assigned_members = set(assigned_members)
-
     new_project = Project(
         name=name,
         description=description,
-        assigned_members=list(final_assigned_members),
+        assigned_members=list(set(assigned_members)),
         target_roles=[], 
         skill_gap=[]
     )
@@ -276,7 +269,8 @@ async def view_project(
     project_id: str, 
     org: Organization = Depends(get_current_org),
     error: str = Query(None), 
-    success: str = Query(None)
+    success: str = Query(None),
+    warning: str = Query(None)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -310,6 +304,9 @@ async def view_project(
         forecast_results = None
         country = None
 
+    toast_msg = success or error or warning
+    toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
+
     return templates.TemplateResponse("org/project_detail.html", {
         "request": request,
         "org": org,
@@ -321,8 +318,8 @@ async def view_project(
         "recommended_courses": recommended_courses,
         "forecast_results": forecast_results,
         "country": country,
-        "member_error": error,    
-        "member_success": success
+        "toast_msg": toast_msg,
+        "toast_type": toast_type
     })
 
 ### --- Project Search Role --- ###
@@ -342,23 +339,13 @@ async def project_search_role(
             return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
     
     role = search.title().strip()
-    language = "en"
-    role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
-
-    team = crud_user.get_users_by_usernames(current_project.assigned_members)
+    role_list = escoAPI.get_esco_occupations_list(role, language="en", limit=10)
 
     PROJECT_ROLES_LIST[current_project.id] = {
         "last_search": search,
         "results": role_list
     }
-    return templates.TemplateResponse("org/project_detail.html", {
-        "request": request,
-        "org": org,
-        "current_project": current_project,
-        "results": role_list,
-        "last_search": search,
-        "team": team
-    })
+    return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
     
 ### --- Role details for Org. projects --- ###
 @router.post("/role_details_for_project", response_class=HTMLResponse)
@@ -532,21 +519,35 @@ async def add_member_to_project(
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
     
     user_in_org = next((u for u in org.members if u == username_to_add), None)
-    redirect_url = f"/org/project/{project_id}"
 
     if not user_in_org:
-        error_msg = urllib.parse.quote(f"User '{username_to_add}' is not a member of your organization.")
-        return RedirectResponse(url=f"{redirect_url}?error={error_msg}", status_code=status.HTTP_303_SEE_OTHER)
+        msg = f"User '{username_to_add}' is not a member of your organization."
+        type_msg = "warning"
     
-    if username_to_add in project.assigned_members:
-        error_msg = urllib.parse.quote(f"User '{username_to_add}' is already assigned to this project.")
-        return RedirectResponse(url=f"{redirect_url}?error={error_msg}", status_code=status.HTTP_303_SEE_OTHER)
+    elif username_to_add in project.assigned_members:
+        msg = f"User '{username_to_add}' is already assigned to this project."
+        type_msg = "warning"
     
-    project.assigned_members.append(username_to_add)
-    crud_org.update_org(org)
-       
-    success_msg = urllib.parse.quote(f"User '{username_to_add}' added to the project successfully!")
-    return RedirectResponse(url=f"{redirect_url}?success={success_msg}", status_code=status.HTTP_303_SEE_OTHER)
+    else:
+        project.assigned_members.append(username_to_add)
+        crud_org.update_org(org)
+        msg = f"User '{username_to_add}' added to the project successfully!"
+        type_msg = "success"
+
+    encoded_msg = urllib.parse.quote(msg)
+    param = "success" if type_msg == "success" else ("warning" if type_msg == "warning" else "error")
+    return RedirectResponse(url=f"/org/project/{project_id}?{param}={encoded_msg}", status_code=status.HTTP_303_SEE_OTHER)
+
+    return templates.TemplateResponse("org/project_detail.html", {
+        "request": request,
+        "org": org,
+        "current_project": project,
+        "team": crud_user.get_users_by_usernames(project.assigned_members),
+        "countries_list": EU_COUNTRIES,
+        "current_year": datetime.now().year,
+        "toast_msg": msg,
+        "toast_type": type_msg
+    })
 
 ### --- Project Calculate Skill Gap POST --- ###
 @router.post("/org/project/calculate_forecast_and_gap")

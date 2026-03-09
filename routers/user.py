@@ -1,9 +1,11 @@
 import ast
 from datetime import datetime
-from fastapi import APIRouter, Request, Form, UploadFile, File, status, Depends
+from fastapi import APIRouter, Query, Request, Form, UploadFile, File, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
 from typing import Optional
+
+import urllib
 from crud import crud_user, crud_org
 from dependencies import get_current_user
 import csv
@@ -13,11 +15,6 @@ from config import templates, pwd_context
 import crud.crud_skill_models as crud_skill_models
 from esco import escoAPI
 from models import Role, Skill, User
-
-USER_ROLES_LIST = {}
-USER_SKILLS_LIST = {}
-USER_COURSES_LIST = {}
-USER_FORECAST_RESULTS = {}
 
 EU_COUNTRIES = [
     "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", 
@@ -63,53 +60,53 @@ async def user_login(username: str = Form(...), password: str = Form(...)):
 
 ### --- Logout --- ###
 @router.get("/user_logout")
-async def logout(user: User = Depends(get_current_user)):
+async def logout():
     response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
     # Delete current session
     response.set_cookie(key="session_token", value="", path="/", httponly=True, max_age=0)
-
-    if user.username in USER_ROLES_LIST:
-        del USER_ROLES_LIST[user.username]
-    if user.username in USER_COURSES_LIST:
-        del USER_COURSES_LIST[user.username]
-    if user.username in USER_FORECAST_RESULTS:
-        del USER_FORECAST_RESULTS[user.username]
     return response
 
 ### --- User Home --- ###
 @router.get("/user_home", response_class=HTMLResponse)
-async def user_home(request: Request, user: User = Depends(get_current_user)):
+async def user_home(
+    request: Request, 
+    user: User = Depends(get_current_user),
+    role_search: Optional[str] = Query(None),
+    skill_search: Optional[str] = Query(None),
+    error: Optional[str] = Query(None),
+    success: Optional[str] = Query(None),
+    warning: Optional[str] = Query(None)
+):
 
     if not user:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-        response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
 
-    saved_roles = USER_ROLES_LIST.get(user.username, {})
-    results = saved_roles.get("results")
-    last_search = saved_roles.get("last_search") or ""
+    role_list = None
+    skill_list = None
 
-    saved_skills = USER_SKILLS_LIST.get(user.username, {})
-    skill_results = saved_skills.get("results")
-    last_skill_search = saved_skills.get("last_search") or ""
+    if role_search and role_search.strip():
+        role_search = role_search.title().strip()
+        role_list = escoAPI.get_esco_occupations_list(role_search, language="en", limit=10)
+    
+    if skill_search and skill_search.strip():
+        skill_search = skill_search.title().strip()
+        skill_list = escoAPI.get_esco_skills_list(skill_search, language="en", limit=10)
 
-    response = templates.TemplateResponse("user/user_home.html", {
-        "request": request, 
-        "user": user, 
-        "results": results, 
-        "last_search": last_search,
-        "skill_results": skill_results,
-        "last_skill_search": last_skill_search
+    toast_msg = success or error or warning
+    toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
+
+    return templates.TemplateResponse("user/user_home.html", {
+        "request": request,
+        "user": user,
+        "role_list": role_list,
+        "role_search": role_search,
+        "skill_list": skill_list,
+        "skill_search": skill_search,
+        "toast_msg": toast_msg,
+        "toast_type": toast_type
     })
-
-    # No cache storage
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    response.headers["Vary"] = "Cookie"
-
-    return response
 
 ### --- User GET Registration --- ###
 @router.get("/user_register", response_class=HTMLResponse)
@@ -139,7 +136,13 @@ async def register_user(
     
 ### --- User Profile --- ###
 @router.get("/user_profile", response_class=HTMLResponse)
-async def user_profile(request: Request, user: User = Depends(get_current_user)):
+async def user_profile(
+    request: Request, 
+    user: User = Depends(get_current_user),
+    success: str = Query(None), 
+    error: str = Query(None),
+    warning: str = Query(None)
+):
     
     if not user:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -148,91 +151,20 @@ async def user_profile(request: Request, user: User = Depends(get_current_user))
 
     invitations = crud_user.get_pending_invitations_for_user(user.username)
         
-    if user.username in USER_COURSES_LIST:
-        session_data = USER_COURSES_LIST[user.username]
-        recommended_courses = session_data["results"]
-    else:
-        recommended_courses = None
-
-    if user.username in USER_FORECAST_RESULTS:
-        session_data = USER_FORECAST_RESULTS[user.username]
-        forecast_results = session_data["results"]
-        country = session_data["country"]
-    else:
-        forecast_results = None
-        country = None
-
-    response = templates.TemplateResponse(
-        "user/user_profile.html", {
-            "request": request, 
-            "user": user, 
-            "countries_list": EU_COUNTRIES,
-            "invitations": invitations,
-            "recommended_courses": recommended_courses,
-            "forecast_results": forecast_results,
-            "country": country,
-            "current_year": datetime.now().year
-        }
-    )
-
-    # No cache storage
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    response.headers["Vary"] = "Cookie"
-
-    return response
-
-### --- Obtain roles from User Input --- ###
-@router.post("/role_list", response_class=HTMLResponse)
-async def role_list(request: Request, search: str = Form(...), user: User = Depends(get_current_user)):
-    if not user:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    toast_msg = success or error or warning
+    toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
     
-    role = search.title().strip()
-    language = "en"
-    role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
-    
-    USER_ROLES_LIST[user.username] = {
-        "last_search": search,
-        "results": role_list
-    }
-    
-    saved_skills = USER_SKILLS_LIST.get(user.username, {})
-
-    return templates.TemplateResponse("user/user_home.html", {
-        "request": request,
-        "user": user,
-        "results": role_list,
-        "last_search": search,
-        "skill_results": saved_skills.get("results"),
-        "last_skill_search": saved_skills.get("last_search") or ""
-    })
-
-### --- Obtain skill list from user input --- ###
-@router.post("/skill_list", response_class=HTMLResponse)
-async def skill_list(request: Request, search: str = Form(...), user: User = Depends(get_current_user)):
-    if not user:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    
-    skill = search.title().strip()
-    language = "en"
-    skill_list = escoAPI.get_esco_skills_list(skill, language=language, limit=10)
-    
-    USER_SKILLS_LIST[user.username] = {
-        "last_search": search,
-        "results": skill_list
-    }
-
-    saved_roles = USER_ROLES_LIST.get(user.username, {})
-
-    return templates.TemplateResponse("user/user_home.html", {
-        "request": request,
-        "user": user,
-        "skill_results": skill_list,
-        "last_skill_search": search,
-        "results": saved_roles.get("results"),
-        "last_search": saved_roles.get("last_search") or ""
+    return templates.TemplateResponse("user/user_profile.html", {
+        "request": request, 
+        "user": user, 
+        "countries_list": EU_COUNTRIES,
+        "invitations": invitations,
+        "toast_msg": toast_msg,
+        "toast_type": toast_type,
+        "current_year": datetime.now().year,
+        "forecast_results": None,
+        "recommended_courses": None,
+        "country": None
     })
 
 ### --- Set User Target Roles --- ###
@@ -251,21 +183,18 @@ async def add_to_user_target_roles(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
     form_data = await request.form()
-
     skills_list = []
 
     # Manual conversion from string to list[Skill]
     if essential_skills:
         try:
             skills_list = ast.literal_eval(essential_skills)
-            
             # Check
             if isinstance(skills_list, list):
                 skills_list = skills_list
             else:
                 print(f"Parsed_data not a valid list. Found type: {type(skills_list)}")
                 skills_list = []
-
         except (ValueError, SyntaxError) as e:
             print(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
             skills_list = []
@@ -277,7 +206,6 @@ async def add_to_user_target_roles(
 
     for skill_dict in skills_list:
         skill_uri = skill_dict.get("uri")
-        
         selected_level = form_data.get(f"level_{skill_uri}")
         
         if selected_level:
@@ -297,36 +225,23 @@ async def add_to_user_target_roles(
     )
 
     already_exists = any(r.id == role_id for r in user.target_roles)
-
+    encoded_uri = urllib.parse.quote(uri, safe='')
 
     if not already_exists:
         user.target_roles.append(role_object)
-        message_text = "Target role added successfully!"
-        message_type = "success"
         crud_user.update_user(user)
+        msg = urllib.parse.quote("Target role added successfully!")
+        return RedirectResponse(url=f"/details?uri={encoded_uri}&success={msg}", status_code=status.HTTP_303_SEE_OTHER)
     else:
-        message_text = "This role is already in your target list."
-        message_type = "warning"
-
-    return templates.TemplateResponse("details.html", {
-        "request": request,
-        "user": user,
-        "role": role_object,
-        "toast_msg": message_text,
-        "toast_type": message_type,
-        "is_user": True
-    })
+        msg = urllib.parse.quote("This role is already in your target list.")
+        return RedirectResponse(url=f"/details?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Add User Skills --- ###
 @router.post("/add_to_user_skills", response_class=HTMLResponse)
 async def add_to_user_skills(
     request: Request,
     user: User = Depends(get_current_user),
-    role_id: str = Form(...),
-    title: str = Form(...),
-    description: str = Form(...),
     essential_skills: str = Form(...),
-    id_full: str = Form(...),
     uri: str = Form(...)
 ):
     if not user:
@@ -374,27 +289,15 @@ async def add_to_user_skills(
                 existing_skills_dict[skill_uri] = new_skill
                 updated_skill = True
 
+    encoded_uri = urllib.parse.quote(uri, safe='')
+
     if updated_skill:
         crud_user.update_user(user)
-        message_text = "Role skills successfully added or updated in your profile!"
+        msg = urllib.parse.quote("Role skills successfully added or updated in your profile!")
+        return RedirectResponse(url=f"/details?uri={encoded_uri}&success={msg}", status_code=status.HTTP_303_SEE_OTHER)
     else:
-        message_text = "No changes were made. Skills are already at the selected levels or no level was selected."
-
-    return templates.TemplateResponse("details.html", {
-        "request": request,
-        "user": user,
-        "role": Role(
-            id=role_id,
-            title=title,
-            description=description if description else "No description available.",
-            essential_skills=skills_list,
-            id_full=id_full,
-            uri=uri
-        ),
-        "toast_msg": message_text,
-        "toast_type": "success" if updated_skill else "warning",
-        "is_user": True
-    })
+        msg = urllib.parse.quote("No changes were made. Skills are already at the selected levels or no level was selected.")
+        return RedirectResponse(url=f"/details?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Add Single Skill to User --- ###
 @router.post("/add_single_skill", response_class=HTMLResponse)
@@ -402,42 +305,34 @@ async def add_single_skill(
     request: Request,
     user: User = Depends(get_current_user),
     uri: str = Form(...),
-    name: str = Form(...)
+    name: str = Form(...),
+    skill_search: Optional[str] = Form(None)
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    saved_roles = USER_ROLES_LIST.get(user.username, {})
-    saved_skills = USER_SKILLS_LIST.get(user.username, {})
-    
-    results = saved_roles.get("results") or []
-    last_search = saved_roles.get("last_search") or ""
-    skill_results = saved_skills.get("results") or []
-    last_skill_search = saved_skills.get("last_search") or ""
 
     form_data = await request.form()
     selected_level = form_data.get(f"level_{uri}")
 
+    search_query = ""
+    if skill_search:
+        search_query = f"&skill_search={urllib.parse.quote(skill_search)}&"
+
     if not selected_level:
-        return templates.TemplateResponse("user/user_home.html", {
-            "request": request,
-            "user": user,
-            "toast_msg": "Please select a proficiency level first.",
-            "toast_type": "warning",
-            "results": results,
-            "last_search": last_search,
-            "skill_results": skill_results,
-            "last_skill_search": last_skill_search
-        })
+        msg = urllib.parse.quote("Please select a proficiency level first.")
+        return RedirectResponse(url=f"/user_home?{search_query}warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
     skill_level = int(selected_level)
     skill_found = False
+    toast_type = "success"
 
     for existing_skill in user.current_skills:
         if existing_skill.uri == uri:
             skill_found = True
             if existing_skill.level == skill_level:
                 message_text = "You already have this skill at this exact level."
+                toast_type = "warning"
             else:
                 existing_skill.level = skill_level
                 message_text = f"Skill \"{existing_skill.name}\" updated to level {skill_level}!"
@@ -450,16 +345,9 @@ async def add_single_skill(
 
     crud_user.update_user(user)
 
-    return templates.TemplateResponse("user/user_home.html", {
-        "request": request,
-        "user": user,
-        "toast_msg": message_text,
-        "toast_type": "success",
-        "results": results,
-        "last_search": last_search,
-        "skill_results": skill_results,
-        "last_skill_search": last_skill_search
-    })
+    msg = urllib.parse.quote(message_text)
+
+    return RedirectResponse(url=f"/user_home?{search_query}{toast_type}={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Password Change --- ###
 @router.post("/change_password_user", response_class=HTMLResponse)
@@ -486,32 +374,25 @@ async def change_password(
     new_pw_hashed = pwd_context.hash(new_pw)
 
     success = crud_user.change_password_user(user, new_pw_hashed)
-
-    if success:
-        msg = "Password updated successfully!"
-        return templates.TemplateResponse("user/user_profile.html", {
-            "request": request,
-            "user": user,
-            "toast_msg": msg,
-            "toast_type": "success",
-            "countries_list": EU_COUNTRIES
-        })
-    else:
-        failed = "Failed to update your password."
-        return templates.TemplateResponse("user/user_profile.html", {
-            "request": request,
-            "user": user,
-            "toast_msg": failed,
-            "toast_type": "error",
-            "countries_list": EU_COUNTRIES,
-        })
+    
+    return templates.TemplateResponse("user/user_profile.html", {
+        "request": request,
+        "user": user,
+        "toast_msg": "Password updated successfully!" if success else "Failed to update your password.",
+        "toast_type": "success" if success else "error",
+        "countries_list": EU_COUNTRIES
+    })
     
 ### --- Details for a selected Skill Model --- ###
-@router.post("/details", response_class=HTMLResponse)
+@router.get("/details", response_class=HTMLResponse)
 async def details_page(
     request: Request, 
-    uri: str = Form(...),
-    user: User = Depends(get_current_user)):
+    uri: str = Query(...),
+    user: User = Depends(get_current_user),
+    success: Optional[str] = Query(None),
+    warning: Optional[str] = Query(None),
+    error: Optional[str] = Query(None)
+):
 
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -521,11 +402,16 @@ async def details_page(
     if not selected_role:
         return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 
+    toast_msg = success or warning or error
+    toast_type = "success" if success else ("warning" if warning else ("error" if error else None))
+
     return templates.TemplateResponse("details.html", {
         "request": request,
         "user": user,
         "is_user": True,
         "role": selected_role,
+        "toast_msg": toast_msg,
+        "toast_type": toast_type
     })
     
 ### --- Delete Target Role from User --- ###    
@@ -581,14 +467,8 @@ async def occupation_forecast_and_gap(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     if len(user.target_roles) > 5:
-        error = "You can analyze up to 5 target roles at a time."
-        return templates.TemplateResponse("user/user_profile.html", {
-            "request": request,
-            "user": user,
-            "toast_msg": error,
-            "toast_type": "error",
-            "countries_list": EU_COUNTRIES
-        })
+        msg = urllib.parse.quote("You can analyze up to 5 target roles at a time.")
+        return RedirectResponse(url=f"/user_profile?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
     forecast_results = []
     role_list = []
@@ -612,11 +492,6 @@ async def occupation_forecast_and_gap(
     updated_user = crud_skill_models.skill_gap_user(user, role_list)
     crud_user.update_user(updated_user)
 
-    USER_FORECAST_RESULTS[updated_user.username] = {
-        "country": country,
-        "results": forecast_results
-    }
-
     # Course recommendation
     missing_skills = {}
     for role in updated_user.skill_gap:
@@ -639,10 +514,6 @@ async def occupation_forecast_and_gap(
     # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
     # assuming "Mechanical Engineer" and similar role as default role type
     recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills)
-
-    USER_COURSES_LIST[updated_user.username] = {
-        "results": recommended_courses
-    }
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
@@ -732,7 +603,7 @@ async def decline_invitation(
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Upload Skill via CSV ---###
-@router.post("/upload_skills_csv", response_class=RedirectResponse)
+@router.post("/upload_skills_csv", response_class=HTMLResponse)
 async def upload_skills_csv(
     request: Request,
     user: User = Depends(get_current_user),
@@ -742,8 +613,8 @@ async def upload_skills_csv(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     if not file.filename.lower().endswith('.csv'):
-        print(f"Errore: Il file {file.filename} non è un CSV.")
-        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
+        msg = urllib.parse.quote("Invalid file type. Please upload a CSV file.")
+        return RedirectResponse(url=f"/user_home?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
     content = await file.read()
     try:

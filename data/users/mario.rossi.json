@@ -184,6 +184,16 @@
             "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
             "name": "engineering principles",
             "level": 3
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/70de94f5-9575-4edd-bca7-c797b023b9d6",
+            "name": "Oracle WebLogic",
+            "level": 3
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/705f5906-9b08-4562-9544-46f6ab944a7e",
+            "name": "forest conservation",
+            "level": 4
         }
     ],
     "skill_gap": [

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block css %}
+    <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/org_profile.css">
 {% endblock %}
 
@@ -31,26 +32,6 @@
                 </summary>
                 
                 <div style="padding: 15px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 5px;">
-                    
-                    {% if wrong_pw %}
-                        <div class="wrong-case">
-                            ⚠️ {{ wrong_pw }}
-                        </div>
-                    {% endif %}
-
-                    {% if failed %}
-                        <div class="fail-case">
-                            ❌ {{ failed }}
-                        </div>
-                    {% endif %}
-
-                    {% if success %}
-                        <div class="success-case">
-                            ✅ {{ success }}
-                        </div>
-                    {% endif %}
-                    
-                    {% if not success %}
                     <form action="/change_password_org" method="post">
                         <label>Current Password:</label>
                         <input type="password" name="old_pw" required>
@@ -62,16 +43,11 @@
                         
                         <button type="submit">Confirm</button>
                     </form>
-                    {% endif %}
-
                 </div>
             </details>
         </div>
 
-        <hr style="width:100%; margin-top: 30px;">
-
-        {% if error %} <p class="status-err">{{ error }}</p> {% endif %}
-        {% if success %} <p class="status-ok">{{ success }}</p> {% endif %}
+        <hr class="hr">
 
         <div class="invitation-container">
             <div>
@@ -99,9 +75,6 @@
                     <input type="text" name="username_to_invite" placeholder="Username" required>
                     <button type="submit" class="btn-primary">Invite</button>
                 </form>
-
-                {% if invite_error %} <p class="status-err">{{ invite_error }}</p> {% endif %}
-                {% if invite_success %} <p class="status-ok">{{ invite_success }}</p> {% endif %}
             </div>
         </div>
     </div>
