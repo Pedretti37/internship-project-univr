@@ -139,14 +139,13 @@ async def register_user(
 async def user_profile(
     request: Request, 
     user: User = Depends(get_current_user),
-    success: str = Query(None), 
-    error: str = Query(None),
-    warning: str = Query(None)
+    success: Optional[str] = Query(None), 
+    error: Optional[str] = Query(None),
+    warning: Optional[str] = Query(None)
 ):
     
     if not user:
         response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-        response.set_cookie("session_token", value="", path="/", httponly=True, max_age=0)
         return response
 
     invitations = crud_user.get_pending_invitations_for_user(user.username)
@@ -184,6 +183,7 @@ async def add_to_user_target_roles(
     
     form_data = await request.form()
     skills_list = []
+    encoded_uri = urllib.parse.quote(uri, safe='')
 
     # Manual conversion from string to list[Skill]
     if essential_skills:
@@ -193,13 +193,15 @@ async def add_to_user_target_roles(
             if isinstance(skills_list, list):
                 skills_list = skills_list
             else:
-                print(f"Parsed_data not a valid list. Found type: {type(skills_list)}")
-                skills_list = []
+                msg = urllib.parse.quote(f"Parsed_data not a valid list. Found type: {type(skills_list)}")
+                return RedirectResponse(url=f"/details?uri={encoded_uri}&error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+            
         except (ValueError, SyntaxError) as e:
-            print(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
-            skills_list = []
+            msg = urllib.parse.quote(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
+            return RedirectResponse(url=f"/details?uri={encoded_uri}&error={msg}", status_code=status.HTTP_303_SEE_OTHER)
     else:
-        skills_list = []
+        msg = urllib.parse.quote("No essential skills data provided for this role.")
+        return RedirectResponse(url=f"/details?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 
     final_skills_list = []
@@ -225,7 +227,6 @@ async def add_to_user_target_roles(
     )
 
     already_exists = any(r.id == role_id for r in user.target_roles)
-    encoded_uri = urllib.parse.quote(uri, safe='')
 
     if not already_exists:
         user.target_roles.append(role_object)
@@ -365,9 +366,8 @@ async def change_password(
         msg = urllib.parse.quote(warning)
         return RedirectResponse(url=f"/user_profile?warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
-    
     new_pw_hashed = pwd_context.hash(new_pw)
-    success = crud_user.change_password_user(user, new_pw_hashed) # Update user too
+    success = crud_user.change_password_user(user, new_pw_hashed) # Updates user too
     
     if success:
         msg = urllib.parse.quote("Password updated successfully!")
@@ -401,7 +401,6 @@ async def details_page(
 
     return templates.TemplateResponse("details.html", {
         "request": request,
-        "user": user,
         "is_user": True,
         "role": selected_role,
         "toast_msg": toast_msg,
@@ -614,7 +613,8 @@ async def upload_skills_csv(
     try:
         decoded_content = content.decode('utf-8')
     except UnicodeDecodeError:
-        return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
+        msg = urllib.parse.quote("Failed to decode the file. Please ensure it's a valid UTF-8 encoded CSV.")
+        return RedirectResponse(url=f"/user_profile?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
     csv_reader = csv.DictReader(io.StringIO(decoded_content))
 

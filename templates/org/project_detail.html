@@ -92,40 +92,36 @@
         <div>
             <h3>Add a Role</h3>
             <div class="browsing-input">
-                <form action="/org/project/{{ current_project.id }}/search" method="post" class="role-form" autocomplete="off">
-                    <input type="text" name="search" class="input" placeholder="🔍 e.g. Software Engineer" value="{{ last_search }}" required>
+                <form action="/org/project/{{ current_project.id }}" method="get" class="role-form" autocomplete="off">
+                    <input type="text" name="search" class="input" placeholder="🔍 e.g. Software Engineer" value="{{ role_search }}" required>
                     <button type="submit" class="btn-primary">Search</button>
                 </form>
             </div>
 
             <div class="role-container">
-                {% if results %}
-                    <h3>Results for "<strong>{{ last_search }}</strong>"</h3>
+                {% if role_list %}
+                    <h3>Results for "<strong>{{ role_search }}</strong>"</h3>
 
                     <div class="roles-list">
                         <ul>
-                            {% for role in results %}
+                            {% for role in role_list %}
                             <li>    
                                 <div class="role-card">
-                                    <form action="/role_details_for_project" method="post" style="display: inline;">
-                                        <input type="hidden" name="uri" value="{{ role.uri }}">
-                                        <input type="hidden" name="project_id" value="{{ current_project.id }}">
-                                        
-                                        <h3>
-                                            <button type="submit" class="role-title">
-                                                {{ role.title | title}}
-                                            </button>
-                                        </h3>
-                                    </form>
+                                    <h3>
+                                        <!-- Link to role details page, urlencode for special characters -->
+                                        <a href="/role_details_for_project?uri={{ role.uri | urlencode }}&project_id={{ current_project.id }}" class="role-title" style="text-decoration: none;">
+                                            {{ role.title | title }}
+                                        </a>
+                                    </h3>
                                 </div>
                             </li>
                             {% endfor %}
                         </ul>
                     </div>
                 {% else %}
-                    {% if last_search %}
+                    {% if role_search %}
                         <div class="no-results">
-                            <p>No roles found for "<strong>{{ last_search }}</strong>".</p>
+                            <p>No roles found for "<strong>{{ role_search }}</strong>".</p>
                             <p style="font-size: 0.9em; color: #666;">Try checking the spelling or use another term.</p>
                         </div>
                     {% endif %}
