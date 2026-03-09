@@ -679,16 +679,14 @@ async def accept_invitation(
     user_skills_updated = False
     existing_skills_dict = {s.uri: s for s in user.current_skills}
 
-    # 2. Controlliamo tutti i progetti per "scongelare" l'utente e le sue skill
+    # Checking if user was in pending_members of any project within the organization
     for project in org.projects:
         pending_list = getattr(project, 'pending_members', [])
         
-        # Cerchiamo se l'utente è in stand-by per questo progetto
-        # Ricorda: pm è un dict tipo {"username": "m.rossi", "skills": [...]}
         pending_user_data = next((pm for pm in pending_list if pm["username"] == user.username), None)
         
         if pending_user_data:
-            # A. Scongeliamo e applichiamo le skill al profilo dell'utente
+            # Unlocking the skills data from the pending member
             for sk in pending_user_data["skills"]:
                 if sk["uri"] in existing_skills_dict:
                     if existing_skills_dict[sk["uri"]].level != sk["level"]:
@@ -700,21 +698,19 @@ async def accept_invitation(
                     existing_skills_dict[sk["uri"]] = new_skill
                     user_skills_updated = True
             
-            # B. Rimuoviamo l'utente dai pending_members
+            # Not pending anymore
             project.pending_members = [pm for pm in pending_list if pm["username"] != user.username]
             
-            # C. Lo promuoviamo nei membri attivi del progetto
+            # Promotion to assigned member
             if user.username not in project.assigned_members:
                 project.assigned_members.append(user.username)
 
-    # 3. Salviamo le modifiche se l'utente ha ricevuto nuove skill
+    # Update user
     if user_skills_updated:
         crud_user.update_user(user)
 
-    # 4. Rimuoviamo l'invito dalle notifiche dell'utente (inserisci qui la tua funzione attuale)
-    # crud_user.delete_invitation(user.username, org_name)
 
-    # 5. Salviamo l'organizzazione (che ora ha il progetto aggiornato)
+    # Update org
     crud_org.update_org(org)
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
@@ -746,7 +742,6 @@ async def upload_skills_csv(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     if not file.filename.lower().endswith('.csv'):
-        # Opzionale: puoi salvare un messaggio di errore nei cookie prima del redirect
         print(f"Errore: Il file {file.filename} non è un CSV.")
         return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 

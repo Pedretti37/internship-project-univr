@@ -720,7 +720,7 @@ async def confirm_project_skills_csv(
 
     form_data = await request.form()
     
-    # 1. Recuperiamo l'ID del progetto e i dati del form
+    # Data recovery
     project_id = form_data.get("project_id")
     total_rows_str = form_data.get("total_rows")
     
@@ -733,7 +733,7 @@ async def confirm_project_skills_csv(
         
     total_rows = int(total_rows_str)
     
-    # 2. Raggruppiamo le skill approvate per utente (username)
+    # Skill per user
     user_updates = {}
     
     for i in range(1, total_rows + 1):
@@ -762,19 +762,16 @@ async def confirm_project_skills_csv(
             "level": skill_level
         })
 
-    # Preparo il set per i membri del progetto (evita duplicati)
     members_to_assign = set(project.assigned_members) if project.assigned_members else set()
     pending_members_dict = {pm["username"]: pm for pm in getattr(project, 'pending_members', [])} if getattr(project, 'pending_members', None) else {}
 
-    # 3. Aggiorniamo i singoli profili degli utenti
+    # Update user skills and project membership based on the confirmed data
     for username, skills in user_updates.items():
         user = crud_user.get_user_by_username(username)
         if not user:
             continue 
 
-        # CONTROLLO: L'utente è già nell'organizzazione?
         if username in org.members:
-            # --- STRADA 1: L'utente è attivo. Aggiorniamo le sue skill nel DB. ---
             existing_skills_dict = {s.uri: s for s in user.current_skills}
             user_updated = False
 
@@ -793,22 +790,19 @@ async def confirm_project_skills_csv(
 
             members_to_assign.add(username)
             
-            # Se per caso era nei pending, lo rimuoviamo
             if username in pending_members_dict:
                 del pending_members_dict[username]
 
         else:
-            # --- STRADA 2: L'utente NON è nell'org. Salviamo username e skill in stand-by. ---
             pending_members_dict[username] = {
                 "username": username,
-                "skills": skills  # 'skills' è già la lista di dizionari pronta!
+                "skills": skills 
             }
 
-    # Assegniamo le liste aggiornate al progetto
+    # Update lists
     project.assigned_members = list(members_to_assign)
     project.pending_members = list(pending_members_dict.values())
 
     crud_org.update_org(org)
 
-    # Reindirizziamo l'utente alla dashboard del progetto appena aggiornato
     return RedirectResponse(url=f"/org/project/{project.id}", status_code=status.HTTP_303_SEE_OTHER)
