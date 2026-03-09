@@ -168,7 +168,7 @@ async def user_profile(
     })
 
 ### --- Set User Target Roles --- ###
-@router.post("/add_to_user_target_roles", response_class=HTMLResponse)
+@router.post("/add_to_user_target_roles", response_class=RedirectResponse)
 async def add_to_user_target_roles(
     request: Request,
     user: User = Depends(get_current_user),
@@ -237,7 +237,7 @@ async def add_to_user_target_roles(
         return RedirectResponse(url=f"/details?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Add User Skills --- ###
-@router.post("/add_to_user_skills", response_class=HTMLResponse)
+@router.post("/add_to_user_skills", response_class=RedirectResponse)
 async def add_to_user_skills(
     request: Request,
     user: User = Depends(get_current_user),
@@ -300,7 +300,7 @@ async def add_to_user_skills(
         return RedirectResponse(url=f"/details?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Add Single Skill to User --- ###
-@router.post("/add_single_skill", response_class=HTMLResponse)
+@router.post("/add_single_skill", response_class=RedirectResponse)
 async def add_single_skill(
     request: Request,
     user: User = Depends(get_current_user),
@@ -350,9 +350,8 @@ async def add_single_skill(
     return RedirectResponse(url=f"/user_home?{search_query}{toast_type}={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Password Change --- ###
-@router.post("/change_password_user", response_class=HTMLResponse)
+@router.post("/change_password_user", response_class=RedirectResponse)
 async def change_password(
-    request: Request, 
     user: User = Depends(get_current_user), 
     old_pw: str = Form(...), 
     new_pw: str = Form(...)
@@ -363,25 +362,20 @@ async def change_password(
     
     if not pwd_context.verify(old_pw, user.hashed_password):
         warning = "Your old password is not correct."
-        return templates.TemplateResponse("user/user_profile.html", {
-            "request": request,
-            "user": user,
-            "toast_msg": warning,
-            "toast_type": "warning",
-            "countries_list": EU_COUNTRIES
-        })
+        msg = urllib.parse.quote(warning)
+        return RedirectResponse(url=f"/user_profile?warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
     
     new_pw_hashed = pwd_context.hash(new_pw)
-
-    success = crud_user.change_password_user(user, new_pw_hashed)
+    success = crud_user.change_password_user(user, new_pw_hashed) # Update user too
     
-    return templates.TemplateResponse("user/user_profile.html", {
-        "request": request,
-        "user": user,
-        "toast_msg": "Password updated successfully!" if success else "Failed to update your password.",
-        "toast_type": "success" if success else "error",
-        "countries_list": EU_COUNTRIES
-    })
+    if success:
+        msg = urllib.parse.quote("Password updated successfully!")
+        toast_type = "success"
+    else:
+        msg = urllib.parse.quote("Failed to update your password.")
+        toast_type = "error"
+    return RedirectResponse(url=f"/user_profile?{toast_type}={msg}", status_code=status.HTTP_303_SEE_OTHER)
     
 ### --- Details for a selected Skill Model --- ###
 @router.get("/details", response_class=HTMLResponse)
