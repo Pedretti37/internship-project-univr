@@ -364,11 +364,6 @@ async def project_search_role(
 @router.post("/role_details_for_project", response_class=HTMLResponse)
 async def details_page(
     request: Request, 
-    role_id: str = Form(...),
-    title: str = Form(...),
-    description: Optional[str] = Form(None),
-    essential_skills: Optional[str] = Form(None),
-    id_full: str = Form(...),
     uri: str = Form(...),
     project_id: str = Form(...),
     org: Organization = Depends(get_current_org)):
@@ -376,37 +371,23 @@ async def details_page(
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    # Manual conversion from string to dict
-    if essential_skills:
-        try:
-            # ast.literal_eval manages {'key': 'value'}
-            e_skills_dict = ast.literal_eval(essential_skills)
-            
-            # Controllo extra: assicuriamoci che sia davvero un dict
-            if not isinstance(e_skills_dict, dict):
-                e_skills_dict = {}
-        except (ValueError, SyntaxError):
-            print(f"Errore nel parsing di essential_skills: {essential_skills}")
-            e_skills_dict = {}
-    else:
-        e_skills_dict = {}
+    current_project: Optional[Project] = next((p for p in org.projects if str(p.id) == project_id), None)
     
-    role_object = Role(
-        id=role_id,
-        title=title,
-        description=description if description else "No description available.",
-        essential_skills=e_skills_dict,
-        id_full=id_full,
-        uri=uri
-    )
+    if not current_project:
+            return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+
+    selected_role = escoAPI.get_single_role_details(uri, language="en")
+
+    if not selected_role:
+        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 
     return templates.TemplateResponse("details.html", {
         "request": request,
         "org": org,
+        "current_project": current_project,
         "is_user": False,
-        "role": role_object,
-        "project_id": project_id,
-        "updated_target_role": False
+        "role": selected_role,
+        "project_id": project_id
     })
 
 ### --- Project Add Role POST --- ###
@@ -424,46 +405,75 @@ async def project_add_role(
 ):
     if not org: return RedirectResponse(url="/", status_code=303)
 
-    # Manual conversion from string to dict
+    form_data = await request.form()
+
+    skills_list = []
+
+    # Manual conversion from string to list[Skill]
     if essential_skills:
         try:
-            # ast.literal_eval manages {'key': 'value'}
-            e_skills_dict = ast.literal_eval(essential_skills)
+            skills_list = ast.literal_eval(essential_skills)
             
-            # Controllo extra: assicuriamoci che sia davvero un dict
-            if not isinstance(e_skills_dict, dict):
-                e_skills_dict = {}
-        except (ValueError, SyntaxError):
-            print(f"Errore nel parsing di essential_skills: {essential_skills}")
-            e_skills_dict = {}
+            # Check
+            if isinstance(skills_list, list):
+                skills_list = skills_list
+            else:
+                print(f"Parsed_data not a valid list. Found type: {type(skills_list)}")
+                skills_list = []
+
+        except (ValueError, SyntaxError) as e:
+            print(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
+            skills_list = []
     else:
-        e_skills_dict = {}
+        skills_list = []
+
+
+    final_skills_list = []
+
+    for skill_dict in skills_list:
+        skill_uri = skill_dict.get("uri")
+        
+        selected_level = form_data.get(f"level_{skill_uri}")
+        
+        if selected_level:
+            skill_dict["level"] = int(selected_level)
+        else:
+            skill_dict["level"] = 5  # Default level if not selected, can be adjusted as needed
+            
+        final_skills_list.append(Skill(**skill_dict))
 
     role_object = Role(
         id=role_id,
         title=title,
         description=description if description else "No description available.",
-        essential_skills=e_skills_dict,
+        essential_skills=final_skills_list,
         id_full=id_full,
         uri=uri
     )
 
-    message_text = "Error: target role not added."
+    toast_msg = "Error: target role not added."
+    toast_type = "error"
     updated_target_role = False
-
     project_found = False
-    for project in org.projects:
+
+    for i, project in enumerate(org.projects):
         if str(project.id) == project_id:
             project_found = True
             already_exists = any(r.id == role_id for r in project.target_roles)
+            
             if not already_exists:
                 project.target_roles.append(role_object)
+                
+                org.projects[i] = project 
+                
                 updated_target_role = True
-                message_text = "Target role added successfully!"
-                break
+                toast_msg = f"Role '{title}' added to project successfully!"
+                toast_type = "success"  # Toast Verde ✅
             else:
-                updated_target_role = True
-                message_text = "This role is already in your target list."
+                toast_msg = f"The role '{title}' is already in your target list."
+                toast_type = "warning"  # Toast Giallo ⚠️
+            
+            break
 
     if not project_found:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
@@ -478,7 +488,8 @@ async def project_add_role(
         "role": role_object,
         "project_id": project_id,
         "updated_target_role": updated_target_role,
-        "message": message_text
+        "toast_msg": toast_msg,    
+        "toast_type": toast_type  
     })
 
 ### --- Delete Target Role from Project --- ###    
@@ -741,7 +752,6 @@ async def confirm_project_skills_csv(
         uri_and_name = form_data.get(f"uri_name_{i}")
         level_str = form_data.get(f"level_{i}")
         
-        # Se c'è un dato mancante o l'utente ha scelto SKIP, saltiamo la riga
         if not username or not uri_and_name or uri_and_name == "SKIP":
             continue
             

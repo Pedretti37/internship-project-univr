@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block css %}
+    <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/user_home.css">
 {% endblock %}
 
@@ -103,9 +104,6 @@
                                             Add
                                     </button>
                                 </form>
-                                {% if skill_message and uri_skill_selected == skill.uri %}
-                                    <p>{{ skill_message }}</p>
-                                {% endif %}
                             </div>
                         </li>
                         {% endfor %}

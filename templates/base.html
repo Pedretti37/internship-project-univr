@@ -4,22 +4,46 @@
     <meta charset="UTF-8">
     <title>Internship Project</title>
     
-    <!-- <link rel="stylesheet" href="/static/css/styles.css"> -->
-
     {% block css %}{% endblock %}
 </head>
 <body>
     {% block content %}{% endblock %}
-    <script>
-    window.addEventListener("pageshow", function(event) {
-        var historyTraversal = event.persisted || 
-                               (typeof window.performance != "undefined" && 
-                                window.performance.navigation.type === 2);
 
-        if (historyTraversal) {
-            window.location.reload();
-        }
-    });
-</script>
+    {% if toast_msg %}
+        <div id="custom-toast" class="custom-toast show {{ toast_type | default('success') }}">
+            <div class="toast-icon">
+                {% if toast_type == 'error' %} ❌
+                {% elif toast_type == 'warning' %} ⚠️
+                {% else %} ✅ {% endif %}
+            </div>
+            <div class="toast-body">
+                {{ toast_msg }}
+            </div>
+        </div>
+    {% endif %}
+
+    <script>
+        window.addEventListener("pageshow", function(event) {
+            var historyTraversal = event.persisted || 
+                                (typeof window.performance != "undefined" && 
+                                    window.performance.navigation.type === 2);
+
+            if (historyTraversal) {
+                window.location.reload();
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toast = document.getElementById("custom-toast");
+            
+            if (toast && toast.classList.contains("show")) {
+                setTimeout(function() {
+                    toast.classList.remove("show");
+                }, 3000); 
+            }
+        });
+    </script>
 </body>
 </html>

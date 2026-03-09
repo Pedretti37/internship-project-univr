@@ -296,27 +296,24 @@ async def add_to_user_target_roles(
         uri=uri
     )
 
-    updated_target_role = False
     already_exists = any(r.id == role_id for r in user.target_roles)
 
 
     if not already_exists:
         user.target_roles.append(role_object)
-        updated_target_role = True
         message_text = "Target role added successfully!"
-    else:
-        updated_target_role = True
-        message_text = "This role is already in your target list."
-
-    if updated_target_role:
+        message_type = "success"
         crud_user.update_user(user)
+    else:
+        message_text = "This role is already in your target list."
+        message_type = "warning"
 
     return templates.TemplateResponse("details.html", {
         "request": request,
         "user": user,
         "role": role_object,
-        "updated_target_role": updated_target_role,
-        "message": message_text,
+        "toast_msg": message_text,
+        "toast_type": message_type,
         "is_user": True
     })
 
@@ -394,8 +391,8 @@ async def add_to_user_skills(
             id_full=id_full,
             uri=uri
         ),
-        "updated_skill": updated_skill,
-        "message": message_text,
+        "toast_msg": message_text,
+        "toast_type": "success" if updated_skill else "warning",
         "is_user": True
     })
 
@@ -425,8 +422,8 @@ async def add_single_skill(
         return templates.TemplateResponse("user/user_home.html", {
             "request": request,
             "user": user,
-            "skill_message": "⚠️ Please select a proficiency level first.",
-            "uri_skill_selected": uri,
+            "toast_msg": "Please select a proficiency level first.",
+            "toast_type": "warning",
             "results": results,
             "last_search": last_search,
             "skill_results": skill_results,
@@ -443,21 +440,21 @@ async def add_single_skill(
                 message_text = "You already have this skill at this exact level."
             else:
                 existing_skill.level = skill_level
-                message_text = f"Skill updated to level {skill_level}!"
+                message_text = f"Skill \"{existing_skill.name}\" updated to level {skill_level}!"
             break
 
     if not skill_found:
         new_skill = Skill(uri=uri, name=name, level=skill_level)
         user.current_skills.append(new_skill)
-        message_text = "Skill added to your profile!"
+        message_text = f"Skill \"{new_skill.name}\" added to your profile!"
 
     crud_user.update_user(user)
 
     return templates.TemplateResponse("user/user_home.html", {
         "request": request,
         "user": user,
-        "skill_message": message_text,
-        "uri_skill_selected": uri,
+        "toast_msg": message_text,
+        "toast_type": "success",
         "results": results,
         "last_search": last_search,
         "skill_results": skill_results,
@@ -477,11 +474,12 @@ async def change_password(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
     if not pwd_context.verify(old_pw, user.hashed_password):
-        error = "Your old password is not correct."
+        warning = "Your old password is not correct."
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
             "user": user,
-            "wrong_pw": error,
+            "toast_msg": warning,
+            "toast_type": "warning",
             "countries_list": EU_COUNTRIES
         })
     
@@ -494,7 +492,8 @@ async def change_password(
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
             "user": user,
-            "success": msg,
+            "toast_msg": msg,
+            "toast_type": "success",
             "countries_list": EU_COUNTRIES
         })
     else:
@@ -502,7 +501,8 @@ async def change_password(
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
             "user": user,
-            "failed": failed,
+            "toast_msg": failed,
+            "toast_type": "error",
             "countries_list": EU_COUNTRIES,
         })
     
@@ -519,7 +519,6 @@ async def details_page(
     selected_role = escoAPI.get_single_role_details(uri, language="en")
 
     if not selected_role:
-        error_msg = "Impossibile caricare i dettagli da ESCO in questo momento."
         return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 
     return templates.TemplateResponse("details.html", {
@@ -586,7 +585,8 @@ async def occupation_forecast_and_gap(
         return templates.TemplateResponse("user/user_profile.html", {
             "request": request,
             "user": user,
-            "error": error,
+            "toast_msg": error,
+            "toast_type": "error",
             "countries_list": EU_COUNTRIES
         })
 

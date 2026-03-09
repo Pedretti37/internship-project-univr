@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block css %}
+    <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/details.css">
 {% endblock %}
 
@@ -86,28 +87,10 @@
                     </div>
                 </form>
             </div>
-
-            <div class="mt-3">
-                {% if updated_target_role or updated_skill %}
-                    <p class="message alert alert-success">{{ message }}</p>
-                {% elif message %}
-                    <p class="message alert alert-info">{{ message }}</p>
-                {% endif %}
-            </div>
         {% else %}
             <div class="details-box">
                 <h2>Tasks & Responsibilities</h2>
                 <h3>Essential Skills:</h3>
-                
-                {% if role.essential_skills %}
-                    <ul class="list-group">
-                        {% for skill in role.essential_skills %}
-                        <li class="list-group-item">
-                            <span>{{ skill.name }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
 
                 <form action="/add_to_project_target_roles" method="post">
                     <input type="hidden" name="project_id" value="{{ project_id }}">
@@ -118,18 +101,35 @@
                     <input type="hidden" name="id_full" value="{{ role.id_full }}">
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
-                    <button type="submit" class="btn btn-primary">
-                        <span>Add to Project's Target Roles</span>
-                    </button>
-                </form>
-                
-                <div>
-                    {% if updated_target_role %}
-                        <p class="message alert alert-success">{{ message }}</p>
-                    {% elif message %}
-                        <p class="message alert alert-info">{{ message }}</p>
+                    {% if role.essential_skills %}
+                        <ul class="list-group mb-4">
+                            {% for skill in role.essential_skills %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>{{ skill.name | capitalize }}</span>
+                                
+                                <select name="level_{{ skill.uri }}" class="form-select form-select-sm" style="width: auto;">
+                                    <option value="">-- Seleziona Livello --</option>
+                                    <option value="1">1 - Principiante</option>
+                                    <option value="2">2 - Base</option>
+                                    <option value="3">3 - Intermedio-basso</option>
+                                    <option value="4">4 - Buono</option>
+                                    <option value="5">5 - Intermedio</option>
+                                    <option value="6">6 - Avanzato</option>
+                                    <option value="7">7 - Esperto</option>
+                                    <option value="8">8 - Master</option>
+                                    <option value="9">9 - Guru</option>
+                                </select>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     {% endif %}
-                </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary">
+                            Add to my Target Roles
+                        </button>
+                    </div>
+                </form>
             </div>
         {% endif %}
     </div>
