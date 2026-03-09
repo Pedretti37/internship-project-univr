@@ -1,0 +1,27 @@
+{
+    "name": "Giacomo",
+    "surname": "Verdi",
+    "username": "giacomo.verdi",
+    "email": "giacomo.verdi@gmail.com",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$Yewdo9T6P4cQovSe876X0g$kMwWTRt2DXz1xIu1+ZOJ83HKL/npH7R2uPdrwcCXeno",
+    "target_roles": [],
+    "current_skills": [
+        {
+            "uri": "http://data.europa.eu/esco/skill/19a8293b-8e95-4de3-983f-77484079c389",
+            "name": "Java (computer programming)",
+            "level": 6
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/2857540c-180b-4208-9127-e94a01871966",
+            "name": "align software with system architectures",
+            "level": 5
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/9d2e926f-53d9-41f5-98f3-19dfaa687f3f",
+            "name": "tools for software configuration management",
+            "level": 8
+        }
+    ],
+    "skill_gap": [],
+    "organization": "simone.pedretti"
+}

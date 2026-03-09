@@ -1,0 +1,149 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9; 
+}
+
+.navbar {
+    display: flex;              
+    justify-content: space-between; 
+    align-items: center;        
+    
+    background-color: #2c3e50;  
+    color: white;
+    
+    height: 60px;             
+    width: 100%;               
+    padding: 0 20px;            
+    box-sizing: border-box;     
+    
+    position: fixed;            
+    top: 0;
+    left: 0;
+    z-index: 1000;              
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+}
+
+.nav-left {
+    font-size: 1.1rem;
+}
+
+.nav-right {
+    display: flex;
+    gap: 20px; 
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #ecf0f1;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #3498db; 
+}
+
+.main-container {
+    margin-top: 80px; 
+    padding: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hr {
+    width:100%; 
+    margin-top: 30px;
+}
+
+.details-box {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
+    border: 1px solid #e6e8eb; 
+    margin-top: 20px;
+}
+
+.details-box table {
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+.details-box table th,
+.details-box table td {
+    vertical-align: middle;
+    padding: 12px 15px; 
+}
+
+.details-box table th:nth-child(1),
+.details-box table td:nth-child(1) {
+    text-align: left;
+    width: 35%;
+}
+
+.details-box table th:nth-child(2),
+.details-box table td:nth-child(2) {
+    text-align: center;
+    width: 15%;
+}
+
+.details-box table th:nth-child(3),
+.details-box table td:nth-child(3) {
+    text-align: left;
+    width: 50%;
+}
+
+.details-box table select.form-select {
+    width: 100%;
+    max-width: 450px; 
+    cursor: pointer;
+}
+
+/* Stile universale per i bottoni blu */
+.btn-primary {
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: inherit;
+    text-align: center;
+}
+
+.btn-primary:hover {
+    background-color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(44, 62, 80, 0.3);
+}
+
+.btn-cancel {
+    background-color: #d62828;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: inherit;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn-cancel:hover {
+    background-color: #b51f1f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(214, 40, 40, 0.3);
+}
+
+.btns {
+    margin-top: 30px;
+}

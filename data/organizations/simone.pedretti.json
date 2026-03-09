@@ -6,41 +6,24 @@
     "orgname": "simone.pedretti",
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$Z6x1LgWAsPZeS2nNWQsBwA$BST2YWW+Kbf/WziynmLiupqZxsUJ9WR78M81h0Oc5dA",
     "members": [
-        "mario.rossi"
+        "mario.rossi",
+        "franco.neri",
+        "giacomo.verdi"
     ],
     "projects": [
         {
-            "id": "bd0278db-ecf2-4992-b903-df8cf0bb0cd8",
-            "name": "a",
-            "description": "a",
+            "id": "e92cc1da-7f06-4646-8015-dae701f28858",
+            "name": "Prova",
+            "description": "ciao",
             "assigned_members": [
-                "mario.rossi"
+                "mario.rossi",
+                "franco.neri",
+                "giacomo.verdi"
             ],
+            "pending_members": [],
             "target_roles": [],
             "skill_gap": [],
-            "created_at": "2026-03-05T10:26:44.504263Z"
-        },
-        {
-            "id": "9b9bdf7d-265d-405b-b6d5-88c4bcb0bf29",
-            "name": "b",
-            "description": "b",
-            "assigned_members": [
-                "mario.rossi"
-            ],
-            "target_roles": [],
-            "skill_gap": [],
-            "created_at": "2026-03-05T10:48:04.933687Z"
-        },
-        {
-            "id": "372dbdd8-bb33-4ee2-8671-c362c2b0c850",
-            "name": "Invitation",
-            "description": "a",
-            "assigned_members": [
-                "mario.rossi"
-            ],
-            "target_roles": [],
-            "skill_gap": [],
-            "created_at": "2026-03-05T13:33:30.439360Z"
+            "created_at": "2026-03-09T09:09:24.589932Z"
         }
     ]
 }

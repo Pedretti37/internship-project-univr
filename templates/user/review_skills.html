@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/review_skills.css">
+{% endblock %}
+
+{% block content %}
+    <nav class="navbar">
+        <div class="nav-left">
+            <span>Review Your <strong>Imported Skills</strong></span>
+        </div>
+
+        <div class="nav-right">
+            <a href="/user_home" class="nav-link">Home</a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <p>We found some matches for your CSV data. Please review them and select the most accurate ESCO terminology before saving.</p>
+
+        {% if skills_not_found %}
+            <div class="alert alert-warning">
+                <strong>⚠️ Not Found:</strong> We couldn't find matches for the following skills:
+                <ul class="mb-0">
+                    {% for nf in skills_not_found %}
+                        <li>{{ nf }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="details-box">
+            <form action="/confirm_skills_csv" method="post">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Your CSV Skill</th>
+                            <th>Level</th>
+                            <th>Official ESCO Match</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in skills_to_review %}
+                        <tr>
+                            <td><span style="color: #666;">{{ item.raw_name }}</span></td>
+                            
+                            <td>
+                                <span class="badge bg-secondary">{{ item.level }}</span>
+                                <input type="hidden" name="level_{{ loop.index }}" value="{{ item.level }}">
+                            </td>
+                            
+                            <td>
+                                <select name="uri_name_{{ loop.index }}" class="form-select">
+                                    <option value="SKIP">❌ Skip this skill (Do not import)</option>
+                                    {% for opt in item.options %}
+                                        <option value="{{ opt.uri }}|||{{ opt.name }}">
+                                            {{ opt.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <input type="hidden" name="total_rows" value="{{ skills_to_review|length }}">
+
+                <div class="btns">
+                    <a href="/user_home" class="btn-cancel">Cancel Import</a>
+                    <button type="submit" class="btn-primary">Confirm and Save to Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

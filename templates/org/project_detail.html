@@ -49,6 +49,19 @@
                 {% if member_error %} <p class="status-err">{{ member_error }}</p> {% endif %}
                 {% if member_success %} <p class="status-ok">{{ member_success }}</p> {% endif %}
             </div>
+
+            <div class="upload-section" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px;">
+                <h3>Upload your team's Skill Model (from MuchSkills)</h3>
+                <p>Select the CSV file containing your team's skill data.</p>
+                <p><small>
+                    If CSV file contains your employee usernames, their profile will be updated and they will be added to the project automatically.
+                </small></p>
+                <form action="/upload_project_skills_csv" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
+                    <input type="file" name="file" accept=".csv" class="form-control" required style="max-width: 300px;">
+                    <input type="hidden" name="project_id" value="{{ current_project.id }}">
+                    <button type="submit" class="btn btn-success">Upload CSV</button>
+                </form>
+            </div>
         </div>
 
         <hr class="hr">

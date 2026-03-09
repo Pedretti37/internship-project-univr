@@ -62,131 +62,26 @@
     ],
     "current_skills": [
         {
-            "uri": "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b",
-            "name": "adjust engineering designs",
-            "level": 9
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9",
-            "name": "mechanical engineering",
-            "level": 5
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
-            "name": "mechanics",
-            "level": 1
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
-            "name": "engineering principles",
-            "level": 8
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
-            "name": "perform scientific research",
-            "level": 2
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12",
-            "name": "approve engineering design",
-            "level": 5
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/75e48971-3242-4ea5-a1ba-4deec48ad41c",
-            "name": "plan teamwork",
-            "level": 8
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/76415d7f-0fde-4364-b45f-5c044580d2aa",
-            "name": "create AutoCAD drawings",
-            "level": 5
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d",
-            "name": "Python (computer programming)",
-            "level": 9
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/a50c6a0a-5171-4be6-aa2b-50fe4d025d45",
-            "name": "create 3D CAD footwear prototypes",
-            "level": 3
-        },
-        {
-            "uri": "http://data.europa.eu/esco/skill/7111b95d-0ce3-441a-9d92-4c75d05c4388",
-            "name": "project management",
+            "uri": "http://data.europa.eu/esco/skill/5ef0c719-5bcb-49f8-b8eb-824388225333",
+            "name": "use scripting programming",
             "level": 7
-        }
-    ],
-    "skill_gap": [
+        },
         {
-            "role_id": "2144",
-            "role_title": "mechanical engineer",
-            "match_score": 45,
-            "total_required": 9,
-            "matching_skills": [
-                {
-                    "uri": "http://data.europa.eu/esco/skill/f54c10e4-630d-4e50-95e9-4e9e268e8f12",
-                    "name": "approve engineering design",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b",
-                    "name": "adjust engineering designs",
-                    "level": 2
-                }
-            ],
-            "partially_matching_skills": [
-                {
-                    "skill": {
-                        "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
-                        "name": "perform scientific research",
-                        "level": 5
-                    },
-                    "user_level": 2
-                },
-                {
-                    "skill": {
-                        "uri": "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9",
-                        "name": "mechanical engineering",
-                        "level": 8
-                    },
-                    "user_level": 5
-                },
-                {
-                    "skill": {
-                        "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
-                        "name": "mechanics",
-                        "level": 6
-                    },
-                    "user_level": 1
-                },
-                {
-                    "skill": {
-                        "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
-                        "name": "engineering principles",
-                        "level": 9
-                    },
-                    "user_level": 8
-                }
-            ],
-            "missing_skills": [
-                {
-                    "uri": "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532",
-                    "name": "technical drawings",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462",
-                    "name": "use technical drawing software",
-                    "level": 4
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919",
-                    "name": "engineering processes",
-                    "level": 7
-                }
-            ]
+            "uri": "http://data.europa.eu/esco/skill/8369c2d6-c100-4cf6-bd83-9668d8678433",
+            "name": "utilise machine learning",
+            "level": 6
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/c95c29fe-3971-46b7-80e9-1f7e75ba99b3",
+            "name": "use specific data analysis software",
+            "level": 8
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/2e686e71-dd6a-45f0-bbda-0c01e2653de3",
+            "name": "maintain forest roads",
+            "level": 9
         }
     ],
+    "skill_gap": [],
     "organization": "simone.pedretti"
 }

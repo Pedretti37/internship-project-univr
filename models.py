@@ -39,6 +39,7 @@ class Project(BaseModel):
     name: str
     description: str
     assigned_members: List[str] = []
+    pending_members: List[dict] = []
     target_roles: List[Role] = []
     skill_gap: List[Dict[str, Any]] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

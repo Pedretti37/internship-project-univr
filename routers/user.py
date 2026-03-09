@@ -670,12 +670,52 @@ async def accept_invitation(
     org = crud_org.get_org_by_orgname(orgname)
     if org:
         org.members.append(user.username)
-        crud_org.update_org(org)
 
     inv = crud_org.get_inv_by_id(inv_id)
     if inv:
         inv.status = "accepted"
         crud_org.update_invitation(inv)
+
+    user_skills_updated = False
+    existing_skills_dict = {s.uri: s for s in user.current_skills}
+
+    # 2. Controlliamo tutti i progetti per "scongelare" l'utente e le sue skill
+    for project in org.projects:
+        pending_list = getattr(project, 'pending_members', [])
+        
+        # Cerchiamo se l'utente è in stand-by per questo progetto
+        # Ricorda: pm è un dict tipo {"username": "m.rossi", "skills": [...]}
+        pending_user_data = next((pm for pm in pending_list if pm["username"] == user.username), None)
+        
+        if pending_user_data:
+            # A. Scongeliamo e applichiamo le skill al profilo dell'utente
+            for sk in pending_user_data["skills"]:
+                if sk["uri"] in existing_skills_dict:
+                    if existing_skills_dict[sk["uri"]].level != sk["level"]:
+                        existing_skills_dict[sk["uri"]].level = sk["level"]
+                        user_skills_updated = True
+                else:
+                    new_skill = Skill(uri=sk["uri"], name=sk["name"], level=sk["level"])
+                    user.current_skills.append(new_skill)
+                    existing_skills_dict[sk["uri"]] = new_skill
+                    user_skills_updated = True
+            
+            # B. Rimuoviamo l'utente dai pending_members
+            project.pending_members = [pm for pm in pending_list if pm["username"] != user.username]
+            
+            # C. Lo promuoviamo nei membri attivi del progetto
+            if user.username not in project.assigned_members:
+                project.assigned_members.append(user.username)
+
+    # 3. Salviamo le modifiche se l'utente ha ricevuto nuove skill
+    if user_skills_updated:
+        crud_user.update_user(user)
+
+    # 4. Rimuoviamo l'invito dalle notifiche dell'utente (inserisci qui la tua funzione attuale)
+    # crud_user.delete_invitation(user.username, org_name)
+
+    # 5. Salviamo l'organizzazione (che ora ha il progetto aggiornato)
+    crud_org.update_org(org)
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -746,14 +786,14 @@ async def upload_skills_csv(
         else:
             skills_not_found.append(skill_name)
 
-    return templates.TemplateResponse("review_skills.html", {
+    return templates.TemplateResponse("user/review_skills.html", {
         "request": request,
         "user": user,
         "skills_to_review": skills_to_review,
         "skills_not_found": skills_not_found
     })
 
-### --- Confirm and Save CSV Skills (Fase 2: Salvataggio) --- ###
+### --- Confirm and Save CSV Skills --- ###
 @router.post("/confirm_skills_csv", response_class=RedirectResponse)
 async def confirm_skills_csv(
     request: Request,

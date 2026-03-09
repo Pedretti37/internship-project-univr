@@ -87,7 +87,7 @@
                                     <h3>{{ skill.name | title}}</h3>
 
                                     <select name="level_{{ skill.uri }}" class="selection">
-                                        <option value="">-- Seleziona Livello --</option>
+                                        <option value="">-- Select level --</option>
                                         <option value="1">1 - Principiante</option>
                                         <option value="2">2 - Base</option>
                                         <option value="3">3 - Intermedio-basso</option>
@@ -131,20 +131,5 @@
                 <button type="submit" class="btn btn-success">Upload CSV</button>
             </form>
         </div>
-        {% if skills_added %}
-            <div class="alert alert-success mt-4" translate="no">
-                <h4 class="alert-heading">✅ CSV Upload Successful!</h4>
-                <p>We processed the skills from your file and matched them to official ESCO terminologies:</p>
-                <hr>
-                <ul class="mb-0" style="list-style-type: none; padding-left: 0;">
-                    {% for raw_name, official_name in skills_added.items() %}
-                        <li style="margin-bottom: 5px;">
-                            📝 <span style="color: #666; text-decoration: line-through;">{{ raw_name }}</span> 
-                            ➔ <strong>{{ official_name }}</strong>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
     </div>
 {% endblock %}

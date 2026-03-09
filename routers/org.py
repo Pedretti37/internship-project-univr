@@ -71,13 +71,12 @@ async def logout(org: Organization = Depends(get_current_org)):
     # Delete current session
     response.set_cookie(key="session_token", value="", path="/", httponly=True, max_age=0)
 
-    for project in org.projects:
-        if project.id in PROJECT_ROLES_LIST:
-            del PROJECT_ROLES_LIST[project.id]
-        if project.id in PROJECT_COURSES_LIST:
-            del PROJECT_COURSES_LIST[project.id]
-        if project.id in PROJECT_FORECAST_RESULTS:
-            del PROJECT_FORECAST_RESULTS[project.id]
+    if org:
+        for project in org.projects:
+            PROJECT_ROLES_LIST.pop(project.id, None)
+            PROJECT_COURSES_LIST.pop(project.id, None)
+            PROJECT_FORECAST_RESULTS.pop(project.id, None)
+            
     return response
 
 ### --- Organization Home --- ###
@@ -251,64 +250,11 @@ async def create_project_submit(
     name: str = Form(...),
     description: str = Form(...),
     assigned_members: list[str] = Form(default=[]), 
-    file: UploadFile = File(None)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     final_assigned_members = set(assigned_members)
-
-    if file and file.filename and file.filename.endswith('.csv'):
-        csvReader = csv.DictReader(codecs.iterdecode(file.file, 'utf-8'))
-        extracted_skills = {}
-        
-        for row in csvReader:
-            username = row.get("Username")
-            skill_name = row.get("Skill_Name")
-            level_str = row.get("Proficiency_Level")
-            
-            if not username or not skill_name:
-                continue
-                
-            try:
-                level = int(level_str)
-            except ValueError:
-                level = 1
-
-            skill_uri = escoAPI.get_esco_skill_uri_by_name(skill_name, language="en")
-            
-            if not skill_uri:
-                print(f"⚠️ Skill ignorata: ESCO non ha trovato '{skill_name}'")
-                continue 
-                
-            sleep(0.05) # Rate limiting
-            
-            if username not in extracted_skills:
-                extracted_skills[username] = []
-                
-            extracted_skills[username].append({
-                "name": skill_name,
-                "uri": skill_uri, 
-                "level": level
-            })
-
-        for username, skills in extracted_skills.items():
-            user = crud_user.get_user_by_username(username)
-
-            if user:
-                if username in org.members:
-                    validated_skills = [Skill(**skill_dict) for skill_dict in skills]
-                    user.current_skills = validated_skills
-                    crud_user.update_user(user) 
-                    
-                    final_assigned_members.add(username)
-                
-                else:
-                    crud_org.create_invitation(org.orgname, username)
-                    print(f"📩 Inviata richiesta di iscrizione all'utente '{username}'.")
-                    
-            else:
-                print(f"⚠️ Utente {username} dal CSV non trovato nel database.")
 
     new_project = Project(
         name=name,
@@ -686,3 +632,183 @@ async def project_calculate_skill_gap(
         "current_year": datetime.now().year
     })
 
+### --- Upload Skills CSV for Project --- ###
+@router.post("/upload_project_skills_csv", response_class=HTMLResponse)
+async def upload_project_skills_csv(
+    request: Request,
+    project_id: str = Form(...),
+    file: UploadFile = File(...),
+    org: Organization = Depends(get_current_org)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    project = next((p for p in org.projects if str(p.id) == project_id), None)
+
+    if not project:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+
+    if not file.filename.lower().endswith('.csv'):
+        print(f"Errore: Il file {file.filename} non è un CSV.")
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+    
+    csvReader = csv.DictReader(codecs.iterdecode(file.file, 'utf-8'))
+    
+    skills_to_review = []
+    skills_not_found = []
+
+    known_users = {}
+
+    for row in csvReader:
+        username = row.get("username")
+        skill_name = row.get("skill_name")
+        level_str = row.get("level")
+        
+        if not username or not skill_name or not level_str:
+            continue
+            
+        try:
+            level = int(level_str)
+            skill_level = max(1, min(9, level))
+        except ValueError:
+            continue
+
+        if username not in known_users:
+            user = crud_user.get_user_by_username(username)
+            if user:
+                known_users[username] = True
+                if username not in org.members:
+                    crud_org.create_invitation(org.orgname, username)
+                    print(f"📩 Inviata richiesta di iscrizione a '{username}'.")
+            else:
+                known_users[username] = False
+                print(f"⚠️ Utente {username} non trovato nel database.")
+
+        if not known_users[username]:
+            continue
+
+        search_results = escoAPI.get_esco_skills_list(skill_name, language="en", limit=10)
+        
+        if search_results:
+            skills_to_review.append({
+                "username": username,
+                "raw_name": skill_name.capitalize(),
+                "level": skill_level,
+                "options": search_results
+            })
+        else:
+            skills_not_found.append({
+                "username": username,
+                "skill_name": skill_name
+            })
+
+    return templates.TemplateResponse("org/review_project_skills.html", {
+        "request": request,
+        "org": org,
+        "project_id": project_id,
+        "skills_to_review": skills_to_review,
+        "skills_not_found": skills_not_found
+    })
+
+@router.post("/org/confirm_project_skills", response_class=RedirectResponse)
+async def confirm_project_skills_csv(
+    request: Request,
+    org: Organization = Depends(get_current_org)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    form_data = await request.form()
+    
+    # 1. Recuperiamo l'ID del progetto e i dati del form
+    project_id = form_data.get("project_id")
+    total_rows_str = form_data.get("total_rows")
+    
+    if not project_id or not total_rows_str:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+
+    project = next((p for p in org.projects if str(p.id) == project_id), None)
+    if not project:
+        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+        
+    total_rows = int(total_rows_str)
+    
+    # 2. Raggruppiamo le skill approvate per utente (username)
+    user_updates = {}
+    
+    for i in range(1, total_rows + 1):
+        username = form_data.get(f"username_{i}")
+        uri_and_name = form_data.get(f"uri_name_{i}")
+        level_str = form_data.get(f"level_{i}")
+        
+        # Se c'è un dato mancante o l'utente ha scelto SKIP, saltiamo la riga
+        if not username or not uri_and_name or uri_and_name == "SKIP":
+            continue
+            
+        parts = uri_and_name.split("|||")
+        if len(parts) != 2:
+            continue
+            
+        skill_uri = parts[0]
+        official_name = parts[1]
+        skill_level = int(level_str)
+
+        if username not in user_updates:
+            user_updates[username] = []
+
+        user_updates[username].append({
+            "uri": skill_uri,
+            "name": official_name,
+            "level": skill_level
+        })
+
+    # Preparo il set per i membri del progetto (evita duplicati)
+    members_to_assign = set(project.assigned_members) if project.assigned_members else set()
+    pending_members_dict = {pm["username"]: pm for pm in getattr(project, 'pending_members', [])} if getattr(project, 'pending_members', None) else {}
+
+    # 3. Aggiorniamo i singoli profili degli utenti
+    for username, skills in user_updates.items():
+        user = crud_user.get_user_by_username(username)
+        if not user:
+            continue 
+
+        # CONTROLLO: L'utente è già nell'organizzazione?
+        if username in org.members:
+            # --- STRADA 1: L'utente è attivo. Aggiorniamo le sue skill nel DB. ---
+            existing_skills_dict = {s.uri: s for s in user.current_skills}
+            user_updated = False
+
+            for sk in skills:
+                if sk["uri"] in existing_skills_dict:
+                    if existing_skills_dict[sk["uri"]].level != sk["level"]:
+                        existing_skills_dict[sk["uri"]].level = sk["level"]
+                        user_updated = True
+                else:
+                    new_skill = Skill(uri=sk["uri"], name=sk["name"], level=sk["level"])
+                    user.current_skills.append(new_skill)
+                    user_updated = True
+
+            if user_updated:
+                crud_user.update_user(user)
+
+            members_to_assign.add(username)
+            
+            # Se per caso era nei pending, lo rimuoviamo
+            if username in pending_members_dict:
+                del pending_members_dict[username]
+
+        else:
+            # --- STRADA 2: L'utente NON è nell'org. Salviamo username e skill in stand-by. ---
+            pending_members_dict[username] = {
+                "username": username,
+                "skills": skills  # 'skills' è già la lista di dizionari pronta!
+            }
+
+    # Assegniamo le liste aggiornate al progetto
+    project.assigned_members = list(members_to_assign)
+    project.pending_members = list(pending_members_dict.values())
+
+    crud_org.update_org(org)
+
+    # Reindirizziamo l'utente alla dashboard del progetto appena aggiornato
+    return RedirectResponse(url=f"/org/project/{project.id}", status_code=status.HTTP_303_SEE_OTHER)

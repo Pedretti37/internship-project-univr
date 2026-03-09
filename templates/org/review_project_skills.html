@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block css %}
+    <link rel="stylesheet" href="/static/css/review_skills.css">
+{% endblock %}
+
+{% block content %}
+    <div class="main-container">
+        <p>Review the skills extracted for your team before adding them to the project.</p>
+
+        {% if skills_not_found %}
+            <div class="alert alert-warning">
+                <strong>⚠️ Not Found:</strong> We couldn't find matches for the following:
+                <ul class="mb-0">
+                    {% for nf in skills_not_found %}
+                        <li>{{ nf.username }} - <em>{{ nf.skill_name }}</em></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="details-box">
+            <form action="/org/confirm_project_skills" method="post">
+                <input type="hidden" name="project_id" value="{{ project_id }}">
+
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>CSV Skill</th>
+                            <th>Level</th>
+                            <th>Official ESCO Match</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in skills_to_review %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.username }}</strong>
+                                <input type="hidden" name="username_{{ loop.index }}" value="{{ item.username }}">
+                            </td>
+                            <td><span style="color: #666;">{{ item.raw_name }}</span></td>
+                            
+                            <td>
+                                <span class="badge bg-secondary">{{ item.level }}</span>
+                                <input type="hidden" name="level_{{ loop.index }}" value="{{ item.level }}">
+                            </td>
+                            
+                            <td>
+                                <select name="uri_name_{{ loop.index }}" class="form-select">
+                                    <option value="SKIP">❌ Skip this skill</option>
+                                    {% for opt in item.options %}
+                                        <option value="{{ opt.uri }}|||{{ opt.name }}">
+                                            {{ opt.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <input type="hidden" name="total_rows" value="{{ skills_to_review|length }}">
+
+                <div class="d-flex justify-content-end gap-3 mt-4">
+                    <a href="/org_home" class="btn btn-outline-danger">Cancel Import</a>
+                    <button type="submit" class="btn btn-success">Confirm and Assign to Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
