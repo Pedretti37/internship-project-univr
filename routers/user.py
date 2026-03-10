@@ -535,6 +535,7 @@ async def forecast_gap_courses(
         "forecast_results": forecast_results, 
         "recommended_courses": recommended_courses,
         "country": country,
+        "sector": sector,
         "countries_list": EU_COUNTRIES,
         "sectors_list": CEDEFOP_SECTORS,
         "current_year": datetime.now().year

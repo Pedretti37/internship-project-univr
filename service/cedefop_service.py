@@ -34,7 +34,7 @@ def read_emp_sector_occupation(db_cedefop: dict, country: str, sector: str, isco
     isco_2d = isco_clean[:2]
 
     # Dict loaded in RAM during startup
-    data = db_cedefop.get("sectors", {}).get(country_clean, {}).get(isco_2d).get(sector.strip(), {})
+    data = db_cedefop.get("sectors", {}).get(country_clean, {}).get(isco_2d).get("sectors", {}).get(sector.strip(), {})
 
     if not data:
         return {"error": f"Data not found for {country_clean}, ISCO code {isco_2d} and sector {sector.strip()}"}
@@ -52,7 +52,7 @@ def read_qualifications(db_cedefop: dict, country: str, isco_id: str) -> dict:
 
     if not data:
         return {"error": f"Qualification data not found for {country_clean} and ISCO code {target_isco}"}
-    
+
     return data
 
 # Forecast job openings
