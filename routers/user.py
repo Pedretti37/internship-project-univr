@@ -7,11 +7,11 @@ from typing import Optional
 
 import urllib
 from crud import crud_user, crud_org, crud_skill_models, crud_cedefop
-from dependencies import get_current_user
+from service.dependencies import get_current_user
 import csv
 import io
 
-from config import templates, pwd_context
+from service.config import templates, pwd_context
 from esco import escoAPI
 from models import Role, Skill, User
 

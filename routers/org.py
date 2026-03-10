@@ -8,11 +8,11 @@ from typing import Optional
 
 import urllib
 from crud import crud_skill_models, crud_user, crud_org, crud_cedefop
-from dependencies import get_current_org
+from service.dependencies import get_current_org
 from esco import escoAPI 
 import ast
 from datetime import datetime
-from config import templates, pwd_context
+from service.config import templates, pwd_context
 from models import Organization, Project, Role, Skill
 
 router = APIRouter()
