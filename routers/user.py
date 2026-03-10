@@ -6,7 +6,8 @@ from pydantic import EmailStr
 from typing import Optional
 
 import urllib
-from crud import crud_user, crud_org, crud_skill_models, crud_cedefop
+from crud import crud_user, crud_org, crud_skill_models
+from service import cedefop_service
 from service.dependencies import get_current_user
 import csv
 import io
@@ -22,6 +23,28 @@ EU_COUNTRIES = [
     "Luxembourg", "Malta", "Netherlands", "Norway", "Poland", "Portugal", 
     "Republic of North Macedonia", "Romania", "Slovakia", "Slovenia", 
     "Spain", "Sweden", "Switzerland", "Turkey"
+]
+CEDEFOP_SECTORS = [
+    "Agriculture, Forestry and Fishing",                                        # A
+    "Mining and quarrying",                                                     # B
+    "Manufacturing",                                                            # C
+    "Electricity, Gas, Steam and Air Conditioning Supply",                      # D
+    "Water Supply, Sewerage, Waste Management and Remediation Activities",      # E
+    "Construction",                                                             # F
+    "Wholesale and Retail Trade, Repair of Motor Vehicles and Motorcycles",     # G
+    "Transportation and Storage",                                               # H
+    "Accommodation and Food Service Activities",                                # I
+    "Information and Communication",                                            # J
+    "Financial and Insurance Activities",                                       # K
+    "Real estate",                                                              # L
+    "Professional, Scientific and Technical Activities",                        # M
+    "Administrative and Support Service Activities",                            # N
+    "Public Administration and Defence, Compulsory Social Security",            # O
+    "Education",                                                                # P
+    "Human Health and Social Work Activities",                                  # Q
+    "Arts and entertainment",                                                   # R
+    "Other service activities",                                                 # S
+    "Activities of Households as Employers"                                     # T
 ]
 
 router = APIRouter()
@@ -156,6 +179,7 @@ async def user_profile(
         "request": request, 
         "user": user, 
         "countries_list": EU_COUNTRIES,
+        "sectors_list": CEDEFOP_SECTORS,
         "invitations": invitations,
         "toast_msg": toast_msg,
         "toast_type": toast_type,
@@ -449,11 +473,12 @@ async def delete_user_skill(
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Occupation Forecast and Gap --- ###
-@router.post("/occupation_forecast_and_gap", response_class=HTMLResponse)
-async def occupation_forecast_and_gap(
+@router.post("/forecast_gap_courses", response_class=HTMLResponse)
+async def forecast_gap_courses(
     request: Request,
     user: User = Depends(get_current_user),
     country: str = Form(...),
+    sector: Optional[str] = Form(None)
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -462,50 +487,47 @@ async def occupation_forecast_and_gap(
         msg = urllib.parse.quote("You can analyze up to 5 target roles at a time.")
         return RedirectResponse(url=f"/user_profile?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
+    db = request.app.state.cedefop
+
     forecast_results = []
-    role_list = []
     for role in user.target_roles:
         # String conversion and cleanup
         role_id_str = str(role.id).strip()
             
         # CEDEFOP
-        data = crud_cedefop.read_emp_occupation(country=country, isco_id=role_id_str)
+        occ_data = cedefop_service.read_emp_occupation(db, country, role_id_str)
+        sec_data = cedefop_service.read_emp_sector_occupation(db, country, sector, role_id_str)
+        qual_data = cedefop_service.read_qualifications(db, country, role_id_str)
+        job_data = cedefop_service.read_job_openings(db, country, role_id_str)
         
         forecast_results.append({
             "title": role.title,  
             "isco_code": role_id_str,
             "uri": role.uri,
-            "data": data              
+            "occupation_data": occ_data,
+            "sector_data": sec_data,
+            "qualifications_data": qual_data,
+            "job_openings_data": job_data
         })
-
-        if data['growth_pct'] >= -5:
-            role_list.append(role)
     
-    updated_user = crud_skill_models.skill_gap_user(user, role_list)
+    updated_user = crud_skill_models.skill_gap_user(user, user.target_roles)
     crud_user.update_user(updated_user)
 
     # Course recommendation
-    missing_skills = {}
-    for role in updated_user.skill_gap:
-        if 0 <= role["match_score"] < 100:
-            for result in forecast_results:
-                if result["isco_code"] == str(role["role_id"]):
-                    data = result["data"]
-                    if data["growth_pct"] >= -5:
-                        # Role is expected to grow or remain stable --> provide educational courses and training opportunities
-                        for skill in role.get("missing_skills", []):
-                            missing_skills[skill.uri] = skill.name
-                        for skill in role.get("partially_matching_skills", []):
-                            skill_obj = skill["skill"]
-                            missing_skills[skill_obj.uri] = skill_obj.name
-                    break
+    all_missing_skills = {}
+    for role_gap in updated_user.skill_gap:
+        for skill in role_gap.get("missing_skills", []):
+            all_missing_skills[skill.uri] = skill.name
+        for skill_entry in role_gap.get("partially_matching_skills", []):
+            s_obj = skill_entry["skill"]
+            all_missing_skills[s_obj.uri] = s_obj.name
 
     # print(len(missing_skills))
 
     # List of recommended courses for the missing skills
     # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
     # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills)
+    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(all_missing_skills)
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
@@ -514,6 +536,7 @@ async def occupation_forecast_and_gap(
         "recommended_courses": recommended_courses,
         "country": country,
         "countries_list": EU_COUNTRIES,
+        "sectors_list": CEDEFOP_SECTORS,
         "current_year": datetime.now().year
     })
 

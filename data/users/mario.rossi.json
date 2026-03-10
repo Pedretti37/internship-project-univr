@@ -58,85 +58,6 @@
             ],
             "id_full": "2144.1",
             "uri": "http://data.europa.eu/esco/occupation/579254cf-6d69-4889-9000-9c79dc568644"
-        },
-        {
-            "id": "7412",
-            "title": "ride technician",
-            "description": "Ride technicians work to maintain and repair amusement park attractions. They need a strong technical knowledge and have specialised knowledge of the rides they are assigned to maintain. Ride technicians usually keep records of the maintenance and repairs performed as well as uptime and downtime for each serviced attraction. Attention to safety is especially important in the maintenance and repair of amusement park rides.",
-            "essential_skills": [
-                {
-                    "uri": "http://data.europa.eu/esco/skill/4ed385bf-3e87-476a-9f06-08c2e801133a",
-                    "name": "assemble electronic units",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/81d47290-6046-44c9-96e0-7d54542072b5",
-                    "name": "ensure health and safety of staff",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/97843c38-17f0-4c9c-aa86-049e2870aa1a",
-                    "name": "ensure health and safety of visitors",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/c585a661-1720-4138-8cc7-0029452a8534",
-                    "name": "amusement park emergency procedures",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/1008da30-7690-42c8-94c7-3f3bd8885c00",
-                    "name": "maintain amusement park equipment",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/fa10db2f-5191-4f89-bf6c-f5accba0f55c",
-                    "name": "maintain ride parts inventory",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/a58b456f-c3d5-493d-93bb-524b2e60af93",
-                    "name": "check ride communications",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/7189683d-7fa5-441c-bf97-bfece3d9a4c8",
-                    "name": "check ride safety restraints",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/89bb44dc-9f4c-400b-86cd-dcd0bd599a58",
-                    "name": "maintain electronic systems",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/7df446fb-7e76-4a7e-9954-88706be77c27",
-                    "name": "monitor amusement park safety",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/82d83fd3-bd6b-4e09-8291-2e0f83e323f9",
-                    "name": "maintain amusement park attractions",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/575f79e8-8500-4ddf-91ec-5e6de73d35a3",
-                    "name": "mechanical components of vehicles",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/95c35c3a-035f-47c2-90cf-7e934d20fc08",
-                    "name": "electronics",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
-                    "name": "mechanics",
-                    "level": 5
-                }
-            ],
-            "id_full": "7412.10",
-            "uri": "http://data.europa.eu/esco/occupation/6188bf20-5cdb-4702-af72-2cb67ec39810"
         }
     ],
     "current_skills": [
@@ -200,10 +121,38 @@
         {
             "role_id": "2144",
             "role_title": "mechanical engineer",
-            "match_score": 0,
+            "match_score": 33,
             "total_required": 9,
-            "matching_skills": [],
-            "partially_matching_skills": [],
+            "matching_skills": [
+                {
+                    "uri": "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9",
+                    "name": "mechanical engineering",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
+                    "name": "mechanics",
+                    "level": 5
+                }
+            ],
+            "partially_matching_skills": [
+                {
+                    "skill": {
+                        "uri": "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b",
+                        "name": "adjust engineering designs",
+                        "level": 5
+                    },
+                    "user_level": 2
+                },
+                {
+                    "skill": {
+                        "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
+                        "name": "engineering principles",
+                        "level": 5
+                    },
+                    "user_level": 3
+                }
+            ],
             "missing_skills": [
                 {
                     "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
@@ -221,33 +170,13 @@
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/42b23922-1c40-4dbe-9e0c-7a568dfdf06b",
-                    "name": "adjust engineering designs",
-                    "level": 5
-                },
-                {
                     "uri": "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462",
                     "name": "use technical drawing software",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9",
-                    "name": "mechanical engineering",
-                    "level": 5
-                },
-                {
                     "uri": "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919",
                     "name": "engineering processes",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
-                    "name": "mechanics",
-                    "level": 5
-                },
-                {
-                    "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
-                    "name": "engineering principles",
                     "level": 5
                 }
             ]

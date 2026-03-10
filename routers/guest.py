@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
-from config import templates
+from service.config import templates
 from esco import escoAPI
 
 router = APIRouter()

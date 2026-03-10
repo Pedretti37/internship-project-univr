@@ -4,8 +4,6 @@ from typing import Dict, List
 from models import Project, Skill, User, Course, Role
 from datetime import datetime
 
-EMP_OCCUPATION = "data/cedefop/employees/Employment_occupation.xlsx"
-EMP_OCCUPATION_DETAIL = "data/cedefop/employees/Employment_occupation_detail.xlsx"
 ED_COURSES_MEC_ENGINEER = "educational_offerings/courses/educational_offerings_esco_tagged.json"
 
 # Skill gap analysis for a user
