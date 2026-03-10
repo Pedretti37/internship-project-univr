@@ -64,7 +64,7 @@
 
         <hr class="hr">
 
-        <div class="show-target-roles" translate="no">
+        <section class="card" translate="no">
             <h2>Current Target Roles</h2>
             {% if current_project.target_roles %}
                 <ul>
@@ -87,9 +87,7 @@
             {% else %}
                 <p><strong>No target roles defined yet. Search below to add one!</strong></p>
             {% endif %}
-        </div>
 
-        <div>
             <h3>Add a Role</h3>
             <div class="browsing-input">
                 <form action="/org/project/{{ current_project.id }}" method="get" class="role-form" autocomplete="off">
@@ -127,181 +125,202 @@
                     {% endif %}
                 {% endif %}
             </div>
-        </div>
+        </section>
 
-        <div class="card" translate="no">
+        <section class="card" translate="no">
+            <h2>Market Analysis</h2>
             {% if current_project.target_roles %}
-                <hr class="hr">
-
-                <h2>Check Future Employment Trend & Skill Gap Analysis</h2>
-                <form action="/org/project/calculate_forecast_and_gap" method="post">
+                <form action="/org/project/forecast_gap_courses" method="post" class="analysis-controls">
                     <input type="hidden" name="project_id" value="{{ current_project.id }}">
-                    <div class="country-selection">
-                        <label>Choose a Country to see future trends:</label>
-                        <br>
+                    <div class="input-group">
+                        <label>Country</label>
                         <select class="selection" name="country" id="country" required>
                             <option value="" disabled {% if not country %}selected{% endif %}>Select a country</option>
                             {% for c in countries_list %}
                                 <option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c }}</option>
                             {% endfor %}
                         </select>
-                        <span><button type="submit" class="btn-primary">Analyze</button></span>
                     </div>
+                    <div class="input-group">
+                        <label>Sector</label>
+                        <select class="selection" name="sector" id="sector">
+                            <option value="" disabled {% if not sector %}selected{% endif %}>Select a sector</option>
+                            {% for s in sectors_list %}
+                                <option value="{{ s }}" {% if sector == s %}selected{% endif %}>{{ s }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Analyze</button>
                 </form>
 
                 {% if forecast_results %}
-                    <h3 style="margin-top: 30px;">🇪🇺 Forecast Results for {{ country }}</h3>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 20px; margin-top: 15px;">
-                        
-                        {% for item in forecast_results %}
-                            
-                            {% if not item.data.error %}
-                            <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                                
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                                    <div>
-                                        <h4 style="margin: 0; color: #333;">{{ item.title | title }}</h4>
-                                        <small style="color: #666; font-family: monospace;">ISCO: {{ item.isco_code }}</small>
-                                    </div>
-                                    
-                                    <div style="text-align: right;">
-                                        <span>
-                                            {{ item.data.trend }} ({{ item.data.growth_pct }}%)
-                                        </span>
-                                        <br>
-                                        <small style="font-size: 0.8em; color: #888;">Change {{ current_year }}-2035</small>
-                                    </div>
+                    {% for item in forecast_results %}
+                        <div class="forecast-card">
+                            <div class="forecast-header">
+                                <div>
+                                    <h3>{{ item.title | title }}</h3>
+                                    <small>ISCO Code: {{ item.isco_code }}</small>
                                 </div>
+                            </div>
 
-                                <p style="font-size: 0.9em; color: #555; margin-bottom: 15px;">
-                                    {% if item.data.trend == "Growing" %}
-                                        🚀 This occupation is projected to grow. Excellent opportunity for upskilling!
-                                    {% elif item.data.trend == "Declining" %}
-                                        ⚠️ Employment is projected to decline. Consider diversifying your skills.
-                                    {% else %}
-                                        ⚖️ Employment is expected to remain stable.
-                                    {% endif %}
-                                </p>
-
-                                <div style="max-height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 4px;">
-                                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9em;">
-                                        <thead style="background-color: #f8f9fa; position: sticky; top: 0;">
-                                            <tr>
-                                                <th style="padding: 8px;">Year</th>
-                                                <th style="padding: 8px;">Employees</th>
-                                                <th style="padding: 8px;">Trend</th>
-                                            </tr>
-                                        </thead>
+                            <!-- Qualificatin trends data -->
+                            <details>
+                                <summary>Qualification Trends ({{ current_year }}-2035)</summary>
+                                <div class="history-table-container">
+                                    <table>
+                                        <thead><tr><th>Year</th><th>High %</th><th>Med %</th><th>Low %</th></tr></thead>
                                         <tbody>
-                                            {% for row in item.data.history %}
-                                                <tr style="border-bottom: 1px solid #f0f0f0;">
-                                                    <td style="padding: 8px;">
-                                                        <strong>{{ row.year }}</strong>
-                                                        {% if row.year == "2035" %} <span style="font-size: 0.7em; background: #e3f2fd; padding: 1px 4px; border-radius: 3px;">End</span> {% endif %}
-                                                    </td>
-                                                    <td style="padding: 8px; font-family: monospace;">
-                                                        {{ row.value }}
-                                                    </td>
-                                                    <td style="padding: 8px;">
-                                                        {% if loop.index0 > 0 %}
-                                                            {% set prev = item.data.history[loop.index0 - 1].value %}
-                                                            {% if row.value > prev %}
-                                                                <span style="color: green;" translate="no">↗</span>
-                                                            {% elif row.value < prev %}
-                                                                <span style="color: red;" translate="no">↘</span>
-                                                            {% else %}
-                                                                <span style="color: gray;" translate="no">=</span>
-                                                            {% endif %}
-                                                        {% else %}
-                                                            <span style="color: gray;" translate="no">-</span>
-                                                        {% endif %}
-                                                    </td>
-                                                </tr>
+                                            {% for q in item.qualifications_data.history if q.year|int >= current_year %}
+                                            <tr><td>{{ q.year }}</td><td>{{ q.high_pct }}%</td><td>{{ q.medium_pct }}%</td><td>{{ q.low_pct }}%</td></tr>
                                             {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
-                            
-                            {% else %}
-                            <div class="alert alert-danger">
-                                <strong>{{ item.title | title }} ({{ item.isco_code }}):</strong> {{ item.data.error }}
-                            </div>
+                            </details>
+
+                            <!-- Job openings data -->
+                            <details>
+                                <summary>Job Openings Forecast ({{ current_year }}-2035)</summary>
+                                <div class="history-table-container">
+                                    <table>
+                                        <thead><tr><th>Year</th><th>Expansion</th><th>Replacement</th><th>Total</th></tr></thead>
+                                        <tbody>
+                                            {% for o in item.job_openings_data.history if o.year|int >= current_year %}
+                                            <tr><td>{{ o.year }}</td><td>{{ "{:+,}".format(o.expansion) }}</td><td>{{ "{:,}".format(o.replacement) }}</td><td><strong>{{ "{:,}".format(o.total_openings) }}</strong></td></tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            <!-- Emp occupation data -->
+                            <details>
+                                <summary>
+                                    Employment Data Forecast ({{ current_year }}-2035)
+                                    <span class="badge {% if item.occupation_data.trend == 'Growing' %}badge-success{% elif item.occupation_data.trend == 'Declining' %}badge-danger{% else %}badge-info{% endif %}">
+                                        {{ item.occupation_data.trend }} ({{ item.occupation_data.growth_pct }}%)
+                                    </span>
+                                </summary>
+                                <div class="history-table-container">
+                                    <table>
+                                        <thead>
+                                            <tr><th>Year</th><th>Estimated Workers</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in item.occupation_data.history if row.year|int >= current_year %}
+                                            <tr><td>{{ row.year }}</td><td>{{ "{:,}".format(row.value) }}</td></tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            {% if item.sector_data and not item.sector_data.error %}
+                                <div class="info-box box-sector">
+                                    <h4>Sector: {{ sector }}</h4>
+
+                                    {% if item.sector_data.history and item.sector_data.history[0].value == 0 and item.sector_data.growth_pct == 0 %}
+                                        <p style="font-size: 0.85em; color: #666;">
+                                            ⚠️ Limited data available for this specific role in the selected sector.
+                                        </p>
+                                    {% else %}
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <strong>{{ item.sector_data.trend }}</strong>
+                                            <span>
+                                                {{ item.sector_data.growth_pct }}%
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </div>
                             {% endif %}
-
-                        {% endfor %}
-                        
-                        <p style="margin-top: 10px; font-size: 0.8em; color: #888; text-align: center;">
-                            Source: CEDEFOP Skills Forecast | Baseline Year: {{ current_year }}
-                        </p>
-                    </div>
+                        </div>
+                    {% endfor %}
                 {% endif %}
+            {% else %}
+                <div>
+                    <p>Add from 1 to 5 target roles to this project to analyze <strong>CEDEFOP's forecast.</strong></p>
+                </div>
             {% endif %}
-        </div>
+            </section>
 
-        <div translate="no">
+        <section class="card" translate="no">
             <h2>Skill gap Assessment</h2>
-
             <div class="skill-gap-container">
                 {% if current_project.skill_gap %}
                     {% for gap in current_project.skill_gap %}
                         <div class="card" style="margin-bottom: 20px;">
                             <h3>{{ gap.role_title | title }}</h3>
-                            
                             <div class="gap-progress-track">
                                 <div class="gap-progress-fill" style="--score: {{ gap.match_score }}%;"></div>
                             </div>
-                            <p><strong>Match:</strong> {{ gap.match_score }}% ({{ gap.matching_skills|length }} / {{ gap.total_required }} skills)</p>
-
-                            {% if gap.missing_skills %}
-                                <h4 style="color: #d32f2f; margin-top: 10px;">⚠️ Missing Skills:</h4>
+                            <p><strong>Match:</strong> {{ gap.match_score }}%
+                                <span style="font-size: 0.9em; color: #666;">
+                                    ({{ gap.matching_skills|length }} fully matched, {{ gap.partially_matching_skills|length }} to improve, {{ gap.missing_skills|length }} missing)
+                                </span>
+                            </p>
+                            {% if gap.partially_matching_skills %}
+                                <h4 style="color: #f57f17; margin-top: 10px;">⚠️ Skills to Improve:</h4>
                                 <ul>
-                                    {% for uri, skill in gap.missing_skills.items() %}
-                                        <li>{{ skill | capitalize }}<a href="{{ uri }}" target="_blank"> ↗</a></li>
+                                    {% for data in gap.partially_matching_skills %}
+                                        <li style="margin-bottom: 5px;">
+                                            <strong>{{ data.skill.name | title }}</strong>
+                                            <span style="font-size: 0.85em; color: #555;">
+                                                (Your level: <b>{{ data.user_level }}</b> / Target: <b>{{ data.skill.level }}</b>)
+                                            </span>
+                                            <a href="{{ data.skill.uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
+                                        </li>
                                     {% endfor %}
                                 </ul>
-                            {% else %}
-                                <p style="color: green;">✅ You have all the required skills!</p>
+                            {% endif %}
+                            {% if gap.missing_skills %}
+                                <h4 style="color: #d32f2f; margin-top: 10px;">❌ Missing Skills:</h4>
+                                <ul>
+                                    {% for skill in gap.missing_skills %}
+                                        <li style="margin-bottom: 5px;">
+                                            <strong>{{ skill.name | title }}</strong>
+                                            <span style="font-size: 0.85em; color: #555;">(Target level: {{ skill.level }})</span>
+                                            <a href="{{ skill.uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            {% if not gap.missing_skills and not gap.partially_matching_skills %}
+                                <p style="color: green; font-weight: bold; margin-top: 15px;">
+                                    ✅ You have all the required skills for this role!
+                                </p>
                             {% endif %}
                         </div>
                     {% endfor %}
                 {% else %}
                     <div class="no-skill-gap">
                         <h4>Not available yet</h4>
-                        <p>Add 1-5 target roles above, select a country and click <strong>Analyze</strong>.</p>
+                        <p>Add 1-5 target roles to this project, select a country, a sector and click <strong>Analyze</strong>.</p>
                     </div>
                 {% endif %}
             </div>
-        </div>
+        </section>
 
-        <hr class="hr">
-
-        <div class="educational-courses">
+        <section class="card">
+            <h2>Recommended Educational Courses</h2>
             {% if recommended_courses %}
-                <h2>Recommended Educational Courses</h2>
-                <p>Based on your team skill gap analysis, we recommend the following courses to help your employees upskill:</p>
-                <ul>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     {% for course in recommended_courses %}
-                        <li>
-                            <div class="course-card">
-                                <h3>{{ course.title | title }}</h3>
-                                <p>{{ course.description }}</p>
-                                <p translate="no"><small>Ects: {{ course.ects }}</small></p>
-                                <p><small>Skills covered:</small></p>
-                                <ul>
-                                    {% for uri, skill in course.skills_covered.items() %}
-                                        <li>{{ skill | capitalize }} <a href="{{ uri }}" target="_blank">↗</a></li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </li>
+                    <div class="info-box">
+                        <h4>{{ course.title | title }}</h4>
+                        <p>{{ course.description }}...</p>
+                        <small>ECTS: {{ course.ects }}</small>
+                        <p><small>Skills covered:</small></p>
+                        <ul>
+                            {% for skill in course.skills_covered %}
+                                <li>{{ skill.name | capitalize }} <a href="{{ skill.uri }}" target="_blank">↗</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                     {% endfor %}
-                </ul>
+                </div>
             {% else %}
-                <p>No recommended courses available.</p>
+                <p>---</p>
             {% endif %}
-        </div>
-        
+        </section>
     </div>
 {% endblock %}

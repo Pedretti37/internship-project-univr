@@ -2,7 +2,6 @@ import os
 import pandas as pd
 from typing import Dict, List
 from models import Project, Skill, User, Course, Role
-from datetime import datetime
 
 ED_COURSES_MEC_ENGINEER = "educational_offerings/courses/educational_offerings_esco_tagged.json"
 
@@ -63,33 +62,52 @@ def skill_gap_user(user: User, role_list: List[Role]) -> User:
 
 # Skill gap analysis for a project team
 def skill_gap_project(project: Project, members: List[User]) -> Project:
-    
-    team_skills = {}
+
+    team_skills_dict = {}
     for user in members:
         if user.current_skills:
-            for uri, skill in user.current_skills.items():
-                team_skills[uri] = skill
+            for s in user.current_skills:
+                # Se la skill è già presente, teniamo il livello più alto trovato finora
+                if s.uri not in team_skills_dict or s.level > team_skills_dict[s.uri]:
+                    team_skills_dict[s.uri] = s.level
 
-    if hasattr(project, 'skill_gap'):
-        project.skill_gap.clear()
-    else:
+    if not hasattr(project, 'skill_gap'):
         project.skill_gap = []
+    project.skill_gap.clear()
 
     for role in project.target_roles:
-        required_skills = role.essential_skills
-
-        matching = {}
-        missing = {}
+        matching = []
+        partially_matching = []
+        missing = []
         
-        for uri, req_skill in required_skills.items():
-            if uri in team_skills:
-                matching[uri] = req_skill
-            else:
-                missing[uri] = req_skill
+        essential_skills = role.essential_skills
+        if isinstance(essential_skills, dict):
+            essential_skills = list(essential_skills.values())
+            
+        total_req = len(essential_skills)
+        score = 0.0
 
-        # Percentage 
-        total_req = len(required_skills)
-        match_pct = int((len(matching) / total_req) * 100) if total_req > 0 else 0
+        for req_skill in essential_skills:
+            req_uri = req_skill.uri
+            req_level = req_skill.level
+            
+            if req_uri in team_skills_dict:
+                best_team_level = team_skills_dict[req_uri]
+                
+                if best_team_level >= req_level:
+                    matching.append(req_skill)
+                    score += 1.0
+                else:
+                    partial_score = best_team_level / req_level
+                    score += partial_score
+                    partially_matching.append({
+                        "skill": req_skill,
+                        "team_best_level": best_team_level
+                    })
+            else:
+                missing.append(req_skill)
+
+        match_pct = int((score / total_req) * 100) if total_req > 0 else 0
         
         role_gap_info = {
             'role_id': role.id,
@@ -97,8 +115,10 @@ def skill_gap_project(project: Project, members: List[User]) -> Project:
             'match_score': match_pct,
             'total_required': total_req,
             'matching_skills': matching,
+            'partially_matching_skills': partially_matching,
             'missing_skills': missing
         }
+        
         project.skill_gap.append(role_gap_info)
 
     return project

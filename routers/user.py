@@ -186,7 +186,8 @@ async def user_profile(
         "current_year": datetime.now().year,
         "forecast_results": None,
         "recommended_courses": None,
-        "country": None
+        "country": None,
+        "sector": None
     })
 
 ### --- Set User Target Roles --- ###
@@ -434,7 +435,7 @@ async def details_page(
 @router.post("/delete_target_role", response_class=RedirectResponse)
 async def delete_target_role(
     user: User = Depends(get_current_user),
-    role_id: str = Form(...)
+    role_uri: str = Form(...)
 ):
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -442,7 +443,7 @@ async def delete_target_role(
     # new list excluding the role to be deleted
     new_target_list = [
         role for role in user.target_roles 
-        if role.id != role_id
+        if role.uri != role_uri
     ]
     
     user.target_roles = new_target_list

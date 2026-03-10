@@ -33,111 +33,158 @@
         </section>
 
         <section class="card">
-            <h2>Market Analysis</h2>
-            <form action="/forecast_gap_courses" method="post" class="analysis-controls">
-                <div class="input-group">
-                    <label for="country">Country</label>
-                    <select class="selection" name="country" id="country" required>
-                        <option value="" disabled {% if not country %}selected{% endif %}>Select a country</option>
-                        {% for c in countries_list %}<option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="sector">Sector (Optional)</label>
-                    <select class="selection" name="sector" id="sector">
-                        <option value="" {% if not sector %}selected{% endif %}>Select a sector</option>
-                        {% for s in sectors_list %}<option value="{{ s }}" {% if sector == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary">Analyze Roles</button>
-            </form>
-
-            {% if forecast_results %}
-                {% for item in forecast_results %}
-                    <div class="forecast-card">
-                        <div class="forecast-header">
-                            <div>
-                                <h3>{{ item.title | title }}</h3>
-                                <small>ISCO Code: {{ item.isco_code }}</small>
-                            </div>
-                        </div>
-
-                        <!-- Qualificatin trends data -->
-                        <details>
-                            <summary>Qualification Trends ({{ current_year }}-2035)</summary>
-                            <div class="history-table-container">
-                                <table>
-                                    <thead><tr><th>Year</th><th>High %</th><th>Med %</th><th>Low %</th></tr></thead>
-                                    <tbody>
-                                        {% for q in item.qualifications_data.history if q.year|int >= current_year %}
-                                        <tr><td>{{ q.year }}</td><td>{{ q.high_pct }}%</td><td>{{ q.medium_pct }}%</td><td>{{ q.low_pct }}%</td></tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </details>
-
-                        <!-- Job openings data -->
-                        <details>
-                            <summary>Job Openings Forecast ({{ current_year }}-2035)</summary>
-                            <div class="history-table-container">
-                                <table>
-                                    <thead><tr><th>Year</th><th>Expansion</th><th>Replacement</th><th>Total</th></tr></thead>
-                                    <tbody>
-                                        {% for o in item.job_openings_data.history if o.year|int >= current_year %}
-                                        <tr><td>{{ o.year }}</td><td>{{ "{:+,}".format(o.expansion) }}</td><td>{{ "{:,}".format(o.replacement) }}</td><td><strong>{{ "{:,}".format(o.total_openings) }}</strong></td></tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </details>
-
-                        <!-- Emp occupation data -->
-                        <details>
-                            <summary>
-                                Employment Data Forecast ({{ current_year }}-2035)
-                                <span class="badge {% if item.occupation_data.trend == 'Growing' %}badge-success{% elif item.occupation_data.trend == 'Declining' %}badge-danger{% else %}badge-info{% endif %}">
-                                    {{ item.occupation_data.trend }} ({{ item.occupation_data.growth_pct }}%)
-                                </span>
-                            </summary>
-                            <div class="history-table-container">
-                                <table>
-                                    <thead>
-                                        <tr><th>Year</th><th>Estimated Workers</th></tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for row in item.occupation_data.history if row.year|int >= current_year %}
-                                        <tr><td>{{ row.year }}</td><td>{{ "{:,}".format(row.value) }}</td></tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </details>
-
-                        {% if item.sector_data and not item.sector_data.error %}
-                            <div class="info-box box-sector">
-                                <h4>Sector: {{ sector }}</h4>
-
-                                {% if item.sector_data.history and item.sector_data.history[0].value == 0 and item.sector_data.growth_pct == 0 %}
-                                    <p style="font-size: 0.85em; color: #666;">
-                                        ⚠️ Limited data available for this specific role in the selected sector.
-                                    </p>
-                                {% else %}
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <strong>{{ item.sector_data.trend }}</strong>
-                                        <span>
-                                            {{ item.sector_data.growth_pct }}%
-                                        </span>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+            <h2>Your current Skill Model</h2>
+            <p>Use <a href="https://app.muchskills.com/login" target="_blank" rel="noopener noreferrer">MuchSkills</a> to create a Skill Model or go back to the home page and search with EscoAPI.</p>
+            {% if user.current_skills %}
+                <ul>
+                    {% for skill in user.current_skills %}
+                        <li>
+                            {{ skill.name | title }}, {{ skill.level }}/9 <a href="{{ skill.uri }}">&UpperRightArrow;</a>
+                            <form action="/delete_user_skill" method="post" style="display:inline;">
+                                <input type="hidden" name="skill_uri" value="{{ skill.uri }}">
+                                <button type="submit" title="Remove skill">
+                                    🗑️ </button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No skills added yet.</p>
             {% endif %}
         </section>
 
-        <section translate="no">
+        <section class="card">
+            <h2>Your current Target Roles</h2>
+            {% if user.target_roles %}
+                <ul>
+                    {% for role in user.target_roles %}
+                        <li>
+                            {{ role.title | capitalize }} <a href="{{ role.uri }}">&UpperRightArrow;</a>
+                            <form action="/delete_target_role" method="post" style="display:inline;">
+                                <input type="hidden" name="role_uri" value="{{ role.uri }}">
+                                <button type="submit" title="Remove role">
+                                    🗑️ </button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No target roles added yet.</p>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            <h2>Market Analysis</h2>
+            {% if user.target_roles %}
+                <form action="/forecast_gap_courses" method="post" class="analysis-controls">
+                    <div class="input-group">
+                        <label for="country">Country</label>
+                        <select class="selection" name="country" id="country" required>
+                            <option value="" disabled {% if not country %}selected{% endif %}>Select a country</option>
+                            {% for c in countries_list %}<option value="{{ c }}" {% if country == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="sector">Sector (Optional)</label>
+                        <select class="selection" name="sector" id="sector">
+                            <option value="" {% if not sector %}selected{% endif %}>Select a sector</option>
+                            {% for s in sectors_list %}<option value="{{ s }}" {% if sector == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Analyze Roles</button>
+                </form>
+
+                {% if forecast_results %}
+                    {% for item in forecast_results %}
+                        <div class="forecast-card">
+                            <div class="forecast-header">
+                                <div>
+                                    <h3>{{ item.title | title }}</h3>
+                                    <small>ISCO Code: {{ item.isco_code }}</small>
+                                </div>
+                            </div>
+
+                            <!-- Qualificatin trends data -->
+                            <details>
+                                <summary>Qualification Trends ({{ current_year }}-2035)</summary>
+                                <div class="history-table-container">
+                                    <table>
+                                        <thead><tr><th>Year</th><th>High %</th><th>Med %</th><th>Low %</th></tr></thead>
+                                        <tbody>
+                                            {% for q in item.qualifications_data.history if q.year|int >= current_year %}
+                                            <tr><td>{{ q.year }}</td><td>{{ q.high_pct }}%</td><td>{{ q.medium_pct }}%</td><td>{{ q.low_pct }}%</td></tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            <!-- Job openings data -->
+                            <details>
+                                <summary>Job Openings Forecast ({{ current_year }}-2035)</summary>
+                                <div class="history-table-container">
+                                    <table>
+                                        <thead><tr><th>Year</th><th>Expansion</th><th>Replacement</th><th>Total</th></tr></thead>
+                                        <tbody>
+                                            {% for o in item.job_openings_data.history if o.year|int >= current_year %}
+                                            <tr><td>{{ o.year }}</td><td>{{ "{:+,}".format(o.expansion) }}</td><td>{{ "{:,}".format(o.replacement) }}</td><td><strong>{{ "{:,}".format(o.total_openings) }}</strong></td></tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            <!-- Emp occupation data -->
+                            <details>
+                                <summary>
+                                    Employment Data Forecast ({{ current_year }}-2035)
+                                    <span class="badge {% if item.occupation_data.trend == 'Growing' %}badge-success{% elif item.occupation_data.trend == 'Declining' %}badge-danger{% else %}badge-info{% endif %}">
+                                        {{ item.occupation_data.trend }} ({{ item.occupation_data.growth_pct }}%)
+                                    </span>
+                                </summary>
+                                <div class="history-table-container">
+                                    <table>
+                                        <thead>
+                                            <tr><th>Year</th><th>Estimated Workers</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in item.occupation_data.history if row.year|int >= current_year %}
+                                            <tr><td>{{ row.year }}</td><td>{{ "{:,}".format(row.value) }}</td></tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            {% if item.sector_data and not item.sector_data.error %}
+                                <div class="info-box box-sector">
+                                    <h4>Sector: {{ sector }}</h4>
+
+                                    {% if item.sector_data.history and item.sector_data.history[0].value == 0 and item.sector_data.growth_pct == 0 %}
+                                        <p style="font-size: 0.85em; color: #666;">
+                                            ⚠️ Limited data available for this specific role in the selected sector.
+                                        </p>
+                                    {% else %}
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <strong>{{ item.sector_data.trend }}</strong>
+                                            <span>
+                                                {{ item.sector_data.growth_pct }}%
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% else %}
+                <div>
+                    <p>Add from 1 to 5 target roles to your profile to analyze <strong>CEDEFOP's forecast.</strong></p>
+                </div>
+            {% endif %}
+        </section>   
+
+        <section class="card" translate="no">
             <h2>Skill gap Assessment</h2>
             <div class="skill-gap-container">
                 {% if user.skill_gap %}
@@ -188,31 +235,33 @@
                 {% else %}
                     <div class="no-skill-gap">
                         <h4>Not available yet</h4>
-                        <p>Add 1-5 target roles above, select a country and click <strong>Analyze</strong>.</p>
+                        <p>Add 1-5 target roles to ypur profile, select a country, a sector and click <strong>Analyze</strong>.</p>
                     </div>
                 {% endif %}
             </div>
         </section>
 
-        {% if recommended_courses %}
         <section class="card">
             <h2>Recommended Courses</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                {% for course in recommended_courses %}
-                <div class="info-box">
-                    <h4>{{ course.title | title }}</h4>
-                    <p>{{ course.description }}...</p>
-                    <small>ECTS: {{ course.ects }}</small>
-                    <p><small>Skills covered:</small></p>
-                    <ul>
-                        {% for skill in course.skills_covered %}
-                            <li>{{ skill.name | capitalize }} <a href="{{ skill.uri }}" target="_blank">↗</a></li>
-                        {% endfor %}
-                    </ul>
+            {% if recommended_courses %}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    {% for course in recommended_courses %}
+                    <div class="info-box">
+                        <h4>{{ course.title | title }}</h4>
+                        <p>{{ course.description }}...</p>
+                        <small>ECTS: {{ course.ects }}</small>
+                        <p><small>Skills covered:</small></p>
+                        <ul>
+                            {% for skill in course.skills_covered %}
+                                <li>{{ skill.name | capitalize }} <a href="{{ skill.uri }}" target="_blank">↗</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
+            {% else %}
+                <p>---</p>
+            {% endif %}
         </section>
-        {% endif %}
     </div>
 {% endblock %}

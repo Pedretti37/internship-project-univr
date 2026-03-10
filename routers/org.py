@@ -26,6 +26,28 @@ EU_COUNTRIES = [
     "Republic of North Macedonia", "Romania", "Slovakia", "Slovenia", 
     "Spain", "Sweden", "Switzerland", "Turkey"
 ]
+CEDEFOP_SECTORS = [
+    "Agriculture, Forestry and Fishing",                                        # A
+    "Mining and quarrying",                                                     # B
+    "Manufacturing",                                                            # C
+    "Electricity, Gas, Steam and Air Conditioning Supply",                      # D
+    "Water Supply, Sewerage, Waste Management and Remediation Activities",      # E
+    "Construction",                                                             # F
+    "Wholesale and Retail Trade, Repair of Motor Vehicles and Motorcycles",     # G
+    "Transportation and Storage",                                               # H
+    "Accommodation and Food Service Activities",                                # I
+    "Information and Communication",                                            # J
+    "Financial and Insurance Activities",                                       # K
+    "Real estate",                                                              # L
+    "Professional, Scientific and Technical Activities",                        # M
+    "Administrative and Support Service Activities",                            # N
+    "Public Administration and Defence, Compulsory Social Security",            # O
+    "Education",                                                                # P
+    "Human Health and Social Work Activities",                                  # Q
+    "Arts and entertainment",                                                   # R
+    "Other service activities",                                                 # S
+    "Activities of Households as Employers"                                     # T
+]
 
 ### --- Organization Login GET --- ###
 @router.get("/org_login", response_class=HTMLResponse)
@@ -278,9 +300,11 @@ async def view_project(
         "role_search": role_search,
         "team": team,
         "countries_list": EU_COUNTRIES,
+        "sectors_list": CEDEFOP_SECTORS,
         "recommended_courses": None,
         "forecast_results": None,
         "country": None,
+        "sector": None,
         "current_year": datetime.now().year,
         "toast_msg": toast_msg,
         "toast_type": toast_type
@@ -474,12 +498,13 @@ async def add_member_to_project(
     return RedirectResponse(url=f"/org/project/{project_id}?{msg_type}={encoded_msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Project Calculate Skill Gap POST --- ###
-@router.post("/org/project/calculate_forecast_and_gap", response_class=HTMLResponse)
-async def project_calculate_skill_gap(
+@router.post("/org/project/forecast_gap_courses", response_class=HTMLResponse)
+async def project_forecast_gap_courses(
     request: Request,
     project_id: str = Form(...),
     org: Organization = Depends(get_current_org),
-    country: str = Form(...)
+    country: str = Form(...),
+    sector: Optional[str] = Form(None)
 ):
     if not org: 
         return RedirectResponse(url="/", status_code=303)
@@ -494,25 +519,28 @@ async def project_calculate_skill_gap(
         msg = urllib.parse.quote("You can analyze up to 5 target roles at a time.")
         return RedirectResponse(url=f"/org/project/{project_id}?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
     
+    db = request.app.state.cedefop
+
     forecast_results = []
-    role_list = []
     for role in project.target_roles:
         # String conversion and cleanup
         role_id_str = str(role.id).strip()
             
         # CEDEFOP
-        data = cedefop_service.read_emp_occupation(country=country, isco_id=role_id_str)
-        
+        occ_data = cedefop_service.read_emp_occupation(db, country, role_id_str)
+        sec_data = cedefop_service.read_emp_sector_occupation(db, country, sector, role_id_str)
+        qual_data = cedefop_service.read_qualifications(db, country, role_id_str)
+        job_data = cedefop_service.read_job_openings(db, country, role_id_str)
+
         forecast_results.append({
             "title": role.title,  
             "isco_code": role_id_str,
             "uri": role.uri,
-            "data": data              
+            "occupation_data": occ_data,
+            "sector_data": sec_data,
+            "qualifications_data": qual_data,
+            "job_openings_data": job_data             
         })
-
-        if data['growth_pct'] >= -5:
-            role_list.append(role)
-
 
     assigned_members = crud_user.get_users_by_usernames(project.assigned_members)
     updated_project = crud_skill_models.skill_gap_project(project, assigned_members)
@@ -520,25 +548,18 @@ async def project_calculate_skill_gap(
     crud_org.update_org(org)
 
     # Course recommendation
-    missing_skills = {}
-    for role in updated_project.skill_gap:
-        if 0 <= role["match_score"] < 100:
-            for result in forecast_results:
-                if result["isco_code"] == str(role["role_id"]):
-                    data = result["data"]
-                    if data["growth_pct"] >= -5:
-                        # Role is expected to grow or remain stable --> provide educational courses and training opportunities
-                        for skill in role.get("missing_skills", []):
-                            missing_skills[skill.uri] = skill.name
-                        for skill in role.get("partially_matching_skills", []):
-                            skill_obj = skill["skill"]
-                            missing_skills[skill_obj.uri] = skill_obj.name
-                    break
+    all_missing_skills = {}
+    for role_gap in updated_project.skill_gap:
+        for skill in role_gap.get("missing_skills", []):
+            all_missing_skills[skill.uri] = skill.name
+        for skill_entry in role_gap.get("partially_matching_skills", []):
+            s_obj = skill_entry["skill"]
+            all_missing_skills[s_obj.uri] = s_obj.name
 
     # List of recommended courses for the missing skills
     # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
     # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(missing_skills)
+    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(all_missing_skills)
 
     return templates.TemplateResponse("org/project_detail.html", {
         "request": request,
@@ -546,10 +567,11 @@ async def project_calculate_skill_gap(
         "forecast_results": forecast_results, 
         "recommended_courses": recommended_courses,
         "country": country,
+        "sector": sector,
         "countries_list": EU_COUNTRIES,
+        "sectors_list": CEDEFOP_SECTORS,
         "current_project": updated_project,
         "team": assigned_members,
-        "error": None,
         "current_year": datetime.now().year
     })
 

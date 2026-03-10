@@ -9,15 +9,12 @@ body {
     display: flex;              
     justify-content: space-between; 
     align-items: center;        
-    
     background-color: #2c3e50;  
     color: white;
-    
     height: 60px;             
     width: 100%;               
     padding: 0 20px;            
     box-sizing: border-box;     
-    
     position: fixed;            
     top: 0;
     left: 0;
@@ -155,18 +152,18 @@ td {
 
 /* Skill Gap Progress Bar */
 .gap-progress-track {
-    background: #eee;
-    border-radius: 10px;
-    height: 12px;
-    width: 100%;
-    margin: 10px 0;
+    background: #e9ecef;
+    height: 8px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    overflow: hidden;
 }
-
 .gap-progress-fill {
-    background: linear-gradient(90deg, #4caf50, #8bc34a);
     height: 100%;
-    border-radius: 10px;
-    width: var(--score); 
+    border-radius: 4px;
+    transition: width 0.6s ease-in-out, background-color 0.6s ease-in-out;
+    width: var(--score, 0%);
+    background-color: color-mix(in oklch, #28a745 var(--score), #dc3545);
 }
 
 /* --- DETAILS/SUMMARY --- */

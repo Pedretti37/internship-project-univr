@@ -42,123 +42,97 @@ body {
 .hr {
     width: 100%; 
     margin-top: 30px;
-    border: 0;
-    border-top: 1px solid #ccc;
+}
+
+/* Form di Selezione */
+.analysis-controls {
+    background: #fdfdfd;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eee;
     margin-bottom: 30px;
 }
 
-/* --- Search Bar & Forms (from user_home) --- */
-.role-form {
-    margin-bottom: 10px;
-    display: flex;
-    flex-wrap: wrap; 
-    align-items: stretch;
-    gap: 15px;
-}
-
-.input {
-    flex: 1; 
-    margin: 0px; 
-    padding: 10px 15px;
-    border: 1px solid #ccc; 
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: text;
-    box-sizing: border-box;
-    outline: none;
-    background-color: white;
-}
-
-/* --- Buttons --- */
-.btn-primary {
-    background-color: #2c3e50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-family: inherit;
-    text-align: center;
-}
-.btn-primary:hover {
-    background-color: #3498db;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(44, 62, 80, 0.3);
-}
-
-.role-title {
-    background: none; 
-    border: none; 
-    padding: 0; 
-    text-decoration: underline; 
-    cursor: pointer; 
-    font-size: inherit; 
-    font-weight: bold;
-    color: #2c3e50;
-    text-decoration: none;
-}
-.role-title:hover {
-    color: #3498db;
-}
-
-/* --- Cards & Roles (from user_profile/user_home) --- */
-.course-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); 
-    border: 1px solid #eef2f6;
-    overflow: hidden; 
-    transition: transform 0.2s ease;
-    padding: 15px 20px;
+.input-group {
     margin-bottom: 15px;
 }
-.course-card:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
-
-/* --- Forecast Selection --- */
-.country-selection {
-    margin-bottom: 10px;
-    display: flex;
-    flex-wrap: wrap; 
-    align-items: stretch;
-    gap: 15px;
-}
-.country-selection label {
-    width: 100%; 
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-.country-selection br { display: none; }
 
 .selection {
-    flex: 1; 
-    margin: 0px; 
-    padding: 10px 15px;
-    border: 1px solid #ccc; 
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-sizing: border-box;
-    outline: none;
-    background-color: white;
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
 }
-.country-selection span { display: flex; }
-.country-selection .btn-primary { margin: 0; height: 100%; box-sizing: border-box; white-space: nowrap; }
 
-/* --- Skill Gap Visuals --- */
-.skill-gap-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem; 
-    padding: 1rem 0;
+/* --- CARD & SEZIONI --- */
+.card, .forecast-card {
+    background: #ffffff;
+    border: 1px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
+
+.forecast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f4f8;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #fff;
+}
+.badge-success { background-color: #27ae60; }
+.badge-danger { background-color: #c0392b; }
+.badge-info { background-color: #2980b9; }
+
+/* --- TABELLE E SCROLL --- */
+.info-box {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.history-table-container {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    background: #fff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th {
+    background: #f1f4f7;
+    position: sticky;
+    top: 0;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    text-transform: capitalize;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Skill Gap Progress Bar */
 .gap-progress-track {
     background: #e9ecef;
     height: 8px;
@@ -174,8 +148,37 @@ body {
     background-color: color-mix(in oklch, #28a745 var(--score), #dc3545);
 }
 
-.card {
-    background: transparent;
+/* --- DETAILS/SUMMARY --- */
+summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 12px;
+    background: #f1f4f7;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+summary:hover { background: #e8ecef; }
+
+
+/* Stile universale per i bottoni blu */
+.btn-primary {
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: inherit;
+    text-align: center;
+}
+
+.btn-primary:hover {
+    background-color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(44, 62, 80, 0.3);
 }
 
 /* Allinea il form di invito (input + bottone) */
