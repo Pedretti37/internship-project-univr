@@ -13,7 +13,7 @@ The application is currently in the **development phase**.
 - **Target Roles:** Users can define up to 5 target roles to track their career path.
 - **Skill Forecast by CEDEFOP:** Users can now see whether their target roles are growing/declining occupation-wise per country.
 - **Skill Gap Evaluation:** Users can evaluate the skill gap between their current skill set and target roles.
-- **Educational Offerings:** An algorithm is being set up to allow users to see available courses offered by DHBW based on their missing skill.
+- **Educational Offerings:** An algorithm is being set up to allow users to see available courses on their missing skill.
 
 ### Organization Module
 - **Organization Registration:** Companies can sign up and create a business profile.
@@ -29,7 +29,6 @@ The application is currently in the **development phase**.
 - **Data Storage:** Lightweight JSON-based file system for easy prototyping of Users, Organizations, and Projects.
 - **ESCO API Integration:** Real-time fetching of occupations and skills from the European Skills/Competences classification.
 - **Guest Access:** Limited "Continue as Guest" mode for platform exploration.
-- **Educational Courses:** From PDF to JSON containing information about DHBW learning courses (just one macro sector for now: Mechanical Engineering)
 
 ## Tech Stack
 
@@ -45,20 +44,19 @@ The application is currently in the **development phase**.
 ## Project Structure
 
 ```text
-├── config.py                   # Main configuration settings
-├── dependencies.py             # Dependency injection (Current User/Org retrieval)
+├── service/                    # Main configuration settings
 ├── main.py                     # Application entry point
 ├── requirements.txt            # Python dependencies
 │
 ├── crud/                       # JSON I/O operations (Database layer)
 ├── data/                       # JSON Storage (Users, Orgs, Projects) and CEDEFOP database
-├── educational_offerings/      # PDF to JSON for educational courses
+├── educational_offerings/      # Educational Courses
 ├── esco/                       # ESCO API integration logic
 ├── models.py                   # Pydantic data models
 ├── routers/                    # Endpoints (User, Org, etc.)
 │
-├── static/                 # CSS and static assets
-└── templates/              # HTML Jinja2 templates
+├── static/                     # CSS and static assets (.csv template)
+└── templates/                  # HTML Jinja2 templates
 ```
 
 ## How to Run
