@@ -6,13 +6,12 @@ from pydantic import EmailStr
 from typing import Optional
 
 import urllib
-from crud import crud_user, crud_org
+from crud import crud_user, crud_org, crud_skill_models, crud_cedefop
 from dependencies import get_current_user
 import csv
 import io
 
 from config import templates, pwd_context
-import crud.crud_skill_models as crud_skill_models
 from esco import escoAPI
 from models import Role, Skill, User
 
@@ -470,7 +469,7 @@ async def occupation_forecast_and_gap(
         role_id_str = str(role.id).strip()
             
         # CEDEFOP
-        data = crud_skill_models.read_emp_occupation(country=country, isco_id=role_id_str)
+        data = crud_cedefop.read_emp_occupation(country=country, isco_id=role_id_str)
         
         forecast_results.append({
             "title": role.title,  

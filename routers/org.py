@@ -7,13 +7,12 @@ from pydantic import EmailStr
 from typing import Optional
 
 import urllib
-from crud import crud_skill_models, crud_user
+from crud import crud_skill_models, crud_user, crud_org, crud_cedefop
 from dependencies import get_current_org
 from esco import escoAPI 
 import ast
 from datetime import datetime
 from config import templates, pwd_context
-import crud.crud_org as crud_org
 from models import Organization, Project, Role, Skill
 
 router = APIRouter()
@@ -501,7 +500,7 @@ async def project_calculate_skill_gap(
         role_id_str = str(role.id).strip()
             
         # CEDEFOP
-        data = crud_skill_models.read_emp_occupation(country=country, isco_id=role_id_str)
+        data = crud_cedefop.read_emp_occupation(country=country, isco_id=role_id_str)
         
         forecast_results.append({
             "title": role.title,  
