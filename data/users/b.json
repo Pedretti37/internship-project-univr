@@ -1,0 +1,11 @@
+{
+    "name": "Simone",
+    "surname": "Pedretti",
+    "username": "b",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$7n3PGcO4V4oxhrB2rpVSSg$eXD0zUUDgIZnehWeQgnlDoC6Zv/DHWQaCCMpzRARbFM",
+    "level": "manager",
+    "target_roles": [],
+    "individual_skills": [],
+    "skill_gap": [],
+    "organization": "a"
+}

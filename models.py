@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
 import uuid
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing import Optional, Dict, List, Any
+from enum import Enum
 
 class Skill(BaseModel):
     uri: str
@@ -16,12 +17,16 @@ class Role(BaseModel):
     id_full: Optional[str] = None
     uri: Optional[str] = None
 
+class UserLevel(str, Enum):
+    EMPLOYEE = "individual"
+    MANAGER = "manager"
+
 class User(BaseModel):
     name: str
     surname: str
     username: str
-    email: EmailStr
     hashed_password: str
+    level: UserLevel = UserLevel.EMPLOYEE # employee default
     target_roles: List[Role] = []
     individual_skills: List[Skill] = []
     skill_gap: List[Dict[str, Any]] = []
@@ -38,21 +43,11 @@ class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: str
+    manager: str
     assigned_members: List[str] = []
     target_roles: List[Role] = []
     skill_gap: List[Dict[str, Any]] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class Organization(BaseModel):
-    name: str
-    address: str
-    phone: str
-    email: EmailStr
-    orgname: str
-    hashed_password: str
-    members: Dict[str, List[Skill]] = {}
-    pending_members: Dict[str, List[Skill]] = {}
-    projects: List[Project] = []
 
 class Course(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -64,6 +59,16 @@ class Course(BaseModel):
     duration_weeks: Optional[int] = None
     start_date: Optional[datetime] = None
     medium_of_instruction: Optional[str] = None
-    cost: Optional[float] = 0.0
+    cost: Optional[float] = None
     location: Optional[str] = None
-    skills_covered: List[Skill] = []
+    skills_covered: Optional[List[Skill]] = []
+
+class Organization(BaseModel):
+    name: str
+    orgname: str
+    hashed_password: str
+    members: Dict[str, List[Skill]] = {}
+    pending_members: Dict[str, List[Skill]] = {}
+    projects: List[Project] = []
+    courses: List[Course] = []
+

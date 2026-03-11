@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="main-container">
-        <p>Review the skills extracted for your team before adding them to the project.</p>
+        <p>Review the skills extracted for your team.</p>
 
         {% if skills_not_found %}
             <div class="alert alert-warning">
@@ -21,7 +21,7 @@
         {% endif %}
 
         <div class="details-box">
-            <form action="/org/confirm_project_skills" method="post">
+            <form action="/org/confirm_employee_skills" method="post">
                 <input type="hidden" name="project_id" value="{{ project_id }}">
 
                 <table class="table table-striped align-middle">
@@ -65,7 +65,7 @@
                 <input type="hidden" name="total_rows" value="{{ skills_to_review|length }}">
 
                 <div class="d-flex justify-content-end gap-3 mt-4">
-                    <a href="/org_home" class="btn btn-outline-danger">Cancel Import</a>
+                    <a href="/org_profile" class="btn btn-outline-danger">Cancel Import</a>
                     <button type="submit" class="btn btn-success">Confirm and Assign to Project</button>
                 </div>
             </form>

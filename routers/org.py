@@ -2,18 +2,16 @@ import codecs
 import csv
 from fastapi import APIRouter, File, Query, Request, Form, UploadFile, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
-from pydantic import EmailStr
 from typing import Optional
 import urllib
-from crud import crud_skill_models, crud_user, crud_org
-from service import cedefop_service
+from crud import crud_user, crud_org
 from service.dependencies import get_current_org
 from esco import escoAPI 
 import ast
 from datetime import datetime
 from service.config import templates, pwd_context
-from models import Organization, Project, Role, Skill
-from educational_offerings import courses_recommendation
+from models import Organization, Project, Skill, Course, UserLevel
+from pydantic import ValidationError
 
 router = APIRouter()
 
@@ -114,14 +112,11 @@ async def org_register(request: Request):
 async def register_org(
     request: Request, 
     name: str = Form(...),
-    address: str = Form(...),
-    phone: str = Form(...),
-    email: EmailStr = Form(...), 
     orgname: str = Form(...),
     password: str = Form(...)
 ):
     hashed_pw = pwd_context.hash(password)
-    new_org = Organization(name=name, address=address, phone=phone, email=email, orgname=orgname, hashed_password=hashed_pw)
+    new_org = Organization(name=name, orgname=orgname, hashed_password=hashed_pw)
     try:
         crud_org.create_organization(new_org)
         return RedirectResponse(url="/org_login", status_code=status.HTTP_303_SEE_OTHER)
@@ -136,12 +131,20 @@ async def register_org(
 async def org_profile(
     request: Request, 
     org: Organization = Depends(get_current_org),
+    course_id: Optional[str] = Query(None),
+    skill_search: Optional[str] = Query(None),
     success: Optional[str] = Query(None),
     error: Optional[str] = Query(None),
     warning: Optional[str] = Query(None)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    skill_list = None
+
+    if skill_search and skill_search.strip():
+        skill_search = skill_search.title().strip()
+        skill_list = escoAPI.get_esco_skills_list(skill_search, language="en", limit=10)
 
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
@@ -150,6 +153,9 @@ async def org_profile(
         "request": request, 
         "org": org,
         "members": crud_user.get_users_by_usernames(org.members.keys()),
+        "skill_list": skill_list,
+        "skill_search": skill_search,
+        "active_course_id": course_id,
         "toast_msg": toast_msg,
         "toast_type": toast_type
     })
@@ -212,54 +218,34 @@ async def invite_member(
 
     return RedirectResponse(url=f"/org_profile?{type}={urllib.parse.quote(msg)}", status_code=status.HTTP_303_SEE_OTHER)
 
-### --- Create Project GET --- ###
-@router.get("/org/create_project", response_class=HTMLResponse)
-async def create_project_form(
-    request: Request, 
+@router.post("/update_user_level", response_class=RedirectResponse)
+async def update_user_level(
+    target_username: str = Form(...),
+    new_level: str = Form(...), 
     org: Organization = Depends(get_current_org)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    if target_username not in org.members:
+        msg = urllib.parse.quote("This user is not in your organization")
+        return RedirectResponse(url=f"/org_profile?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
+    user = crud_user.get_user_by_username(target_username)
+    if not user:
+        msg = urllib.parse.quote("This user is not in your organization")
+        return RedirectResponse(url=f"/org_profile?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
+    user.level = UserLevel(new_level) 
     
-    # member list for assignment with checkboxes
-    members = crud_user.get_users_by_usernames(org.members)
+    crud_user.update_user(user)
 
-    return templates.TemplateResponse("org/create_project.html", {
-        "request": request,
-        "org": org,
-        "members": members
-    })
-
-### --- Create Project POST --- ###
-@router.post("/org/create_project", response_class=RedirectResponse)
-async def create_project_submit(
-    org: Organization = Depends(get_current_org),
-    name: str = Form(...),
-    description: str = Form(...),
-    members_list: list[str] = Form(default=[]), 
-):
-    if not org:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-
-    new_project = Project(
-        name=name,
-        description=description,
-        assigned_members=members_list,
-        target_roles=[], 
-        skill_gap=[]
-    )
-
-    org.projects.append(new_project)
-    crud_org.update_org(org)
-
-    if new_project in org.projects:
-        success = f"Project '{name}' created successfully!"
-        msg = urllib.parse.quote(success)
-        return RedirectResponse(url=f"/org_home?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
+    if new_level == 'manager':
+        msg = urllib.parse.quote(f"{user.name} {user.surname} promoted to Manager!")
     else:
-        error = f"Failed to create project '{name}'."
-        msg = urllib.parse.quote(error)
-        return RedirectResponse(url=f"/org_home?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+        msg = urllib.parse.quote(f"{user.name} {user.surname} demoted from Manager.")
+
+    return RedirectResponse(url=f"/org_profile?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- View Project GET --- ###
 @router.get("/org/project/{project_id}", response_class=HTMLResponse)
@@ -290,9 +276,10 @@ async def view_project(
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
 
-    return templates.TemplateResponse("org/project_detail.html", {
+    return templates.TemplateResponse("project_detail.html", {
         "request": request,
         "org": org,
+        "is_manager": False,
         "current_project": current_project,
         "role_list": role_list,
         "role_search": role_search,
@@ -307,276 +294,10 @@ async def view_project(
         "toast_msg": toast_msg,
         "toast_type": toast_type
     })
-    
-### --- Role details for Org. projects --- ###
-@router.get("/role_details_for_project", response_class=HTMLResponse)
-async def details_page(
-    request: Request, 
-    uri: str = Query(...),
-    project_id: str = Query(...),
-    org: Organization = Depends(get_current_org),
-    success: Optional[str] = Query(None),
-    error: Optional[str] = Query(None),
-    warning: Optional[str] = Query(None)
-):
-
-    if not org:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    
-    current_project: Optional[Project] = next((p for p in org.projects if str(p.id) == project_id), None)
-    if not current_project:
-            return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
-
-    selected_role = escoAPI.get_single_role_details(uri, language="en")
-
-    if not selected_role:
-        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
-
-    toast_msg = success or warning or error
-    toast_type = "success" if success else ("warning" if warning else ("error" if error else None))
-
-    return templates.TemplateResponse("details.html", {
-        "request": request,
-        "is_user": False,
-        "role": selected_role,
-        "project_id": project_id,
-        "toast_msg": toast_msg,
-        "toast_type": toast_type
-    })
-
-### --- Project Add Role POST --- ###
-@router.post("/add_to_project_target_roles", response_class=RedirectResponse) 
-async def project_add_role(
-    request: Request,
-    project_id: str = Form(...),
-    role_id: str = Form(...),
-    title: str = Form(...),
-    description: Optional[str] = Form(None),
-    essential_skills: Optional[str] = Form(None),
-    id_full: str = Form(...),
-    uri: str = Form(...),
-    org: Organization = Depends(get_current_org)
-):
-    if not org: 
-        return RedirectResponse(url="/", status_code=303)
-
-    form_data = await request.form()
-    skills_list = []
-    encoded_uri = urllib.parse.quote(uri, safe='')
-
-    # Manual conversion from string to list[Skill]
-    if essential_skills:
-        try:
-            skills_list = ast.literal_eval(essential_skills)
-            # Check
-            if isinstance(skills_list, list):
-                skills_list = skills_list
-            else:
-                msg = urllib.parse.quote(f"Parsed_data not a valid list. Found type: {type(skills_list)}")
-                return RedirectResponse(url=f"/role_details_for_project?uri={encoded_uri}&error={msg}", status_code=status.HTTP_303_SEE_OTHER)
-            
-        except (ValueError, SyntaxError) as e:
-            msg = urllib.parse.quote(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
-            return RedirectResponse(url=f"/role_details_for_project?uri={encoded_uri}&error={msg}", status_code=status.HTTP_303_SEE_OTHER)
-    else:
-        msg = urllib.parse.quote("No essential skills data provided for this role.")
-        return RedirectResponse(url=f"/role_details_for_project?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
-
-
-    final_skills_list = []
-
-    for skill_dict in skills_list:
-        skill_uri = skill_dict.get("uri")
-        selected_level = form_data.get(f"level_{skill_uri}")
-        
-        if selected_level:
-            skill_dict["level"] = int(selected_level)
-        else:
-            skill_dict["level"] = 5  # Default level if not selected, can be adjusted as needed
-            
-        final_skills_list.append(Skill(**skill_dict))
-
-    role_object = Role(
-        id=role_id,
-        title=title,
-        description=description if description else "No description available.",
-        essential_skills=final_skills_list,
-        id_full=id_full,
-        uri=uri
-    )
-
-    toast_msg = "Error: target role not added."
-    toast_type = "error" # Toast Rosso ❌
-    updated_target_role = False
-    project_found = False
-
-    for i, project in enumerate(org.projects):
-        if str(project.id) == project_id:
-            project_found = True
-            already_exists = any(r.uri == uri for r in project.target_roles)
-            
-            if not already_exists:
-                project.target_roles.append(role_object)
-                
-                org.projects[i] = project 
-                
-                updated_target_role = True
-                toast_msg = f"Role '{title}' added to project successfully!"
-                toast_type = "success"  # Toast Verde ✅
-            else:
-                toast_msg = f"The role '{title}' is already in your target list."
-                toast_type = "warning"  # Toast Giallo ⚠️
-            
-            break
-
-    if not project_found:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
-    
-    if updated_target_role:
-        crud_org.update_org(org)
-
-    encoded_msg = urllib.parse.quote(toast_msg)
-    #return RedirectResponse(url=f"/role_details_for_project?uri={encoded_uri}&project_id={project_id}&{toast_type}={encoded_msg}", status_code=status.HTTP_303_SEE_OTHER)
-    return RedirectResponse(url=f"/org/project/{project_id}?{toast_type}={encoded_msg}", status_code=status.HTTP_303_SEE_OTHER)
-
-### --- Delete Target Role from Project --- ###    
-@router.post("/delete_project_target_role", response_class=RedirectResponse)
-async def delete_project_target_role(
-    org: Organization = Depends(get_current_org),
-    uri: str = Form(...),
-    project_id: str = Form(...)
-):
-    if not org:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-
-    role_removed = False
-    for project in org.projects:
-        if str(project.id) == project_id:
-            for role in project.target_roles:
-                if role.uri == uri:
-                    project.target_roles.remove(role)
-                    role_removed = True
-                    break
-
-    if role_removed:
-        crud_org.update_org(org)
-
-    return RedirectResponse(url=f"/org/project/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
-
-### --- Add Member to Project POST --- ###
-@router.post("/org/project/{project_id}/add_member", response_class=RedirectResponse)
-async def add_member_to_project(
-    project_id: str,
-    username_to_add: str = Form(...),
-    org: Organization = Depends(get_current_org)
-):
-    if not org: 
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-
-    project = next((p for p in org.projects if str(p.id) == project_id), None)
-    if project is None:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
-    
-    user_in_org = next((u for u in org.members if u == username_to_add), None)
-    if not user_in_org:
-        msg = f"User '{username_to_add}' is not a member of your organization."
-        type_msg = "warning"
-    
-    elif username_to_add in project.assigned_members:
-        msg = f"User '{username_to_add}' is already assigned to this project."
-        type_msg = "warning"
-    
-    else:
-        project.assigned_members.append(username_to_add)
-        crud_org.update_org(org)
-        msg = f"User '{username_to_add}' added to the project successfully!"
-        type_msg = "success"
-
-    encoded_msg = urllib.parse.quote(msg)
-    msg_type = "success" if type_msg == "success" else ("warning" if type_msg == "warning" else "error")
-    return RedirectResponse(url=f"/org/project/{project_id}?{msg_type}={encoded_msg}", status_code=status.HTTP_303_SEE_OTHER)
-
-### --- Project Calculate Skill Gap POST --- ###
-@router.post("/org/project/forecast_gap_courses", response_class=HTMLResponse)
-async def project_forecast_gap_courses(
-    request: Request,
-    project_id: str = Form(...),
-    org: Organization = Depends(get_current_org),
-    country: str = Form(...),
-    sector: Optional[str] = Form(None)
-):
-    if not org: 
-        return RedirectResponse(url="/", status_code=303)
-
-    project_index = next((i for i, p in enumerate(org.projects) if str(p.id) == project_id), None)
-    if project_index is None:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
-    
-    project = org.projects[project_index]
-
-    if len(project.target_roles) > 5:
-        msg = urllib.parse.quote("You can analyze up to 5 target roles at a time.")
-        return RedirectResponse(url=f"/org/project/{project_id}?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
-    
-    db = request.app.state.cedefop
-
-    forecast_results = []
-    for role in project.target_roles:
-        # String conversion and cleanup
-        role_id_str = str(role.id).strip()
-            
-        # CEDEFOP
-        occ_data = cedefop_service.read_emp_occupation(db, country, role_id_str)
-        sec_data = cedefop_service.read_emp_sector_occupation(db, country, sector, role_id_str)
-        qual_data = cedefop_service.read_qualifications(db, country, role_id_str)
-        job_data = cedefop_service.read_job_openings(db, country, role_id_str)
-
-        forecast_results.append({
-            "title": role.title,  
-            "isco_code": role_id_str,
-            "uri": role.uri,
-            "occupation_data": occ_data,
-            "sector_data": sec_data,
-            "qualifications_data": qual_data,
-            "job_openings_data": job_data             
-        })
-
-    assigned_members = crud_user.get_users_by_usernames(project.assigned_members)
-    updated_project = crud_skill_models.skill_gap_project(project, org.members)
-    org.projects[project_index] = updated_project
-    crud_org.update_org(org)
-
-    # Course recommendation
-    all_missing_skills = {}
-    for role_gap in updated_project.skill_gap:
-        for skill in role_gap.get("missing_skills", []):
-            all_missing_skills[skill.uri] = skill.name
-        for skill_entry in role_gap.get("partially_matching_skills", []):
-            s_obj = skill_entry["skill"]
-            all_missing_skills[s_obj.uri] = s_obj.name
-
-    # List of recommended courses for the missing skills
-    # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
-    # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = courses_recommendation(all_missing_skills)
-
-    return templates.TemplateResponse("org/project_detail.html", {
-        "request": request,
-        "org": org,
-        "forecast_results": forecast_results, 
-        "recommended_courses": recommended_courses,
-        "country": country,
-        "sector": sector,
-        "countries_list": EU_COUNTRIES,
-        "sectors_list": CEDEFOP_SECTORS,
-        "current_project": updated_project,
-        "team": assigned_members,
-        "current_year": datetime.now().year
-    })
 
 ### --- Upload Skills CSV for Organization --- ###
-@router.post("/upload_project_skills_csv", response_class=HTMLResponse)
-async def upload_project_skills_csv(
+@router.post("/upload_employee_skills_csv", response_class=HTMLResponse)
+async def upload_employee_skills_csv(
     request: Request,
     file: UploadFile = File(...),
     org: Organization = Depends(get_current_org)
@@ -669,8 +390,8 @@ async def upload_project_skills_csv(
         "toast_type": msg_type
     })
 
-@router.post("/org/confirm_project_skills", response_class=RedirectResponse)
-async def confirm_project_skills_csv(
+@router.post("/org/confirm_employee_skills", response_class=RedirectResponse)
+async def confirm_employee_skills(
     request: Request,
     org: Organization = Depends(get_current_org)
 ):
@@ -724,3 +445,104 @@ async def confirm_project_skills_csv(
 
     msg = urllib.parse.quote("Skills processed successfully.")
     return RedirectResponse(url=f"/org_profile?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- Create Course --- ###
+@router.post("/add_course", response_class=RedirectResponse)
+async def add_course(
+    title: str = Form(...),
+    description: str = Form(...),
+    moi: Optional[str] = Form(None),
+    ects: Optional[int] = Form(None),
+    format: Optional[str] = Form(None),
+    start_date: Optional[datetime] = Form(None),
+    duration_weeks: Optional[int] = Form(0),
+    cost: Optional[float] = Form(0.0),
+    link: Optional[str] = Form(None),
+    location: Optional[str] = Form(None),
+    is_public: bool = Form(False), 
+    
+    org: Organization = Depends(get_current_org)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    new_course = Course(
+        title=title,
+        description=description,
+        medium_of_instruction=moi,
+        ects=ects,
+        format=format,
+        start_date=start_date,
+        duration_weeks=duration_weeks,
+        cost=cost,
+        link=link,
+        location=location,
+        is_public=is_public,
+        skills_covered=[] # Added later on!
+    )
+
+    # List creation if not present
+    if not hasattr(org, 'courses') or org.courses is None:
+        org.courses = []
+
+    org.courses.append(new_course)
+    crud_org.update_org(org)
+
+    msg = urllib.parse.quote("Course created successfully! Now you can add skills.")
+    return RedirectResponse(url=f"/org_profile?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- Add skills to course --- ###
+@router.post("/add_skill_course", response_class=RedirectResponse)
+async def add_skill_course(
+    request: Request,
+    course_id: str = Form(...),
+    uri: str = Form(...),
+    name: str = Form(...),
+    skill_search: Optional[str] = Form(None),
+    org: Organization = Depends(get_current_org)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+    form_data = await request.form()
+    selected_level = form_data.get(f"level_{uri}")
+
+    search_query = ""
+    if skill_search:
+        search_query = f"&skill_search={urllib.parse.quote(skill_search)}&"
+
+    if not selected_level:
+        msg = urllib.parse.quote("Please select a level first.")
+        return RedirectResponse(url=f"/org_profile?{search_query}warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
+    level = int(selected_level)
+
+    target_course = next((c for c in org.courses if str(c.id) == course_id), None)
+    
+    if not target_course:
+        msg = urllib.parse.quote("Course not found.")
+        return RedirectResponse(url=f"/org_profile?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
+    try:
+        new_skill = Skill(uri=uri, name=name, level=level)
+    except ValidationError as e:
+        msg = urllib.parse.quote("Invalid skill data.")
+        return RedirectResponse(url=f"/org_profile?course_id={course_id}&error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
+    existing_skill = next((s for s in target_course.skills_covered if s.uri == uri), None)
+    
+    if existing_skill:
+        existing_skill.level = level
+        msg = urllib.parse.quote(f"Skill '{name}' updated to level {level}.")
+    else:
+        target_course.skills_covered.append(new_skill)
+        msg = urllib.parse.quote(f"Skill '{name}' added successfully to the course.")
+
+    crud_org.update_org(org)
+
+    redirect_url = f"/org_profile?course_id={course_id}&success={msg}"
+    
+    if skill_search:
+        redirect_url += f"&skill_search={urllib.parse.quote(skill_search)}"
+
+    return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)

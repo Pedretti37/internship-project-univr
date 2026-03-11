@@ -55,9 +55,29 @@
                     {% for member in members %}
                         <details>
                             <summary>
-                                <span><strong>{{ member.name }} {{ member.surname }}</strong></span>
+                                <span>{{ member.name }} {{ member.surname }}</span>
                                 <small class="member-username">@{{ member.username }}</small>
+                                {% if member.level == 'manager' %}
+                                    <span><strong>Manager</strong></span>
+                                {% endif %}
                             </summary>
+
+                            <form action="/update_user_level" method="post" style="margin: 0;">
+                                <input type="hidden" name="target_username" value="{{ member.username }}">
+                                
+                                {% if member.level == 'manager' %}
+                                    <input type="hidden" name="new_level" value="individual">
+                                    <button type="submit" class="btn btn-warning" style="padding: 2px 8px; font-size: 0.9em;" onclick="event.stopPropagation();">
+                                        Revoke Manager
+                                    </button>
+                                {% else %}
+                                    <input type="hidden" name="new_level" value="manager">
+                                    <button type="submit" class="btn btn-success" style="padding: 2px 8px; font-size: 0.9em;" onclick="event.stopPropagation();">
+                                        Promote to Manager
+                                    </button>
+                                {% endif %}
+                            </form>
+
                             <div>
                                 {% set org_skills = org.members.get(member.username) %}
                                 {% if org_skills and org_skills|length > 0 %}
@@ -92,12 +112,201 @@
             <h3>Upload your team's Skill Model (from MuchSkills)</h3>
             <p>Select the CSV file containing your team's skill data.</p>
             <p><small>
-                If CSV file contains your employee usernames, their profile will be updated. If an username in not in your team, an invitation will be sent to them.
+                If CSV file contains your employee usernames, their profile will be updated. If an username is not in your team, an invitation will be sent to them.
             </small></p>
-            <form action="/upload_project_skills_csv" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
+            <form action="/upload_employee_skills_csv" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
                 <input type="file" name="file" accept=".csv" class="form-control" required style="max-width: 300px;">
                 <button type="submit" class="btn btn-success">Upload CSV</button>
             </form>
         </section>
+
+        <section class="card">
+            <h3>Create a new Course</h3>
+            <form action="/add_course" method="post">
+
+                <div>
+                    <label for="title">Course title *</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+
+                <div>
+                    <label for="description">Descrption *</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                </div>
+
+                <div>
+                    <label for="moi">Language</label>
+                    <input type="text" id="moi" name="moi">
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <div>
+                        <label for="ects">ECTS</label>
+                        <input type="number" id="ects" name="ects" min="1">
+                    </div>
+                    
+                    <div >
+                        <label for="format">Format</label>
+                        <select id="format" name="format">
+                            <option value="">Choose...</option>
+                            <option value="Online">Online</option>
+                            <option value="In-person">In-person</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <div>
+                        <label for="start_date">Start date</label>
+                        <input type="date" id="start_date" name="start_date">
+                    </div>
+
+                    <div>
+                        <label for="duration">Duration (weeks)</label>
+                        <input type="number" id="duration_weeks" name="duration_weeks" step="1" value="0">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="cost">Cost (€)</label>
+                    <input type="number" id="cost" name="cost" step="0.01" value="0.00">
+                </div>
+
+                <div>
+                    <label for="link">Course link</label>
+                    <input type="url" id="link" name="link" placeholder="https://...">
+                </div>
+
+                <div>
+                    <label for="location">Location</label>
+                    <input type="text" id="location" name="location">
+                </div>
+
+                <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="is_public" name="is_public" value="true" checked style="width: auto;">
+                    <label for="is_public" style="margin: 0; cursor: pointer;">
+                        <strong>Make this course public</strong><br>
+                        <small class="text-muted">If checked, this course will be visible to other organizations and users.</small>
+                    </label>
+                </div>
+
+                <div>
+                    <p>You can add some skills later on after creating the course.</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save Course</button>
+            </form>
+        </section>
+
+        {% if org.courses %}
+            <section class="card">
+                <h3>Your courses</h3>
+                {% for course in org.courses %}
+                    <details {% if active_course_id == course.id %} open {% endif %}>
+                        <summary>
+                            <span style="font-weight: bold; font-size: 1.1em;">{{ course.title }}</span>
+                            {% if course.is_public %}
+                                <span style="font-size: 0.8em; color: #28a745;">(Public)</span>
+                            {% else %}
+                                <span style="font-size: 0.8em; color: #6c757d;">(Private)</span>
+                            {% endif %}
+                        </summary>
+                        <div style="margin-top: 15px;">
+                            <div class="course-info">
+                                <p>{{ course.description }}</p>
+                                <ul style="list-style: none; padding: 0; display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.9em;">
+                                    <li><strong>Format:</strong> {{ course.format | default('N/A', true) }}</li>
+                                    <li><strong>Language:</strong> {{ course.medium_of_instruction | default('N/A', true) }}</li>
+                                    <li><strong>ECTS:</strong> {{ course.ects | default('N/A', true) }}</li>
+                                    <li><strong>Cost:</strong> €{{ course.cost | default('N/A', true) }}</li>
+                                </ul>
+                                <ul style="list-style: none; padding: 0;">
+                                    <li><strong>Start date:</strong> {{course.start_date | default('N/A', true) }}</li>
+                                    <li><strong>Duration (weeks):</strong> {{course.duration_weeks | default('N/A', true) }}</li>
+                                </ul>
+                                {% if course.link %}
+                                    <a href="{{ course.link }}" target="_blank" style="font-size: 0.9em;">🔗 Go to course page</a>
+                                {% endif %}
+                                <p><strong>Location:</strong> {{ course.location }}</p>
+                            </div>
+
+                            <hr style="margin: 15px 0;">
+
+                            <div class="course-skills">
+                                <h4>Covered Skills</h4>
+                                {% if course.skills_covered %}
+                                    <ul class="skill-pills" style="display: flex; gap: 10px; flex-wrap: wrap; list-style: none; padding: 0;">
+                                        {% for skill in course.skills_covered %}
+                                            <li style="background: #e9ecef; padding: 5px 10px; border-radius: 15px; font-size: 0.85em;">
+                                                {{ skill.name | title }} 
+                                                <strong>(Lvl: {{ skill.level }}/9)</strong>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted" style="font-size: 0.9em; font-style: italic;">No skills mapped to this course yet.</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="add-skill-form" style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                <h4 style="margin-top: 0;">Add a Skill from ESCO</h4>
+                                
+                                <form action="/org_profile" method="get" style="display: flex; gap: 10px;">
+                                    <input type="hidden" name="course_id" value="{{ course.id }}">
+                                    
+                                    <input type="text" name="skill_search" placeholder="Search ESCO (e.g. Python, Management)..." value="{{ skill_search or '' }}" required style="flex-grow: 1;">
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                </form>
+                                
+                                {% if skill_list %}
+                                    <div>
+                                        <h4>Results for "<strong>{{ skill_search }}</strong>"</h4>
+                                        {% for skill in skill_list %}
+                                            <details>
+                                                <summary>
+                                                    <span>{{ skill.name | title }}</span>
+                                                </summary>
+                                                <form action="/add_skill_course" method="post">
+                                                    <input type="hidden" name="course_id" value="{{ course.id }}">
+                                                    <input type="hidden" name="uri" value="{{ skill.uri }}">
+                                                    <input type="hidden" name="name" value="{{ skill.name }}">
+                                                    <input type="hidden" name="skill_search" value="{{ skill_search }}">
+                                                    
+                                                    <select name="level_{{ skill.uri }}" class="selection">
+                                                        <option value="">-- Select level --</option>
+                                                        <option value="1">1 - Principiante</option>
+                                                        <option value="2">2 - Base</option>
+                                                        <option value="3">3 - Intermedio-basso</option>
+                                                        <option value="4">4 - Buono</option>
+                                                        <option value="5">5 - Intermedio</option>
+                                                        <option value="6">6 - Avanzato</option>
+                                                        <option value="7">7 - Esperto</option>
+                                                        <option value="8">8 - Master</option>
+                                                        <option value="9">9 - Guru</option>
+                                                    </select>
+
+                                                    <button type="submit" class="btn btn-primary">
+                                                            Add
+                                                    </button>
+                                                </form>
+                                            </details>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {% if skill_search %}
+                                        <div class="no-results">
+                                            <p>No skills found for "<strong>{{ skill_search }}</strong>".</p>
+                                            <p style="font-size: 0.9em; color: #666;">Try checking the spelling or use another term.</p>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </details>
+                {% endfor %}
+            </section>
+        {% endif %}
     </div>
 {% endblock %}
