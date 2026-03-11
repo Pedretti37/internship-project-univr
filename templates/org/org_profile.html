@@ -67,12 +67,12 @@
                                 
                                 {% if member.level == 'manager' %}
                                     <input type="hidden" name="new_level" value="individual">
-                                    <button type="submit" class="btn btn-warning" style="padding: 2px 8px; font-size: 0.9em;" onclick="event.stopPropagation();">
+                                    <button type="submit" style="padding: 2px 8px; font-size: 0.9em;" onclick="event.stopPropagation();">
                                         Revoke Manager
                                     </button>
                                 {% else %}
                                     <input type="hidden" name="new_level" value="manager">
-                                    <button type="submit" class="btn btn-success" style="padding: 2px 8px; font-size: 0.9em;" onclick="event.stopPropagation();">
+                                    <button type="submit" style="padding: 2px 8px; font-size: 0.9em;" onclick="event.stopPropagation();">
                                         Promote to Manager
                                     </button>
                                 {% endif %}
@@ -91,7 +91,7 @@
                                         {% endfor %}
                                     </ul>
                                 {% else %}
-                                    <p class="text-muted"><em>No organizational skills certified for this user yet.</em></p>
+                                    <p><em>No organizational skills certified for this user yet.</em></p>
                                 {% endif %}
                             </div>
                         </details>
@@ -114,41 +114,130 @@
             <p><small>
                 If CSV file contains your employee usernames, their profile will be updated. If an username is not in your team, an invitation will be sent to them.
             </small></p>
-            <form action="/upload_employee_skills_csv" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
+            <form action="/upload_employee_skills_csv" method="post" enctype="multipart/form-data">
                 <input type="file" name="file" accept=".csv" class="form-control" required style="max-width: 300px;">
                 <button type="submit" class="btn btn-success">Upload CSV</button>
             </form>
         </section>
 
         <section class="card">
-            <h3>Create a new Course</h3>
-            <form action="/add_course" method="post">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0;">Organizational Skill Gap Analysis</h2>
+                <form action="/org_global_gap" method="get" style="margin: 0;">
+                    <button type="submit" class="btn btn-primary">Analyze</button>
+                </form>
+
+                <a href="/org_profile" class="btn btn-primary">Close Analysis</a>
+            </div>
+            {% if analysis_active %}
+                <hr style="margin: 20px 0;">
+                <button onclick="downloadPDF()" class="btn btn-primary">📄 Export PDF</button>
+
+                <div id="report-content">
+                    <h3>Missing Skills Across Projects</h3>
+                    {% if global_gap %}
+                        <ul>
+                        {% for uri, data in global_gap.items() %}
+                            <li style="margin-bottom: 5px;">
+                                <strong>{{ data.name | title }}</strong> 
+                                <span class="text-muted">- Missing in {{ data.count }} project(s)</span>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No skill gaps found in current projects.</p>
+                    {% endif %}
+
+                    <hr style="margin: 20px 0;">
+
+                    <h3>Recommended Corporate Training (HR Level)</h3>
+                    {% if hr_recommendations %}
+                        <div>
+                        {% for course in hr_recommendations %}
+                            <div style="border: 1px solid #ccc; padding: 15px; border-radius: 5px; background: #fafafa; page-break-inside: avoid; break-inside: avoid;">
+                                <span style="background: #e2e3e5; color: #383d41; padding: 3px 8px; border-radius: 3px; font-size: 0.8em; font-weight: bold; text-transform: uppercase;">
+                                    {{ course.category }}
+                                </span>
+                                
+                                <h4 style="margin: 10px 0 5px 0;">{{ course.title }}</h4>
+                                <p style="margin: 0 0 10px 0; font-size: 0.9em;">{{ course.description | truncate(200, False, '...') }}</p>
+                                
+                                <ul style="margin: 0; padding-left: 20px; font-size: 0.85em; color: #555;">
+                                    <li><strong>Format:</strong> {{ course.format or 'N/A' }}</li>
+                                    <li><strong>Cost:</strong> {% if course.cost %}€{{ course.cost }}{% else %}Free{% endif %}</li>
+                                    <li><strong>Start date:</strong> {{ course.start_date or 'N/A' }}</li>
+                                    <li><strong>Duration (weeks):</strong> {{ course.duration_weeks or 'N/A' }}</li>
+                                    <li><strong>Location:</strong> {{ course.location or 'N/A' }}</li>
+                                </ul>
+                                
+                                {% if course.link %}
+                                    <a href="{{ course.link }}" target="_blank" style="display: inline-block; margin-top: 10px; font-weight: bold;">View Details &rarr;</a>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No specific HR-level courses (Seminars, Industrial Training) found for these skill gaps.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            {% if course_to_edit %}
+                <h3>Edit Course: {{ course_to_edit.title }}</h3>
+                <form action="/edit_course/{{ course_to_edit.id }}" method="post">
+            {% else %}
+                <h3>Create a new Course</h3>
+                <form action="/add_course" method="post">
+            {% endif %}
 
                 <div>
                     <label for="title">Course title *</label>
-                    <input type="text" id="title" name="title" required>
+                    <input type="text" id="title" name="title" value="{{ course_to_edit.title if course_to_edit else '' }}" required>
                 </div>
 
                 <div>
                     <label for="description">Descrption *</label>
-                    <textarea id="description" name="description" rows="4" required></textarea>
+                    <textarea id="description" name="description" rows="4" required>{{ course_to_edit.description if course_to_edit else '' }}</textarea>
+                </div>
+
+                <div>
+                    <label for="category">Course Category *</label>
+                    <select id="category" name="category" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                        <option value="" disabled {% if not course_to_edit %}selected{% endif %}>Select a category...</option>
+                        
+                        <optgroup label="Individual & Manager Level">
+                            <option value="Online Course">Online Course</option>
+                            <option value="University Course">University Course</option>
+                            <option value="Video Tutorial">Video Tutorial</option>
+                            <option value="Webinar">Webinar</option>
+                        </optgroup>
+                        
+                        <optgroup label="HR & Organization Level">
+                            <option value="Seminar">Seminar</option>
+                            <option value="Hands-on Session">Hands-on Session</option>
+                            <option value="Industrial Training">Industrial Training</option>
+                        </optgroup>
+                    </select>
+                    <small class="text-muted">This helps the system recommend the right training to the right user level.</small>
                 </div>
 
                 <div>
                     <label for="moi">Language</label>
-                    <input type="text" id="moi" name="moi">
+                    <input type="text" id="moi" name="moi" value="{{ course_to_edit.medium_of_instruction if course_to_edit else '' }}">
                 </div>
 
                 <div style="display: flex; gap: 10px;">
                     <div>
                         <label for="ects">ECTS</label>
-                        <input type="number" id="ects" name="ects" min="1">
+                        <input type="number" id="ects" name="ects" min="1" value="{{ course_to_edit.ects if course_to_edit else '' }}">
                     </div>
                     
                     <div >
                         <label for="format">Format</label>
                         <select id="format" name="format">
-                            <option value="">Choose...</option>
+                            <option value="" {% if not course_to_edit or not course_to_edit.format %}selected{% endif %}>Choose...</option>
                             <option value="Online">Online</option>
                             <option value="In-person">In-person</option>
                             <option value="Hybrid">Hybrid</option>
@@ -159,28 +248,28 @@
                 <div style="display: flex; gap: 10px;">
                     <div>
                         <label for="start_date">Start date</label>
-                        <input type="date" id="start_date" name="start_date">
+                        <input type="date" id="start_date" name="start_date" value="{{ course_to_edit.start_date if course_to_edit else '' }}">
                     </div>
 
                     <div>
                         <label for="duration">Duration (weeks)</label>
-                        <input type="number" id="duration_weeks" name="duration_weeks" step="1" value="0">
+                        <input type="number" id="duration_weeks" name="duration_weeks" step="1" value="{{ course_to_edit.duration_weeks if course_to_edit else '0' }}">
                     </div>
                 </div>
 
                 <div>
                     <label for="cost">Cost (€)</label>
-                    <input type="number" id="cost" name="cost" step="0.01" value="0.00">
+                    <input type="number" id="cost" name="cost" step="0.01" value="{{ course_to_edit.cost if course_to_edit else '0.00' }}">
                 </div>
 
                 <div>
                     <label for="link">Course link</label>
-                    <input type="url" id="link" name="link" placeholder="https://...">
+                    <input type="url" id="link" name="link" placeholder="https://..." value="{{ course_to_edit.link if course_to_edit else '' }}">
                 </div>
 
                 <div>
                     <label for="location">Location</label>
-                    <input type="text" id="location" name="location">
+                    <input type="text" id="location" name="location" value="{{ course_to_edit.location if course_to_edit else '' }}">
                 </div>
 
                 <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
@@ -195,7 +284,15 @@
                     <p>You can add some skills later on after creating the course.</p>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Save Course</button>
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">
+                        {% if course_to_edit %}Update Course{% else %}Save Course{% endif %}
+                    </button>
+                    
+                    {% if course_to_edit %}
+                        <a href="/org_profile" style="text-decoration: none;">Cancel</a>
+                    {% endif %}
+                </div>
             </form>
         </section>
 
@@ -303,10 +400,60 @@
                                 {% endif %}
                             </div>
 
+                            <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: center;">
+                                <form action="/toggle_course_visibility/{{ course.id }}" method="post" style="margin: 0;">
+                                    {% if course.is_public %}
+                                        <button type="submit" class="btn btn-primary" title="Revoke Public Access">
+                                            Make Private
+                                        </button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-primary" title="Give Public Access">
+                                            Make Public
+                                        </button>
+                                    {% endif %}
+                                </form>
+
+                                <form action="/org_profile" method="get">
+                                    <input type="hidden" name="edit_course_id" value="{{ course.id }}">
+                                    <button type="submit" class="btn btn-primary">
+                                        Edit
+                                    </button>
+                                </form>
+
+                                <form action="/delete_course/{{ course.id }}" method="post" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this course? This action cannot be undone.');">
+                                    <button type="submit" class="btn btn-primary">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                            <hr class="hr">
                         </div>
                     </details>
                 {% endfor %}
             </section>
         {% endif %}
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        function downloadPDF() {
+            const element = document.getElementById('report-content');
+            
+            const opt = {
+                margin:       [0.5, 0.5, 0.5, 0.5], 
+                filename:     'HR_Skill_Gap_Report.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2,
+                    scrollY: 0,           
+                    useCORS: true,        
+                    backgroundColor: '#ffffff' 
+                }, 
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
 {% endblock %}

@@ -1,0 +1,11 @@
+{
+    "name": "Luca",
+    "surname": "Quaresima",
+    "username": "c",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$RwjBWCsFIGQsZexdy9n73w$dEIhveZOYD0QDycMeHVFWZ+Pl48fLT8y3yyFJQetej4",
+    "level": "individual",
+    "target_roles": [],
+    "individual_skills": [],
+    "skill_gap": [],
+    "organization": "a"
+}

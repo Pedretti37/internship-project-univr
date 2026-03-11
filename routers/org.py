@@ -7,11 +7,11 @@ import urllib
 from crud import crud_user, crud_org
 from service.dependencies import get_current_org
 from esco import escoAPI 
-import ast
 from datetime import datetime
 from service.config import templates, pwd_context
 from models import Organization, Project, Skill, Course, UserLevel
 from pydantic import ValidationError
+from educational_offerings.courses_recommendation import recommend_courses_for_skill_gap
 
 router = APIRouter()
 
@@ -133,6 +133,8 @@ async def org_profile(
     org: Organization = Depends(get_current_org),
     course_id: Optional[str] = Query(None),
     skill_search: Optional[str] = Query(None),
+    analyze: Optional[bool] = Query(False),
+    edit_course_id: Optional[str] = Query(None),
     success: Optional[str] = Query(None),
     error: Optional[str] = Query(None),
     warning: Optional[str] = Query(None)
@@ -140,11 +142,49 @@ async def org_profile(
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
+    global_gap = {}
+    hr_recommendations = []
+
+    if analyze:
+        for project in org.projects:
+            gaps = project.get("skill_gap", []) if isinstance(project, dict) else project.skill_gap
+            for gap_entry in gaps:
+                missing = gap_entry.get("missing_skills", [])
+                partial = [p["skill"] for p in gap_entry.get("partially_matching_skills", [])]
+                all_needed = missing + partial
+                
+                for skill in all_needed:
+                    uri = skill["uri"] if isinstance(skill, dict) else skill.uri
+                    name = skill["name"] if isinstance(skill, dict) else skill.name
+                    if uri not in global_gap:
+                        global_gap[uri] = {"name": name, "count": 0}
+                    global_gap[uri]["count"] += 1
+
+        # Sorting for count
+        global_gap = dict(sorted(global_gap.items(), key=lambda item: item[1]['count'], reverse=True))
+
+        # Recommendation for orgs
+        if global_gap:
+            skills_to_recommend = {uri: data["name"] for uri, data in global_gap.items()}
+            all_orgs = crud_org.get_all_orgs()
+            hr_recommendations = recommend_courses_for_skill_gap(
+                skills_to_recommend, "hr", org.orgname, all_orgs
+            )
+
+    # Keeping research with ESCO API
     skill_list = None
 
     if skill_search and skill_search.strip():
         skill_search = skill_search.title().strip()
         skill_list = escoAPI.get_esco_skills_list(skill_search, language="en", limit=10)
+
+    # If course to edit
+    course_to_edit = None
+    if edit_course_id:
+        for c in org.courses:
+            if str(c.id) == edit_course_id:
+                course_to_edit = c
+                break
 
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
@@ -156,6 +196,10 @@ async def org_profile(
         "skill_list": skill_list,
         "skill_search": skill_search,
         "active_course_id": course_id,
+        "global_gap": global_gap,
+        "hr_recommendations": hr_recommendations,
+        "analysis_active": analyze,
+        "course_to_edit": course_to_edit,
         "toast_msg": toast_msg,
         "toast_type": toast_type
     })
@@ -381,7 +425,7 @@ async def upload_employee_skills_csv(
         query_params = f"warning={urllib.parse.quote(msg)}"
         return RedirectResponse(url=f"/org_profile?{query_params}", status_code=303)
 
-    return templates.TemplateResponse("org/review_project_skills.html", {
+    return templates.TemplateResponse("org/review_employee_skills.html", {
         "request": request,
         "org": org,
         "skills_to_review": skills_to_review,
@@ -446,11 +490,16 @@ async def confirm_employee_skills(
     msg = urllib.parse.quote("Skills processed successfully.")
     return RedirectResponse(url=f"/org_profile?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
+@router.get("/org_global_gap")
+async def org_global_gap():
+    return RedirectResponse(url="/org_profile?analyze=true", status_code=status.HTTP_303_SEE_OTHER)
+
 ### --- Create Course --- ###
 @router.post("/add_course", response_class=RedirectResponse)
 async def add_course(
     title: str = Form(...),
     description: str = Form(...),
+    category: str = Form(...),
     moi: Optional[str] = Form(None),
     ects: Optional[int] = Form(None),
     format: Optional[str] = Form(None),
@@ -469,6 +518,7 @@ async def add_course(
     new_course = Course(
         title=title,
         description=description,
+        category=category,
         medium_of_instruction=moi,
         ects=ects,
         format=format,
@@ -490,6 +540,79 @@ async def add_course(
 
     msg = urllib.parse.quote("Course created successfully! Now you can add skills.")
     return RedirectResponse(url=f"/org_profile?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- TOGGLE VISIBILITY (Give/Revoke Access) --- ###
+@router.post("/toggle_course_visibility/{course_id}")
+async def toggle_course_visibility(
+    course_id: str, 
+    org: Organization = Depends(get_current_org)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    for course in org.courses:
+        if str(course.id) == course_id:
+            # Switch state of visibility
+            course.is_public = not course.is_public
+            crud_org.update_org(org)
+            status_msg = "public" if course.is_public else "private"
+            return RedirectResponse(
+                url=f"/org_profile?success=Course+is+now+{status_msg}", 
+                status_code=status.HTTP_303_SEE_OTHER
+            )
+            
+    return RedirectResponse(url="/org_profile?error=Course+not+found", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- Delete course --- ###
+@router.post("/delete_course/{course_id}")
+async def delete_course(
+    course_id: str, 
+    org: Organization = Depends(get_current_org)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    
+    original_count = len(org.courses)
+    org.courses = [c for c in org.courses if str(c.id) != course_id]
+    
+    if len(org.courses) < original_count:
+        crud_org.update_org(org)
+        return RedirectResponse(url="/org_profile?success=Course+deleted+successfully", status_code=status.HTTP_303_SEE_OTHER)
+        
+    return RedirectResponse(url="/org_profile?error=Course+not+found", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- Update course --- ###
+@router.post("/edit_course/{course_id}")
+async def edit_course(
+    course_id: str,
+    title: str = Form(...),
+    description: str = Form(...),
+    category: str = Form(...),
+    format: Optional[str] = Form(None),
+    cost: Optional[float] = Form(0.0),
+    location: Optional[str] = Form(None),
+    link: Optional[str] = Form(None),
+    moi: Optional[str] = Form(None),
+    org: Organization = Depends(get_current_org)
+):
+    if not org:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+        
+    for course in org.courses:
+        if str(course.id) == course_id:
+            course.title = title
+            course.description = description
+            course.category = category
+            course.format = format
+            course.cost = cost
+            course.location = location
+            course.link = link
+            course.medium_of_instruction = moi
+            
+            crud_org.update_org(org)
+            return RedirectResponse(url="/org_profile?success=Course+updated+successfully", status_code=status.HTTP_303_SEE_OTHER)
+
+    return RedirectResponse(url="/org_profile?error=Course+not+found", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Add skills to course --- ###
 @router.post("/add_skill_course", response_class=RedirectResponse)

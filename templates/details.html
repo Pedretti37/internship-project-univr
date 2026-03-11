@@ -56,7 +56,7 @@
                     {% if role.essential_skills %}
                         <ul class="list-group mb-4">
                             {% for skill in role.essential_skills %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <li class="list-group-item justify-content-between align-items-center">
                                 <span>{{ skill.name | capitalize }}</span>
                                 
                                 <select name="level_{{ skill.uri }}" class="form-select form-select-sm" style="width: auto;">
@@ -76,7 +76,7 @@
                         </ul>
                     {% endif %}
 
-                    <div class="d-flex gap-3">
+                    <div>
                         <button type="submit" formaction="/add_to_user_skills" class="btn btn-primary">
                             Add to my Skills
                         </button>
@@ -102,9 +102,9 @@
                     <input type="hidden" name="uri" value="{{ role.uri }}">
 
                     {% if role.essential_skills %}
-                        <ul class="list-group mb-4">
+                        <ul>
                             {% for skill in role.essential_skills %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <li class="list-group-item justify-content-between align-items-center">
                                 <span>{{ skill.name | capitalize }}</span>
                                 
                                 <select name="level_{{ skill.uri }}" class="form-select form-select-sm" style="width: auto;">
@@ -124,7 +124,7 @@
                         </ul>
                     {% endif %}
 
-                    <div class="d-flex gap-3">
+                    <div>
                         <button type="submit" class="btn btn-primary">
                             Add to my Target Roles
                         </button>

@@ -535,9 +535,7 @@ async def forecast_gap_courses(
     # print(len(missing_skills))
 
     # List of recommended courses for the missing skills
-    # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
-    # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = recommend_courses_for_skill_gap(all_missing_skills)
+    recommended_courses = recommend_courses_for_skill_gap(all_missing_skills, 'individual', user.organization, crud_org.get_all_orgs())
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,
@@ -798,7 +796,7 @@ async def view_project(
     current_project: Optional[Project] = next((p for p in org.projects if str(p.id) == project_id), None)
 
     if not current_project:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 
     team = crud_user.get_users_by_usernames(current_project.assigned_members)
 
@@ -850,7 +848,7 @@ async def details_page(
     
     current_project: Optional[Project] = next((p for p in org.projects if str(p.id) == project_id), None)
     if not current_project:
-            return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+            return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
 
     selected_role = escoAPI.get_single_role_details(uri, language="en")
 
@@ -1008,7 +1006,7 @@ async def add_member_to_project(
 
     project = next((p for p in org.projects if str(p.id) == project_id), None)
     if project is None:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
     
     user_in_org = next((u for u in org.members if u == username_to_add), None)
     if not user_in_org:
@@ -1046,7 +1044,7 @@ async def project_forecast_gap_courses(
 
     project_index = next((i for i, p in enumerate(org.projects) if str(p.id) == project_id), None)
     if project_index is None:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
     
     project = org.projects[project_index]
 
@@ -1092,9 +1090,7 @@ async def project_forecast_gap_courses(
             all_missing_skills[s_obj.uri] = s_obj.name
 
     # List of recommended courses for the missing skills
-    # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
-    # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = recommend_courses_for_skill_gap(all_missing_skills)
+    recommended_courses = recommend_courses_for_skill_gap(all_missing_skills, "manager", user.organization, crud_org.get_all_orgs())
 
     return templates.TemplateResponse("project_detail.html", {
         "request": request,

@@ -1,0 +1,74 @@
+{
+    "name": "Org1",
+    "orgname": "z",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$6H0PwRijtHbuHUMoxZhTCg$2c8gdTdzU/Dh0ZnF+O5EukNQWJvfdzW3hBi/YhRqlK0",
+    "members": {},
+    "pending_members": {},
+    "projects": [],
+    "courses": [
+        {
+            "id": "2da12423-4233-49a8-9d22-b0634d72982f",
+            "title": "Mechanics",
+            "description": "Course about mechanics",
+            "ects": 5,
+            "format": "Online",
+            "link": null,
+            "duration_weeks": 10,
+            "start_date": "2026-09-01T00:00:00",
+            "medium_of_instruction": "English",
+            "cost": 200.0,
+            "location": "University of Verona",
+            "category": "University Course",
+            "is_public": true,
+            "skills_covered": [
+                {
+                    "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
+                    "name": "mechanics",
+                    "level": 8
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/87b1c959-236d-4761-b3be-b1c729497f75",
+                    "name": "fluid mechanics",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/d460032f-f49e-4b70-90c2-ba563aee14be",
+                    "name": "quantum mechanics",
+                    "level": 3
+                }
+            ]
+        },
+        {
+            "id": "9a47e937-fb4f-4522-9ffe-e41f97cf297c",
+            "title": "Software Engineering",
+            "description": "Course about S.E.",
+            "ects": 3,
+            "format": "Online",
+            "link": null,
+            "duration_weeks": 6,
+            "start_date": "2026-09-14T00:00:00",
+            "medium_of_instruction": "English",
+            "cost": 0.0,
+            "location": "University of Verona",
+            "category": "Online Course",
+            "is_public": false,
+            "skills_covered": [
+                {
+                    "uri": "http://data.europa.eu/esco/skill/19a8293b-8e95-4de3-983f-77484079c389",
+                    "name": "Java (computer programming)",
+                    "level": 7
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d",
+                    "name": "Python (computer programming)",
+                    "level": 8
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/902fb91c-3113-4004-9b4f-79aa86b638b7",
+                    "name": "web application security threats",
+                    "level": 3
+                }
+            ]
+        }
+    ]
+}

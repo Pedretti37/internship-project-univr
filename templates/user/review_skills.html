@@ -21,8 +21,8 @@
 
         {% if skills_not_found %}
             <div class="alert alert-warning">
-                <strong>⚠️ Not Found:</strong> We couldn't find matches for the following skills:
-                <ul class="mb-0">
+                <strong>Not Found:</strong> We couldn't find matches for the following skills:
+                <ul>
                     {% for nf in skills_not_found %}
                         <li>{{ nf }}</li>
                     {% endfor %}
@@ -46,7 +46,7 @@
                             <td><span style="color: #666;">{{ item.raw_name }}</span></td>
                             
                             <td>
-                                <span class="badge bg-secondary">{{ item.level }}</span>
+                                <span>{{ item.level }}</span>
                                 <input type="hidden" name="level_{{ loop.index }}" value="{{ item.level }}">
                             </td>
                             

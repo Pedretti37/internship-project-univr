@@ -60,7 +60,7 @@
 
             {% if is_manager %}
                 <p>Add members to the team:</p>
-                <form action="/org/project/{{ current_project.id }}/add_member" method="post" class="form">
+                <form action="/manager/project/{{ current_project.id }}/add_member" method="post" class="form">
                     <input type="text" name="username_to_add" class="input" placeholder="Employee username" required>
                     <input type="hidden" name="project_id" value="{{ current_project.id }}">
                     <button type="submit" class="btn-primary">Add Member</button>
@@ -253,86 +253,122 @@
             </section>
         {% endif %}
 
-        <section class="card" translate="no">
-            <h2>Skill gap Assessment</h2>
-            <div class="skill-gap-container">
-                {% if current_project.skill_gap %}
-                    {% for gap in current_project.skill_gap %}
-                        <div class="card" style="margin-bottom: 20px;">
-                            <h3>{{ gap.role_title | title }}</h3>
-                            <div class="gap-progress-track">
-                                <div class="gap-progress-fill" style="--score: {{ gap.match_score }}%;"></div>
-                            </div>
-                            <p><strong>Match:</strong> {{ gap.match_score }}%
-                                <span style="font-size: 0.9em; color: #666;">
-                                    ({{ gap.matching_skills|length }} fully matched, {{ gap.partially_matching_skills|length }} to improve, {{ gap.missing_skills|length }} missing)
-                                </span>
-                            </p>
-                            {% if gap.partially_matching_skills %}
-                                <h4 style="color: #f57f17; margin-top: 10px;">⚠️ Skills to Improve:</h4>
-                                <ul>
-                                    {% for data in gap.partially_matching_skills %}
-                                        <li style="margin-bottom: 5px;">
-                                            <strong>{{ data.skill.name | title }}</strong>
-                                            <span style="font-size: 0.85em; color: #555;">
-                                                (Team best level: <b>{{ data.team_best_level }}</b> / Target level: <b>{{ data.skill.level }}</b>)
-                                            </span>
-                                            <a href="{{ data.skill.uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                            {% if gap.missing_skills %}
-                                <h4 style="color: #d32f2f; margin-top: 10px;">❌ Missing Skills:</h4>
-                                <ul>
-                                    {% for skill in gap.missing_skills %}
-                                        <li style="margin-bottom: 5px;">
-                                            <strong>{{ skill.name | title }}</strong>
-                                            <span style="font-size: 0.85em; color: #555;">(Target level: {{ skill.level }})</span>
-                                            <a href="{{ skill.uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                            {% if not gap.missing_skills and not gap.partially_matching_skills %}
-                                <p style="color: green; font-weight: bold; margin-top: 15px;">
-                                    ✅ You have all the required skills for this role!
-                                </p>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="no-skill-gap">
-                        <h4>Not available yet</h4>
-                        <p>Add 1-5 target roles to this project, select a country, a sector and click <strong>Analyze</strong>.</p>
-                    </div>
-                {% endif %}
-            </div>
+        <section class="card">
+            {% if user.skill_gap or recommended_courses%}
+                <button onclick="downloadPDF()" class="btn btn-primary">📄 Export PDF</button>
+            {% endif %}
         </section>
 
-        {% if is_manager %}
-            <section class="card">
-                <h2>Recommended Educational Courses</h2>
-                {% if recommended_courses %}
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        {% for course in recommended_courses %}
-                        <div class="info-box">
-                            <h4>{{ course.title | title }}</h4>
-                            <p>{{ course.description }}...</p>
-                            <small>ECTS: {{ course.ects }}</small>
-                            <p><small>Skills covered:</small></p>
-                            <ul>
-                                {% for skill in course.skills_covered %}
-                                    <li>{{ skill.name | capitalize }} <a href="{{ skill.uri }}" target="_blank">↗</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+        <div id="report-content">
+            <section class="card" translate="no">
+                <h2>Skill gap Assessment</h2>
+                <div class="skill-gap-container">
+                    {% if current_project.skill_gap %}
+                        {% for gap in current_project.skill_gap %}
+                            <div class="card" style="margin-bottom: 20px; page-break-inside: avoid; break-inside: avoid;">
+                                <h3>{{ gap.role_title | title }}</h3>
+                                
+                                <p><strong>Match:</strong> {{ gap.match_score }}%
+                                    <span style="font-size: 0.9em; color: #666;">
+                                        ({{ gap.matching_skills|length }} fully matched, {{ gap.partially_matching_skills|length }} to improve, {{ gap.missing_skills|length }} missing)
+                                    </span>
+                                </p>
+                                {% if gap.partially_matching_skills %}
+                                    <h4 style="color: #f57f17; margin-top: 10px;">⚠️ Skills to Improve:</h4>
+                                    <ul>
+                                        {% for data in gap.partially_matching_skills %}
+                                            <li style="margin-bottom: 5px;">
+                                                <strong>{{ data.skill.name | title }}</strong>
+                                                <span style="font-size: 0.85em; color: #555;">
+                                                    (Team best level: <b>{{ data.team_best_level }}</b> / Target level: <b>{{ data.skill.level }}</b>)
+                                                </span>
+                                                <a href="{{ data.skill.uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                {% if gap.missing_skills %}
+                                    <h4 style="color: #d32f2f; margin-top: 10px;">❌ Missing Skills:</h4>
+                                    <ul>
+                                        {% for skill in gap.missing_skills %}
+                                            <li style="margin-bottom: 5px;">
+                                                <strong>{{ skill.name | title }}</strong>
+                                                <span style="font-size: 0.85em; color: #555;">(Target level: {{ skill.level }})</span>
+                                                <a href="{{ skill.uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                {% if not gap.missing_skills and not gap.partially_matching_skills %}
+                                    <p style="color: green; font-weight: bold; margin-top: 15px;">
+                                        ✅ You have all the required skills for this role!
+                                    </p>
+                                {% endif %}
+                            </div>
                         {% endfor %}
-                    </div>
-                {% else %}
-                    <p>---</p>
-                {% endif %}
+                    {% else %}
+                        <div class="no-skill-gap">
+                            <h4>Not available yet</h4>
+                            <p>Add 1-5 target roles to this project, select a country, a sector and click <strong>Analyze</strong>.</p>
+                        </div>
+                    {% endif %}
+                </div>
             </section>
-        {% endif %}
+
+            {% if is_manager %}
+                <section class="card">
+                    <h2>Recommended Educational Courses</h2>
+                    {% if recommended_courses %}
+                        <div>
+                            {% for course in recommended_courses %}
+                            <div class="info-box">
+                                <h4>{{ course.title | title }}</h4>
+                                <p>{{ course.description }}</p>
+                                <p>Category: {{ course.category }}</p>
+                                <p>Format: {{ course. format }}</p>
+                                <p>Start date: {{ course.start_date }}</p>
+                                <p>Duration (weeks): {{ course.duration_weeks }}</p>
+                                <small>ECTS: {{ course.ects }}</small>
+                                <p>Location: {{ course.location }}</p>
+                                <p>Link: {{ course.link }} </p>
+                                <p><small>Skills covered:</small></p>
+                                <ul>
+                                    {% for skill in course.skills_covered %}
+                                        <li>{{ skill.name | capitalize }} <a href="{{ skill.uri }}" target="_blank">↗</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>---</p>
+                    {% endif %}
+                </section>
+            {% endif %}
+        </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        function downloadPDF() {
+            const element = document.getElementById('report-content');
+            
+            const opt = {
+                margin:       [0.5, 0.5, 0.5, 0.5], 
+                filename:     'Project_Skill_Gap_Report.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2,
+                    scrollY: 0,           
+                    useCORS: true,        
+                    backgroundColor: '#ffffff' 
+                }, 
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+
 {% endblock %}

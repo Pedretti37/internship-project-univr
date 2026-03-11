@@ -61,6 +61,8 @@ class Course(BaseModel):
     medium_of_instruction: Optional[str] = None
     cost: Optional[float] = None
     location: Optional[str] = None
+    category: Optional[str] = None
+    is_public: bool = False
     skills_covered: Optional[List[Skill]] = []
 
 class Organization(BaseModel):

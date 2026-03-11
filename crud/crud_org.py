@@ -1,6 +1,7 @@
 import json
 import os
 from models import Organization, Invitation
+from typing import List
 
 DATA_DIR_ORGS = "data/organizations"
 os.makedirs(DATA_DIR_ORGS, exist_ok=True)
@@ -39,13 +40,6 @@ def update_org(org: Organization):
     except Exception as e:
         print(f"Error updating organization: {e}")
 
-def add_member_to_org(org: Organization, username: str):
-    if username not in org.members:
-        org.members.append(username)
-
-    update_org(org)
-    return org
-
 def change_password_org(org: Organization, new_pw: str) -> bool:
     path = get_json_path(org.orgname)
     
@@ -77,6 +71,24 @@ def get_org_by_orgname(orgname: str) -> Organization | None:
             return Organization(**data)
     except Exception:
         return None
+
+### --- CRUD: Get All --- ###
+def get_all_orgs() -> List[Organization]:
+    all_organizations = []
+    
+    # Verifichiamo che la directory esista
+    if not os.path.exists(DATA_DIR_ORGS):
+        return []
+
+    # Scansioniamo tutti i file nella cartella
+    for filename in os.listdir(DATA_DIR_ORGS):
+        if filename.endswith(".json"):
+            orgname = filename[:-5]  # Rimuoviamo ".json" per ottenere l'orgname
+            org = get_org_by_orgname(orgname)
+            if org:
+                all_organizations.append(org)
+                
+    return all_organizations
 
 ### --- Create Invitation --- ###
 def create_invitation(orgname: str, username: str) -> bool:
