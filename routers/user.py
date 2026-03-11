@@ -250,7 +250,7 @@ async def add_to_user_target_roles(
         uri=uri
     )
 
-    already_exists = any(r.id == role_id for r in user.target_roles)
+    already_exists = any(r.uri == uri for r in user.target_roles)
 
     if not already_exists:
         user.target_roles.append(role_object)
@@ -631,7 +631,7 @@ async def upload_skills_csv(
 
     if not file.filename.lower().endswith('.csv'):
         msg = urllib.parse.quote("Invalid file type. Please upload a CSV file.")
-        return RedirectResponse(url=f"/user_home?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url=f"/user_profile?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
     content = await file.read()
     try:
@@ -691,7 +691,7 @@ async def confirm_skills_csv(
     # Obtain number of rows = number of skills to review, which we had saved in a hidden input in the HTML form
     total_rows_str = form_data.get("total_rows")
     if not total_rows_str:
-        return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
         
     total_rows = int(total_rows_str)
     
@@ -729,5 +729,5 @@ async def confirm_skills_csv(
     if updated:
         crud_user.update_user(user)
 
-    return RedirectResponse(url="/user_home", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
 

@@ -182,13 +182,13 @@ summary:hover { background: #e8ecef; }
 }
 
 /* Allinea il form di invito (input + bottone) */
-.add-member-form {
+.form {
     display: flex;
     gap: 10px;
     margin-top: 15px;
 }
 
-.add-member-form input {
+.form input {
     flex: 1;
     padding: 10px;
     border: 1px solid #ccc;

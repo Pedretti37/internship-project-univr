@@ -1,15 +1,15 @@
-Username,Job_Title,Skill_Name,Proficiency_Level
-mario.rossi,Senior Mechanical Engineer,Mechanical engineering,9
-mario.rossi,Senior Mechanical Engineer,Computer-aided design (CAD) software,8
-mario.rossi,Senior Mechanical Engineer,Thermodynamics,7
-mario.rossi,Senior Mechanical Engineer,Fluid mechanics,8
-luigi.verdi,Junior Mechanical Engineer,Mechanical engineering,4
-luigi.verdi,Junior Mechanical Engineer,Computer-aided design (CAD) software,5
-luigi.verdi,Junior Mechanical Engineer,Thermodynamics,3
-luigi.verdi,Junior Mechanical Engineer,Robotics,2
-giulia.bianchi,Project Manager,Project management,8
-giulia.bianchi,Project Manager,Risk management,7
-giulia.bianchi,Project Manager,Mechanical engineering,2
-luca.neri,Manufacturing Engineer,Quality control systems,7
-luca.neri,Manufacturing Engineer,Computer-aided design (CAD) software,6
-luca.neri,Manufacturing Engineer,Process engineering,8
+Username,Skill_Name,Proficiency_Level
+mario.rossi,Mechanical engineering,9
+mario.rossi,Computer-aided design (CAD) software,8
+mario.rossi,Thermodynamics,7
+mario.rossi,Fluid mechanics,8
+luigi.verdi,Mechanical engineering,4
+luigi.verdi,Computer-aided design (CAD) software,5
+luigi.verdi,Thermodynamics,3
+luigi.verdi,Robotics,2
+giulia.bianchi,Project management,8
+giulia.bianchi,Risk management,7
+giulia.bianchi,,Mechanical engineering,2
+luca.neri,Quality control systems,7
+luca.neri,Computer-aided design (CAD) software,6
+luca.neri,Process engineering,8

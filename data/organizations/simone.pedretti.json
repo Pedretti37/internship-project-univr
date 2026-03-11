@@ -75,98 +75,83 @@
                     "uri": "http://data.europa.eu/esco/occupation/579254cf-6d69-4889-9000-9c79dc568644"
                 },
                 {
-                    "id": "1311",
-                    "title": "forester",
-                    "description": "Foresters are responsible for monitoring the natural and economic viability of a woodland or forest and for activities related to its management and conservation.",
+                    "id": "3118",
+                    "title": "mechanical engineering drafter",
+                    "description": "Mechanical engineering drafters convert mechanical engineers' designs and sketches into technical drawings detailing dimensions, fastening and assembling methods and other specifications used for example in manufacturing processes.",
                     "essential_skills": [
                         {
-                            "uri": "http://data.europa.eu/esco/skill/49212efd-acf0-4257-a011-e07c9e369ecf",
-                            "name": "animal welfare legislation",
+                            "uri": "http://data.europa.eu/esco/skill/ae0f2a15-ba82-4a88-817c-431c58c70167",
+                            "name": "manual draughting techniques",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/8df12fb1-7f41-4068-8d05-007e8fec8f33",
-                            "name": "conserve forests",
+                            "uri": "http://data.europa.eu/esco/skill/5c98825f-146d-4d35-97cf-207b2afd9ae2",
+                            "name": "create technical plans",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/3d9873e5-7128-49d9-9048-f72b8ea4b29e",
-                            "name": "manage forests",
+                            "uri": "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1",
+                            "name": "CAD software",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/f2f463e5-2382-49cb-8199-e7e043d868df",
-                            "name": "health and safety regulations",
+                            "uri": "http://data.europa.eu/esco/skill/4339176e-3acd-4f7f-a5d9-445bee3d23f2",
+                            "name": "mathematics",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/6f5850ea-5785-4e2c-b062-743066fd5bdb",
-                            "name": "environmental legislation",
+                            "uri": "http://data.europa.eu/esco/skill/03b9b491-fc9b-4868-914a-bf7cd47b5041",
+                            "name": "create solutions to problems",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/8abdc43c-2bfd-417c-97c2-27fcdaf53171",
-                            "name": "promote environmental awareness",
+                            "uri": "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532",
+                            "name": "technical drawings",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/01755f08-4df4-4cf0-8d22-08f94cad68b5",
-                            "name": "organise labour",
+                            "uri": "http://data.europa.eu/esco/skill/b34e2ba1-9080-48c9-9b42-ee9192a4d3f1",
+                            "name": "use CAD software",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/76f4dac8-9cf6-4f07-9cfc-e350e50fb39e",
-                            "name": "organise tree plantations",
+                            "uri": "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462",
+                            "name": "use technical drawing software",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/968ae7d9-40ca-4593-8dc6-fac11e4eeb6b",
-                            "name": "supervise forestry workers",
+                            "uri": "http://data.europa.eu/esco/skill/3c333552-8d89-43f5-90bd-856e15bec433",
+                            "name": "design drawings",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/347b6a67-59ad-4408-bb9c-cfa502867e24",
-                            "name": "monitor forest health",
+                            "uri": "http://data.europa.eu/esco/skill/432ab648-aece-4237-969f-8bca94fe181c",
+                            "name": "use manual draughting techniques",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/f8460277-3c9a-4be4-b203-600a2a295f47",
-                            "name": "plant disease control",
+                            "uri": "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c",
+                            "name": "principles of mechanical engineering",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/787e449d-d635-46c1-a0d2-e4bd0b49dee0",
-                            "name": "monitor forest productivity",
+                            "uri": "http://data.europa.eu/esco/skill/9c071f1d-eac3-449d-b004-c14775b5a3b9",
+                            "name": "mechanical engineering",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/9d75efb9-0c77-4f86-b5e7-99100808564a",
-                            "name": "pest control in plants",
+                            "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
+                            "name": "mechanics",
                             "level": 5
                         },
                         {
-                            "uri": "http://data.europa.eu/esco/skill/68949f17-32a2-469e-b874-2fe7ac1cef34",
-                            "name": "write technical reports related to trees",
-                            "level": 5
-                        },
-                        {
-                            "uri": "http://data.europa.eu/esco/skill/afdcb380-ef9f-4785-b877-cc551f035034",
-                            "name": "agronomy",
-                            "level": 5
-                        },
-                        {
-                            "uri": "http://data.europa.eu/esco/skill/2b281511-176e-4f7c-a581-0875d3c4cb51",
-                            "name": "forestry regulations",
-                            "level": 5
-                        },
-                        {
-                            "uri": "http://data.europa.eu/esco/skill/081d7679-5070-4777-bece-a28c49f15636",
-                            "name": "environmental policy",
+                            "uri": "http://data.europa.eu/esco/skill/c5c51528-ccfc-4c53-b409-c200aaa44222",
+                            "name": "liaise with engineers",
                             "level": 5
                         }
                     ],
-                    "id_full": "1311.1",
-                    "uri": "http://data.europa.eu/esco/occupation/f04eaeff-52f5-4d52-93ad-6f846884827f"
+                    "id_full": "3118.3.11",
+                    "uri": "http://data.europa.eu/esco/occupation/38240cc5-d1d9-4de9-9480-29c51da291eb"
                 }
             ],
             "skill_gap": [

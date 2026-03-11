@@ -288,7 +288,6 @@ async def view_project(
         role_search = role_search.title().strip()
         role_list = escoAPI.get_esco_occupations_list(role_search, language="en", limit=10)
 
-
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
 
@@ -415,7 +414,7 @@ async def project_add_role(
     for i, project in enumerate(org.projects):
         if str(project.id) == project_id:
             project_found = True
-            already_exists = any(r.id == role_id for r in project.target_roles)
+            already_exists = any(r.uri == uri for r in project.target_roles)
             
             if not already_exists:
                 project.target_roles.append(role_object)
@@ -438,13 +437,14 @@ async def project_add_role(
         crud_org.update_org(org)
 
     encoded_msg = urllib.parse.quote(toast_msg)
-    return RedirectResponse(url=f"/role_details_for_project?uri={encoded_uri}&project_id={project_id}&{toast_type}={encoded_msg}", status_code=status.HTTP_303_SEE_OTHER)
+    #return RedirectResponse(url=f"/role_details_for_project?uri={encoded_uri}&project_id={project_id}&{toast_type}={encoded_msg}", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url=f"/org/project/{project_id}?{toast_type}={encoded_msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Delete Target Role from Project --- ###    
 @router.post("/delete_project_target_role", response_class=RedirectResponse)
 async def delete_project_target_role(
     org: Organization = Depends(get_current_org),
-    role_id: str = Form(...),
+    uri: str = Form(...),
     project_id: str = Form(...)
 ):
     if not org:
@@ -454,7 +454,7 @@ async def delete_project_target_role(
     for project in org.projects:
         if str(project.id) == project_id:
             for role in project.target_roles:
-                if role.id == role_id:
+                if role.uri == uri:
                     project.target_roles.remove(role)
                     role_removed = True
                     break

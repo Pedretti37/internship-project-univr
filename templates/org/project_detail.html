@@ -19,50 +19,64 @@
 
     <div class="main-container">
         
-        <div>
+        <div class="card">
             <h2>Description</h2>
             <p>{{ current_project.description }}</p>
         </div>
 
-        <hr class="hr">
-
-        <div>
+        <div class="card">
             <h2>Assigned Team</h2>
-            <p>Employees involved in this assessment.</p>
+            <p>Employees involved in this project.</p>
             
             <ul>
             {% for member in team %}
                 <li>
-                    <strong>{{ member.name }} {{ member.surname }}</strong>
-                    <br><small class="member-details-text">@{{ member.username }} • {{ member.current_skills|length }} skills mapped</small>
+                    <details>
+                        <summary>
+                            <span><strong>{{ member.name }} {{ member.surname }}</strong></span>
+                            <small class="member-username">@{{ member.username }}</small>
+                        </summary>
+                        {% if member.current_skills %}
+                            <ul>
+                                {% for skill in member.current_skills %}
+                                    <li>
+                                        {{ skill.name | title }}, {{ skill.level }}/9 <a href="{{ skill.uri }}">&UpperRightArrow;</a>
+                                        <form action="/delete_user_skill" method="post" style="display:inline;">
+                                            <input type="hidden" name="skill_uri" value="{{ skill.uri }}">
+                                            <button type="submit" title="Remove skill">
+                                                🗑️ </button>
+                                        </form>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No skills mapped.</p>
+                        {% endif %}
+                    </details>
                 </li>
             {% endfor %}
             </ul>
 
-            <div>
-                <p>Add members to the team:</p>
-                <form action="/org/project/{{ current_project.id }}/add_member" method="post" class="add-member-form">
-                    <input type="text" name="username_to_add" class="input" placeholder="Employee username" required>
-                    <input type="hidden" name="project_id" value="{{ current_project.id }}">
-                    <button type="submit" class="btn-primary">Add Member</button>
-                </form>
-            </div>
-
-            <div class="upload-section" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px;">
-                <h3>Upload your team's Skill Model (from MuchSkills)</h3>
-                <p>Select the CSV file containing your team's skill data.</p>
-                <p><small>
-                    If CSV file contains your employee usernames, their profile will be updated and they will be added to the project automatically.
-                </small></p>
-                <form action="/upload_project_skills_csv" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
-                    <input type="file" name="file" accept=".csv" class="form-control" required style="max-width: 300px;">
-                    <input type="hidden" name="project_id" value="{{ current_project.id }}">
-                    <button type="submit" class="btn btn-success">Upload CSV</button>
-                </form>
-            </div>
+            <p>Add members to the team:</p>
+            <form action="/org/project/{{ current_project.id }}/add_member" method="post" class="form">
+                <input type="text" name="username_to_add" class="input" placeholder="Employee username" required>
+                <input type="hidden" name="project_id" value="{{ current_project.id }}">
+                <button type="submit" class="btn-primary">Add Member</button>
+            </form>
         </div>
 
-        <hr class="hr">
+        <div class="card">
+            <h3>Upload your team's Skill Model (from MuchSkills)</h3>
+            <p>Select the CSV file containing your team's skill data.</p>
+            <p><small>
+                If CSV file contains your employee usernames, their profile will be updated and they will be added to the project automatically.
+            </small></p>
+            <form action="/upload_project_skills_csv" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
+                <input type="file" name="file" accept=".csv" class="form-control" required style="max-width: 300px;">
+                <input type="hidden" name="project_id" value="{{ current_project.id }}">
+                <button type="submit" class="btn btn-success">Upload CSV</button>
+            </form>
+        </div>
 
         <section class="card" translate="no">
             <h2>Current Target Roles</h2>
@@ -74,7 +88,7 @@
                                 {{ role.title | title }} <a href="{{ role.uri }}" target="_blank" style="text-decoration: none;"><small>(ESCO ID: {{ role.id }})</small></a>
                             </span>
                             <form action="/delete_project_target_role" method="post" style="display:inline;">
-                                <input type="hidden" name="role_id" value="{{ role.id }}">
+                                <input type="hidden" name="uri" value="{{ role.uri }}">
                                 <input type="hidden" name="project_id" value="{{ current_project.id }}">
 
                                 <button type="submit" title="Remove role">
@@ -90,8 +104,8 @@
 
             <h3>Add a Role</h3>
             <div class="browsing-input">
-                <form action="/org/project/{{ current_project.id }}" method="get" class="role-form" autocomplete="off">
-                    <input type="text" name="search" class="input" placeholder="🔍 e.g. Software Engineer" value="{{ role_search }}" required>
+                <form action="/org/project/{{ current_project.id }}" method="get" class="form" autocomplete="off">
+                    <input type="text" name="role_search" class="input" placeholder="e.g. Software Engineer" value="{{ role_search or '' }}" required>
                     <button type="submit" class="btn-primary">Search</button>
                 </form>
             </div>

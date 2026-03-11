@@ -51,6 +51,16 @@
             {% else %}
                 <p>No skills added yet.</p>
             {% endif %}
+
+            <div class="details-box mt-4">
+                <h2>Import Skills</h2>
+                <p>Want to add multiple skills at once? Download our <a href="/static/csv/my_skill_template.csv" download>CSV template</a>, fill it out, and upload it here!</p>
+                
+                <form action="/upload_skills_csv" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
+                    <input type="file" name="file" accept=".csv" class="form-control" required style="max-width: 300px;">
+                    <button type="submit" class="btn btn-success">Upload CSV</button>
+                </form>
+            </div>
         </section>
 
         <section class="card">
