@@ -46,7 +46,7 @@
                         <div class="members-grid">
                             {% for member in members %}
                             <label class="member-card-select">
-                                <input type="checkbox" name="assigned_members" value="{{ member.username }}">
+                                <input type="checkbox" name="members_list" value="{{ member.username }}">
                                 <div>
                                     <strong>{{ member.name }} {{ member.surname }}</strong><br>
                                     <small>(<i>{{ member.username }}</i>)</small>

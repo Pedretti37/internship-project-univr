@@ -1,0 +1,11 @@
+{
+    "name": "Franco",
+    "surname": "Gialli",
+    "username": "franco.gialli",
+    "email": "franco.gialli@gmail.com",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$17pXKkUIIQSgNOY8x5hTig$3Oe9U+5HLhK0bXqVX17hqoQBx1252GIQaHZ3LDiRk/8",
+    "target_roles": [],
+    "individual_skills": [],
+    "skill_gap": [],
+    "organization": "a"
+}

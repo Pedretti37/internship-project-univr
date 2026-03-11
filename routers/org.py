@@ -237,15 +237,18 @@ async def create_project_submit(
     org: Organization = Depends(get_current_org),
     name: str = Form(...),
     description: str = Form(...),
-    assigned_members: list[str] = Form(default=[]), 
+    members_list: list[str] = Form(default=[]), 
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
+    # Dict for {username : List[Skill]}
+    initial_members = {username: [] for username in members_list}
+
     new_project = Project(
         name=name,
         description=description,
-        assigned_members=list(set(assigned_members)),
+        assigned_members=initial_members,
         target_roles=[], 
         skill_gap=[]
     )
@@ -281,7 +284,7 @@ async def view_project(
     if not current_project:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
-    team = crud_user.get_users_by_usernames(current_project.assigned_members)
+    team = crud_user.get_users_by_usernames(current_project.assigned_members.keys())
 
     role_list = None
     if role_search and role_search.strip():
@@ -542,7 +545,7 @@ async def project_forecast_gap_courses(
             "job_openings_data": job_data             
         })
 
-    assigned_members = crud_user.get_users_by_usernames(project.assigned_members)
+    assigned_members = crud_user.get_users_by_usernames(project.assigned_members.keys())
     updated_project = crud_skill_models.skill_gap_project(project, assigned_members)
     org.projects[project_index] = updated_project
     crud_org.update_org(org)
@@ -650,6 +653,9 @@ async def upload_project_skills_csv(
                 "skill_name": skill_name
             })
 
+    if msg_type == "error":
+        return RedirectResponse(url=f"/org_home?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+
     return templates.TemplateResponse("org/review_project_skills.html", {
         "request": request,
         "org": org,
@@ -669,23 +675,27 @@ async def confirm_project_skills_csv(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     form_data = await request.form()
-    
-    # Data recovery
     project_id = form_data.get("project_id")
     total_rows_str = form_data.get("total_rows")
     
     if not project_id or not total_rows_str:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
-    project = next((p for p in org.projects if str(p.id) == project_id), None)
-    if not project:
+    project_idx = next((i for i, p in enumerate(org.projects) if str(p.id) == project_id), None)
+    if project_idx is None:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+    
+    project = org.projects[project_idx]
         
     total_rows = int(total_rows_str)
     
-    # Skill per user
-    user_updates = {}
+    if project.assigned_members is None: project.assigned_members = {}
+    if project.pending_members is None: project.pending_members = {}
+
+    total_rows = int(total_rows_str)
+    updates: dict[str, list[Skill]] = {}
     
+    # 3. Parsing del Form
     for i in range(1, total_rows + 1):
         username = form_data.get(f"username_{i}")
         uri_and_name = form_data.get(f"uri_name_{i}")
@@ -695,64 +705,42 @@ async def confirm_project_skills_csv(
             continue
             
         parts = uri_and_name.split("|||")
-        if len(parts) != 2:
-            continue
-            
-        skill_uri = parts[0]
-        official_name = parts[1]
-        skill_level = int(level_str)
+        if len(parts) != 2: continue
 
-        if username not in user_updates:
-            user_updates[username] = []
+        skill_obj = Skill(uri=parts[0], name=parts[1], level=int(level_str))
+        
+        if username not in updates:
+            updates[username] = []
+        updates[username].append(skill_obj)
 
-        user_updates[username].append({
-            "uri": skill_uri,
-            "name": official_name,
-            "level": skill_level
-        })
-
-    members_to_assign = set(project.assigned_members) if project.assigned_members else set()
-    pending_members_dict = {pm["username"]: pm for pm in getattr(project, 'pending_members', [])} if getattr(project, 'pending_members', None) else {}
-
-    # Update user skills and project membership based on the confirmed data
-    for username, skills in user_updates.items():
-        user = crud_user.get_user_by_username(username)
-        if not user:
-            continue 
-
+    # 4. LOGICA DI SMISTAMENTO (Con aggiornamento e non sovrascrittura totale)
+    for username, new_skills in updates.items():
         if username in org.members:
-            existing_skills_dict = {s.uri: s for s in user.current_skills}
-            user_updated = False
-
-            for sk in skills:
-                if sk["uri"] in existing_skills_dict:
-                    if existing_skills_dict[sk["uri"]].level != sk["level"]:
-                        existing_skills_dict[sk["uri"]].level = sk["level"]
-                        user_updated = True
-                else:
-                    new_skill = Skill(uri=sk["uri"], name=sk["name"], level=sk["level"])
-                    user.current_skills.append(new_skill)
-                    user_updated = True
-
-            if user_updated:
-                crud_user.update_user(user)
-
-            members_to_assign.add(username)
+            # Utente già nell'org: lo mettiamo in assigned
+            # Se vuoi mantenere le skill vecchie e aggiungere le nuove:
+            current_skills = project.assigned_members.get(username, [])
+            # Evitiamo duplicati basandoci sulla URI
+            existing_uris = {s.uri for s in current_skills}
+            for ns in new_skills:
+                if ns.uri not in existing_uris:
+                    current_skills.append(ns)
             
-            if username in pending_members_dict:
-                del pending_members_dict[username]
-
+            project.assigned_members[username] = current_skills
+            
+            # Pulizia dai pending
+            if username in project.pending_members:
+                del project.pending_members[username]
         else:
-            pending_members_dict[username] = {
-                "username": username,
-                "skills": skills 
-            }
+            # Utente esterno: va nei pending
+            project.pending_members[username] = new_skills
+            
+            # Pulizia dagli assigned (se per qualche motivo era lì)
+            if username in project.assigned_members:
+                del project.assigned_members[username]
 
-    # Update lists
-    project.assigned_members = list(members_to_assign)
-    project.pending_members = list(pending_members_dict.values())
-
+    # 5. Riaffidiamo il progetto all'organizzazione per sicurezza (Pydantic tracking)
+    org.projects[project_idx] = project
     crud_org.update_org(org)
 
-    msg = urllib.parse.quote("Skills imported and users assigned successfully!")
-    return RedirectResponse(url=f"/org/project/{project.id}?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
+    msg = urllib.parse.quote("Skills processed successfully.")
+    return RedirectResponse(url=f"/org/project/{project_id}?success={msg}", status_code=status.HTTP_303_SEE_OTHER)

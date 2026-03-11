@@ -1,0 +1,99 @@
+{
+    "name": "Internship UniVR - Simone Pedretti",
+    "address": "Via Verdi 94",
+    "phone": "4932014592",
+    "email": "simonepedretti04@gmail.com",
+    "orgname": "a",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$9X4vxZiT8r53rrUWQui9lw$8BvDMAzklG9R17nms+y9C/wxcRwd0ZhtFzcvXXgcl6o",
+    "members": [
+        "mario.rossi",
+        "giacomo.verdi",
+        "franco.gialli"
+    ],
+    "projects": [
+        {
+            "id": "95c205b7-d8ae-43bd-b136-1125ecc4bf1d",
+            "name": "Prova",
+            "description": "prova",
+            "assigned_members": {
+                "mario.rossi": [
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/54804209-6aac-4ca4-bf3c-aef4fbe18f8c",
+                        "name": "principles of mechanical engineering",
+                        "level": 9
+                    },
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/a2b5dcf3-5b6a-453d-876c-cff540c0faf1",
+                        "name": "CAD software",
+                        "level": 8
+                    },
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/857e8624-4db0-4725-a758-5914bd8cc350",
+                        "name": "thermodynamics",
+                        "level": 7
+                    },
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/f7ec9783-09e3-4064-917a-362492adb210",
+                        "name": "assist in the administration of fluids to animals",
+                        "level": 8
+                    }
+                ],
+                "giacomo.verdi": [
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/2fea2558-630e-480d-9e12-47a05bc19b55",
+                        "name": "precision mechanics",
+                        "level": 4
+                    },
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/feb717ff-fba6-4a91-aa10-ee11cf2da6b4",
+                        "name": "design electronic systems",
+                        "level": 5
+                    },
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/857e8624-4db0-4725-a758-5914bd8cc350",
+                        "name": "thermodynamics",
+                        "level": 3
+                    },
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/abf982c1-6b59-4572-a38c-97d3a6869af4",
+                        "name": "make use of personal robots for practical support",
+                        "level": 2
+                    }
+                ],
+                "franco.gialli": [
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/cd5efa8c-e44d-4cbc-91c6-796018dbed68",
+                        "name": "perform project management",
+                        "level": 8
+                    },
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/4bdbd6db-7d75-40e7-b40e-5718e2982dfb",
+                        "name": "perform financial risk management in international trade",
+                        "level": 7
+                    },
+                    {
+                        "uri": "http://data.europa.eu/esco/skill/2fea2558-630e-480d-9e12-47a05bc19b55",
+                        "name": "precision mechanics",
+                        "level": 2
+                    }
+                ]
+            },
+            "pending_members": {},
+            "target_roles": [],
+            "skill_gap": [],
+            "created_at": "2026-03-11T10:31:37.623438Z"
+        },
+        {
+            "id": "6188117b-ce2c-478a-9155-54d6ac4bdfb1",
+            "name": "Prova 2",
+            "description": "prova 2",
+            "assigned_members": {
+                "mario.rossi": []
+            },
+            "pending_members": {},
+            "target_roles": [],
+            "skill_gap": [],
+            "created_at": "2026-03-11T11:03:32.127692Z"
+        }
+    ]
+}

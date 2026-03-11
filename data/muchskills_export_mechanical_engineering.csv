@@ -1,15 +1,12 @@
-Username,Skill_Name,Proficiency_Level
+username,skill_name,level
 mario.rossi,Mechanical engineering,9
 mario.rossi,Computer-aided design (CAD) software,8
 mario.rossi,Thermodynamics,7
 mario.rossi,Fluid mechanics,8
-luigi.verdi,Mechanical engineering,4
-luigi.verdi,Computer-aided design (CAD) software,5
-luigi.verdi,Thermodynamics,3
-luigi.verdi,Robotics,2
-giulia.bianchi,Project management,8
-giulia.bianchi,Risk management,7
-giulia.bianchi,,Mechanical engineering,2
-luca.neri,Quality control systems,7
-luca.neri,Computer-aided design (CAD) software,6
-luca.neri,Process engineering,8
+giacomo.verdi,Mechanical engineering,4
+giacomo.verdi,Computer-aided design (CAD) software,5
+giacomo.verdi,Thermodynamics,3
+giacomo.verdi,Robotics,2
+franco.gialli,Project management,8
+franco.gialli,Risk management,7
+franco.gialli,Mechanical engineering,2

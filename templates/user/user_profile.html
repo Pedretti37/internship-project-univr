@@ -30,14 +30,39 @@
                     <button type="submit" class="btn-primary">Update</button>
                 </form>
             </details>
+
+            {% if invitations %}
+                <div>
+                    <h3>Pending invitations:</h3>
+                    <ul>
+                        {% for inv in invitations %}
+                            <li>
+                                <span>Organization: <strong>{{ inv.orgname }}</strong></span>
+                                <div class="invitation-actions" style="display: inline-flex; gap: 10px;">
+                                    <form action="/accept_invitation" method="post">
+                                        <input type="hidden" name="orgname" value="{{ inv.orgname }}">
+                                        <input type="hidden" name="inv_id" value="{{ inv.id }}">
+                                        <button type="submit" class="btn-success">Accept</button>
+                                    </form>
+
+                                    <form action="/decline_invitation" method="post">
+                                        <input type="hidden" name="inv_id" value="{{ inv.id }}">
+                                        <button type="submit" class="btn-danger">Decline</button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
         </section>
 
         <section class="card">
-            <h2>Your current Skill Model</h2>
+            <h2>Your Individual Skill Model</h2>
             <p>Use <a href="https://app.muchskills.com/login" target="_blank" rel="noopener noreferrer">MuchSkills</a> to create a Skill Model or go back to the home page and search with EscoAPI.</p>
-            {% if user.current_skills %}
+            {% if user.individual_skills %}
                 <ul>
-                    {% for skill in user.current_skills %}
+                    {% for skill in user.individual_skills %}
                         <li>
                             {{ skill.name | title }}, {{ skill.level }}/9 <a href="{{ skill.uri }}">&UpperRightArrow;</a>
                             <form action="/delete_user_skill" method="post" style="display:inline;">
@@ -62,6 +87,53 @@
                 </form>
             </div>
         </section>
+
+        {% if org %}
+            <section class="card">
+                <h2>Organization Skill Models</h2>
+                <p>Project-specific skills assigned by <strong>{{ org.orgname }}</strong>:</p>
+                <div class="projects-container">
+                    {# Inizializziamo un namespace per gestire lo scope della variabile #}
+                    {% set ns = namespace(has_projects=false) %}
+                    
+                    {% for project in org.projects %}
+                        {% if project.assigned_members and user.username in project.assigned_members %}
+                            {% set ns.has_projects = true %}
+                            <div class="project-item">
+                                <details>
+                                    <summary>
+                                        <span>Project: <strong>{{ project.name }}</strong></span>
+                                    </summary>
+                                    <p>{{ project.description }}</p>
+                                    
+                                    <div class="assigned-skills">
+                                        <strong>Your Assigned Skills:</strong>
+                                        {% set user_project_skills = project.assigned_members[user.username] %}
+
+                                        {% if user_project_skills and user_project_skills | length > 0 %}
+                                            <ul class="skill-pills">
+                                                {% for skill in user_project_skills %}
+                                                    <li>{{ skill.name | title }} - <strong>Lvl: {{ skill.level }}/9</strong></li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p class="text-muted" style="font-style: italic; font-size: 0.9em; margin-top: 5px;">
+                                                No specific skills have been assigned to you for this project yet.
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </details>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# Ora il controllo funzionerà correttamente #}
+                    {% if not ns.has_projects %}
+                        <p class="text-muted">You are not yet assigned to any active projects in this organization.</p>
+                    {% endif %}
+                </div>
+            </section>
+        {% endif %}
 
         <section class="card">
             <h2>Your current Target Roles</h2>

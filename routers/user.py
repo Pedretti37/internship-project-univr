@@ -171,6 +171,7 @@ async def user_profile(
         return response
 
     invitations = crud_user.get_pending_invitations_for_user(user.username)
+    org = crud_org.get_org_by_orgname(user.organization)
         
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
@@ -181,6 +182,7 @@ async def user_profile(
         "countries_list": EU_COUNTRIES,
         "sectors_list": CEDEFOP_SECTORS,
         "invitations": invitations,
+        "org": org,
         "toast_msg": toast_msg,
         "toast_type": toast_type,
         "current_year": datetime.now().year,
@@ -290,7 +292,7 @@ async def add_to_user_skills(
 
     updated_skill = False
     
-    existing_skills_dict = {s.uri: s for s in user.current_skills}
+    existing_skills_dict = {s.uri: s for s in user.individual_skills}
 
     for skill_dict in skills_list:
         skill_uri = skill_dict.get("uri")
@@ -309,7 +311,7 @@ async def add_to_user_skills(
             else:
                 skill_dict["level"] = skill_level
                 new_skill = Skill(**skill_dict)
-                user.current_skills.append(new_skill)
+                user.individual_skills.append(new_skill)
                 
                 existing_skills_dict[skill_uri] = new_skill
                 updated_skill = True
@@ -352,7 +354,7 @@ async def add_single_skill(
     skill_found = False
     toast_type = "success"
 
-    for existing_skill in user.current_skills:
+    for existing_skill in user.individual_skills:
         if existing_skill.uri == uri:
             skill_found = True
             if existing_skill.level == skill_level:
@@ -365,7 +367,7 @@ async def add_single_skill(
 
     if not skill_found:
         new_skill = Skill(uri=uri, name=name, level=skill_level)
-        user.current_skills.append(new_skill)
+        user.individual_skills.append(new_skill)
         message_text = f"Skill \"{new_skill.name}\" added to your profile!"
 
     crud_user.update_user(user)
@@ -463,11 +465,11 @@ async def delete_user_skill(
 
     # new list excluding the skill to be deleted
     new_skills_list = [
-        skill for skill in user.current_skills 
+        skill for skill in user.individual_skills 
         if skill.uri != skill_uri
     ]
     
-    user.current_skills = new_skills_list
+    user.individual_skills = new_skills_list
 
     crud_user.update_user(user)
 
@@ -564,44 +566,24 @@ async def accept_invitation(
         inv.status = "accepted"
         crud_org.update_invitation(inv)
 
-    user_skills_updated = False
-    existing_skills_dict = {s.uri: s for s in user.current_skills}
-
-    # Checking if user was in pending_members of any project within the organization
     for project in org.projects:
-        pending_list = getattr(project, 'pending_members', [])
-        
-        pending_user_data = next((pm for pm in pending_list if pm["username"] == user.username), None)
-        
-        if pending_user_data:
-            # Unlocking the skills data from the pending member
-            for sk in pending_user_data["skills"]:
-                if sk["uri"] in existing_skills_dict:
-                    if existing_skills_dict[sk["uri"]].level != sk["level"]:
-                        existing_skills_dict[sk["uri"]].level = sk["level"]
-                        user_skills_updated = True
-                else:
-                    new_skill = Skill(uri=sk["uri"], name=sk["name"], level=sk["level"])
-                    user.current_skills.append(new_skill)
-                    existing_skills_dict[sk["uri"]] = new_skill
-                    user_skills_updated = True
+        # Usiamo .get() perché ora pending_members è un Dict[username, List[Skill]]
+        if project.pending_members and user.username in project.pending_members:
             
-            # Not pending anymore
-            project.pending_members = [pm for pm in pending_list if pm["username"] != user.username]
+            # Recuperiamo le skill che erano state "parcheggiate" nel pending
+            skills_to_transfer = project.pending_members.pop(user.username)
             
-            # Promotion to assigned member
-            if user.username not in project.assigned_members:
-                project.assigned_members.append(user.username)
+            # Inizializziamo assigned_members se necessario
+            if project.assigned_members is None:
+                project.assigned_members = {}
+            
+            # Trasferiamo le skill nell'effettivo team assegnato
+            project.assigned_members[user.username] = skills_to_transfer
 
-    # Update user
-    if user_skills_updated:
-        crud_user.update_user(user)
-
-
-    # Update org
+    # 4. Salvataggio finale dell'organizzazione aggiornata
     crud_org.update_org(org)
 
-    return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/user_profile?success=Welcome+to+"+orgname, status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Decline Invitation --- ###
 @router.post("/decline_invitation", response_class=RedirectResponse)
@@ -695,7 +677,7 @@ async def confirm_skills_csv(
         
     total_rows = int(total_rows_str)
     
-    existing_skills_dict = {s.uri: s for s in user.current_skills}
+    existing_skills_dict = {s.uri: s for s in user.individual_skills}
     updated = False
 
     for i in range(1, total_rows + 1):
@@ -722,7 +704,7 @@ async def confirm_skills_csv(
                 updated = True
         else:
             new_skill = Skill(uri=skill_uri, name=official_name, level=skill_level)
-            user.current_skills.append(new_skill)
+            user.individual_skills.append(new_skill)
             existing_skills_dict[skill_uri] = new_skill
             updated = True
 

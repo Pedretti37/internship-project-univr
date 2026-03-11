@@ -23,7 +23,7 @@ class User(BaseModel):
     email: EmailStr
     hashed_password: str
     target_roles: List[Role] = []
-    current_skills: List[Skill] = []
+    individual_skills: List[Skill] = []
     skill_gap: List[Dict[str, Any]] = []
     organization: Optional[str] = None
 
@@ -38,8 +38,8 @@ class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: str
-    assigned_members: List[str] = []
-    pending_members: List[dict] = []
+    assigned_members: Dict[str, List[Skill]] = {}
+    pending_members: Dict[str, List[Skill]] = {}
     target_roles: List[Role] = []
     skill_gap: List[Dict[str, Any]] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
