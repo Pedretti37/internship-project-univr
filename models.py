@@ -38,8 +38,7 @@ class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: str
-    assigned_members: Dict[str, List[Skill]] = {}
-    pending_members: Dict[str, List[Skill]] = {}
+    assigned_members: List[str] = []
     target_roles: List[Role] = []
     skill_gap: List[Dict[str, Any]] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -51,7 +50,8 @@ class Organization(BaseModel):
     email: EmailStr
     orgname: str
     hashed_password: str
-    members: List[str] = []
+    members: Dict[str, List[Skill]] = {}
+    pending_members: Dict[str, List[Skill]] = {}
     projects: List[Project] = []
 
 class Course(BaseModel):

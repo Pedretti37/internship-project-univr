@@ -11,7 +11,7 @@
 
         {% if skills_not_found %}
             <div class="alert alert-warning">
-                <strong>⚠️ Not Found:</strong> We couldn't find matches for the following:
+                <strong>Not Found:</strong> We couldn't find matches for the following:
                 <ul class="mb-0">
                     {% for nf in skills_not_found %}
                         <li>{{ nf.username }} - <em>{{ nf.skill_name }}</em></li>

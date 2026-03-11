@@ -31,7 +31,7 @@
                         <div class="project-card">
                             <h3>{{ proj.name }}</h3>
                             <p class="project-desc">
-                                {{ proj.description }}
+                                {{ proj.description | truncate(150, False, '...') }}
                             </p>
                             <div class="project-footer">
                                 <small>Team Size: <strong>{{ proj.assigned_members|length }}</strong></small>

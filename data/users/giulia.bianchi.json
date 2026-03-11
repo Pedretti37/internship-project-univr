@@ -1,0 +1,11 @@
+{
+    "name": "Giulia",
+    "surname": "Bianchi",
+    "username": "giulia.bianchi",
+    "email": "giulia.bianchi@gmail.com",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$jZHyXotR6j0nJMR4z1krxQ$HVvjSx/HkleVs949eHUlyb8ZYsdAl+8n6iEw3U0nlBE",
+    "target_roles": [],
+    "individual_skills": [],
+    "skill_gap": [],
+    "organization": null
+}

@@ -61,19 +61,17 @@ def skill_gap_user(user: User, role_list: List[Role]) -> User:
     return user
 
 # Skill gap analysis for a project team
-def skill_gap_project(project: Project, members: List[User]) -> Project:
-
+def skill_gap_project(project: Project, org_members: Dict[str, List[Skill]]) -> Project:
     team_skills_dict = {}
-    for user in members:
-        if user.current_skills:
-            for s in user.current_skills:
-                # Se la skill è già presente, teniamo il livello più alto trovato finora
-                if s.uri not in team_skills_dict or s.level > team_skills_dict[s.uri]:
-                    team_skills_dict[s.uri] = s.level
+    
+    for username in project.assigned_members:
+        user_org_skills = org_members.get(username, [])
+        
+        for s in user_org_skills:
+            if s.uri not in team_skills_dict or s.level > team_skills_dict[s.uri]:
+                team_skills_dict[s.uri] = s.level
 
-    if not hasattr(project, 'skill_gap'):
-        project.skill_gap = []
-    project.skill_gap.clear()
+    project.skill_gap = []
 
     for role in project.target_roles:
         matching = []

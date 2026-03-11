@@ -13,6 +13,7 @@
 
         <div class="nav-right">
             <a href="/org_home" class="nav-link">Home</a>
+            <a href="/org_profile" class="nav-link">Profile</a>
             <a href="/org_logout" class="nav-link logout-btn">Logout</a>
         </div>
     </nav>
@@ -33,8 +34,8 @@
                         <span><strong>{{ member.name }} {{ member.surname }}</strong></span>
                         <small class="member-username">@{{ member.username }}</small>
                     </summary>
-                    {% set project_skills = current_project.assigned_members.get(member.username) %}
                     
+                    {% set project_skills = org.members.get(member.username) %}
                     {% if project_skills %}
                         <ul class="skill-list">
                             {% for skill in project_skills %}
@@ -46,7 +47,7 @@
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p class="text-muted">No specific skills assigned yet.</p>
+                        <p class="text-muted">No organizational skills certified yet.</p>
                     {% endif %}
                 </details>
             {% endfor %}
@@ -56,19 +57,6 @@
                 <input type="text" name="username_to_add" class="input" placeholder="Employee username" required>
                 <input type="hidden" name="project_id" value="{{ current_project.id }}">
                 <button type="submit" class="btn-primary">Add Member</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <h3>Upload your team's Skill Model (from MuchSkills)</h3>
-            <p>Select the CSV file containing your team's skill data.</p>
-            <p><small>
-                If CSV file contains your employee usernames, their profile will be updated and they will be added to the project automatically.
-            </small></p>
-            <form action="/upload_project_skills_csv" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
-                <input type="file" name="file" accept=".csv" class="form-control" required style="max-width: 300px;">
-                <input type="hidden" name="project_id" value="{{ current_project.id }}">
-                <button type="submit" class="btn btn-success">Upload CSV</button>
             </form>
         </div>
 
@@ -273,7 +261,7 @@
                                         <li style="margin-bottom: 5px;">
                                             <strong>{{ data.skill.name | title }}</strong>
                                             <span style="font-size: 0.85em; color: #555;">
-                                                (Your level: <b>{{ data.user_level }}</b> / Target: <b>{{ data.skill.level }}</b>)
+                                                (Team best level: <b>{{ data.team_best_level }}</b> / Target level: <b>{{ data.skill.level }}</b>)
                                             </span>
                                             <a href="{{ data.skill.uri }}" target="_blank" style="text-decoration: none;" title="View on ESCO"> ↗</a>
                                         </li>

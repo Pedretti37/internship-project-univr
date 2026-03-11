@@ -52,14 +52,30 @@
                 <h2>My Team ({{ members|length }})</h2>
 
                 {% if members %}
-                    <ul>
                     {% for member in members %}
-                        <li class="member-item">
-                            <span><strong>{{ member.name }} {{ member.surname }}</strong></span>
-                            <small class="member-username">@{{ member.username }}</small>
-                        </li>
+                        <details>
+                            <summary>
+                                <span><strong>{{ member.name }} {{ member.surname }}</strong></span>
+                                <small class="member-username">@{{ member.username }}</small>
+                            </summary>
+                            <div>
+                                {% set org_skills = org.members.get(member.username) %}
+                                {% if org_skills and org_skills|length > 0 %}
+                                    <ul class="skill-pills">
+                                        {% for skill in org_skills %}
+                                            <li>
+                                                <span class="skill-name">{{ skill.name | title }}</span>
+                                                <span class="skill-level">Lvl: {{ skill.level }}/9</span>
+                                                <span class="skill-uri"><a href="{{ skill.uri }}" target="_blank"> &UpperRightArrow;</a></span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted"><em>No organizational skills certified for this user yet.</em></p>
+                                {% endif %}
+                            </div>
+                        </details>
                     {% endfor %}
-                    </ul>
                 {% else %}
                     <p>No members yet. Invite someone!</p>
                 {% endif %}
@@ -71,5 +87,17 @@
                 </form>
             </div>
         </div>
+
+        <section class="card">
+            <h3>Upload your team's Skill Model (from MuchSkills)</h3>
+            <p>Select the CSV file containing your team's skill data.</p>
+            <p><small>
+                If CSV file contains your employee usernames, their profile will be updated. If an username in not in your team, an invitation will be sent to them.
+            </small></p>
+            <form action="/upload_project_skills_csv" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-3">
+                <input type="file" name="file" accept=".csv" class="form-control" required style="max-width: 300px;">
+                <button type="submit" class="btn btn-success">Upload CSV</button>
+            </form>
+        </section>
     </div>
 {% endblock %}

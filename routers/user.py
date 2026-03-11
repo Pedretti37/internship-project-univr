@@ -558,32 +558,30 @@ async def accept_invitation(
     crud_user.update_user(user)
 
     org = crud_org.get_org_by_orgname(orgname)
-    if org:
-        org.members.append(user.username)
+    if not org:
+        return RedirectResponse(url="/user_profile?error=Organization+not+found", status_code=303)
+
+    if org.members is None: 
+        org.members = {}
+    if getattr(org, 'pending_members', None) is None:
+        org.pending_members = {}
+
+    pending_skills = []
+    if hasattr(org, 'pending_members') and user.username in org.pending_members:
+        pending_skills = org.pending_members[user.username]
+        del org.pending_members[user.username]
+
+    org.members[user.username] = pending_skills
 
     inv = crud_org.get_inv_by_id(inv_id)
     if inv:
         inv.status = "accepted"
         crud_org.update_invitation(inv)
 
-    for project in org.projects:
-        # Usiamo .get() perché ora pending_members è un Dict[username, List[Skill]]
-        if project.pending_members and user.username in project.pending_members:
-            
-            # Recuperiamo le skill che erano state "parcheggiate" nel pending
-            skills_to_transfer = project.pending_members.pop(user.username)
-            
-            # Inizializziamo assigned_members se necessario
-            if project.assigned_members is None:
-                project.assigned_members = {}
-            
-            # Trasferiamo le skill nell'effettivo team assegnato
-            project.assigned_members[user.username] = skills_to_transfer
-
-    # 4. Salvataggio finale dell'organizzazione aggiornata
     crud_org.update_org(org)
 
-    return RedirectResponse(url="/user_profile?success=Welcome+to+"+orgname, status_code=status.HTTP_303_SEE_OTHER)
+    msg = urllib.parse.quote(f"Welcome to {orgname}!")
+    return RedirectResponse(url=f"/user_profile?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Decline Invitation --- ###
 @router.post("/decline_invitation", response_class=RedirectResponse)

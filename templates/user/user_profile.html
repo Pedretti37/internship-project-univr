@@ -90,10 +90,28 @@
 
         {% if org %}
             <section class="card">
-                <h2>Organization Skill Models</h2>
-                <p>Project-specific skills assigned by <strong>{{ org.orgname }}</strong>:</p>
+                <h2>Organization Skill Model</h2>
+                <p>Your certified skills within <strong>{{ org.name }}</strong>:</p>
+
+                <div class="org-master-skills" style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4>Your Certified Competencies</h4>
+                    {% set master_skills = org.members.get(user.username) %}
+                    
+                    {% if master_skills %}
+                        <ul class="skill-pills">
+                            {% for skill in master_skills %}
+                                <li>{{ skill.name | title }} - <strong>Lvl: {{ skill.level }}/9</strong></li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No organizational skills have been uploaded for your profile yet.</p>
+                    {% endif %}
+                </div>
+
+                <hr>
+
+                <h3>Your Active Projects</h3>
                 <div class="projects-container">
-                    {# Inizializziamo un namespace per gestire lo scope della variabile #}
                     {% set ns = namespace(has_projects=false) %}
                     
                     {% for project in org.projects %}
@@ -104,30 +122,14 @@
                                     <summary>
                                         <span>Project: <strong>{{ project.name }}</strong></span>
                                     </summary>
-                                    <p>{{ project.description }}</p>
-                                    
-                                    <div class="assigned-skills">
-                                        <strong>Your Assigned Skills:</strong>
-                                        {% set user_project_skills = project.assigned_members[user.username] %}
-
-                                        {% if user_project_skills and user_project_skills | length > 0 %}
-                                            <ul class="skill-pills">
-                                                {% for skill in user_project_skills %}
-                                                    <li>{{ skill.name | title }} - <strong>Lvl: {{ skill.level }}/9</strong></li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <p class="text-muted" style="font-style: italic; font-size: 0.9em; margin-top: 5px;">
-                                                No specific skills have been assigned to you for this project yet.
-                                            </p>
-                                        {% endif %}
+                                    <div style="padding: 10px;">
+                                        <p>{{ project.description }}</p>
                                     </div>
                                 </details>
                             </div>
                         {% endif %}
                     {% endfor %}
 
-                    {# Ora il controllo funzionerà correttamente #}
                     {% if not ns.has_projects %}
                         <p class="text-muted">You are not yet assigned to any active projects in this organization.</p>
                     {% endif %}

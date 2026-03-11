@@ -150,7 +150,7 @@ async def org_profile(
     return templates.TemplateResponse("org/org_profile.html", {
         "request": request, 
         "org": org,
-        "members": crud_user.get_users_by_usernames(org.members),
+        "members": crud_user.get_users_by_usernames(org.members.keys()),
         "toast_msg": toast_msg,
         "toast_type": toast_type
     })
@@ -242,13 +242,10 @@ async def create_project_submit(
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    # Dict for {username : List[Skill]}
-    initial_members = {username: [] for username in members_list}
-
     new_project = Project(
         name=name,
         description=description,
-        assigned_members=initial_members,
+        assigned_members=members_list,
         target_roles=[], 
         skill_gap=[]
     )
@@ -284,7 +281,7 @@ async def view_project(
     if not current_project:
         return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
 
-    team = crud_user.get_users_by_usernames(current_project.assigned_members.keys())
+    team = crud_user.get_users_by_usernames(current_project.assigned_members)
 
     role_list = None
     if role_search and role_search.strip():
@@ -545,8 +542,8 @@ async def project_forecast_gap_courses(
             "job_openings_data": job_data             
         })
 
-    assigned_members = crud_user.get_users_by_usernames(project.assigned_members.keys())
-    updated_project = crud_skill_models.skill_gap_project(project, assigned_members)
+    assigned_members = crud_user.get_users_by_usernames(project.assigned_members)
+    updated_project = crud_skill_models.skill_gap_project(project, org.members)
     org.projects[project_index] = updated_project
     crud_org.update_org(org)
 
@@ -578,41 +575,36 @@ async def project_forecast_gap_courses(
         "current_year": datetime.now().year
     })
 
-### --- Upload Skills CSV for Project --- ###
+### --- Upload Skills CSV for Organization --- ###
 @router.post("/upload_project_skills_csv", response_class=HTMLResponse)
 async def upload_project_skills_csv(
     request: Request,
-    project_id: str = Form(...),
     file: UploadFile = File(...),
     org: Organization = Depends(get_current_org)
 ):
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
-    project = next((p for p in org.projects if str(p.id) == project_id), None)
-
-    if not project:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
-
     if not file.filename.lower().endswith('.csv'):
         msg = urllib.parse.quote("Invalid file type. Please upload a CSV file.")
         return RedirectResponse(url=f"/org_home?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
     
+    await file.seek(0)
+
     csvReader = csv.DictReader(codecs.iterdecode(file.file, 'utf-8'))
     
     skills_to_review = []
     skills_not_found = []
-
     known_users = {}
 
-    msg = "Fail to read CSV file."
-    msg_type = "error"
+    invitated = []
+    not_found = []
 
     for row in csvReader:
         username = row.get("username")
         skill_name = row.get("skill_name")
         level_str = row.get("level")
-        
+
         if not username or not skill_name or not level_str:
             continue
             
@@ -628,12 +620,10 @@ async def upload_project_skills_csv(
                 known_users[username] = True
                 if username not in org.members:
                     crud_org.create_invitation(org.orgname, username)
-                    msg = f"📩 User '{username}' invited!"
-                    msg_type = "success"
+                    invitated.append(username)
             else:
                 known_users[username] = False
-                msg = f"⚠️ User {username} not found in the database."
-                msg_type = "warning"
+                not_found.append(username)
 
         if not known_users[username]:
             continue
@@ -653,13 +643,27 @@ async def upload_project_skills_csv(
                 "skill_name": skill_name
             })
 
-    if msg_type == "error":
-        return RedirectResponse(url=f"/org_home?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+    msg = "CSV processed successfully."
+    msg_type = "success"
+
+    # MSG for warnings
+    warnings = []
+    if invitated:
+        warnings.append(f"Invited: {', '.join(invitated)}")
+    if not_found:
+        warnings.append(f"Not found in DB: {', '.join(not_found)}")
+
+    if warnings:
+        msg = " | ".join(warnings)
+        msg_type = "warning" if invitated else "error"
+
+    if not skills_to_review and (invitated or not_found):
+        query_params = f"warning={urllib.parse.quote(msg)}"
+        return RedirectResponse(url=f"/org_profile?{query_params}", status_code=303)
 
     return templates.TemplateResponse("org/review_project_skills.html", {
         "request": request,
         "org": org,
-        "project_id": project_id,
         "skills_to_review": skills_to_review,
         "skills_not_found": skills_not_found,
         "toast_msg": msg,
@@ -675,27 +679,19 @@ async def confirm_project_skills_csv(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     form_data = await request.form()
-    project_id = form_data.get("project_id")
     total_rows_str = form_data.get("total_rows")
     
-    if not project_id or not total_rows_str:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
+    if not total_rows_str:
+        return RedirectResponse(url="/org_profile", status_code=status.HTTP_303_SEE_OTHER)
 
-    project_idx = next((i for i, p in enumerate(org.projects) if str(p.id) == project_id), None)
-    if project_idx is None:
-        return RedirectResponse(url="/org_home", status_code=status.HTTP_303_SEE_OTHER)
-    
-    project = org.projects[project_idx]
-        
     total_rows = int(total_rows_str)
     
-    if project.assigned_members is None: project.assigned_members = {}
-    if project.pending_members is None: project.pending_members = {}
+    if org.members is None: org.members = {}
+    if org.pending_members is None: org.pending_members = {}
 
     total_rows = int(total_rows_str)
     updates: dict[str, list[Skill]] = {}
     
-    # 3. Parsing del Form
     for i in range(1, total_rows + 1):
         username = form_data.get(f"username_{i}")
         uri_and_name = form_data.get(f"uri_name_{i}")
@@ -713,34 +709,19 @@ async def confirm_project_skills_csv(
             updates[username] = []
         updates[username].append(skill_obj)
 
-    # 4. LOGICA DI SMISTAMENTO (Con aggiornamento e non sovrascrittura totale)
     for username, new_skills in updates.items():
         if username in org.members:
-            # Utente già nell'org: lo mettiamo in assigned
-            # Se vuoi mantenere le skill vecchie e aggiungere le nuove:
-            current_skills = project.assigned_members.get(username, [])
-            # Evitiamo duplicati basandoci sulla URI
-            existing_uris = {s.uri for s in current_skills}
-            for ns in new_skills:
-                if ns.uri not in existing_uris:
-                    current_skills.append(ns)
+            org.members[username] = new_skills
             
-            project.assigned_members[username] = current_skills
-            
-            # Pulizia dai pending
-            if username in project.pending_members:
-                del project.pending_members[username]
+            if username in org.pending_members:
+                del org.pending_members[username]
         else:
-            # Utente esterno: va nei pending
-            project.pending_members[username] = new_skills
+            org.pending_members[username] = new_skills
             
-            # Pulizia dagli assigned (se per qualche motivo era lì)
-            if username in project.assigned_members:
-                del project.assigned_members[username]
+            if username in org.members:
+                del org.members[username]
 
-    # 5. Riaffidiamo il progetto all'organizzazione per sicurezza (Pydantic tracking)
-    org.projects[project_idx] = project
     crud_org.update_org(org)
 
     msg = urllib.parse.quote("Skills processed successfully.")
-    return RedirectResponse(url=f"/org/project/{project_id}?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url=f"/org_profile?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
