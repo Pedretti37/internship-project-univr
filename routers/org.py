@@ -13,6 +13,7 @@ import ast
 from datetime import datetime
 from service.config import templates, pwd_context
 from models import Organization, Project, Role, Skill
+from educational_offerings import courses_recommendation
 
 router = APIRouter()
 
@@ -557,7 +558,7 @@ async def project_forecast_gap_courses(
     # List of recommended courses for the missing skills
     # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
     # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(all_missing_skills)
+    recommended_courses = courses_recommendation(all_missing_skills)
 
     return templates.TemplateResponse("org/project_detail.html", {
         "request": request,

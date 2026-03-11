@@ -13,6 +13,7 @@ import io
 from service.config import templates, pwd_context
 from esco import escoAPI
 from models import Role, Skill, User
+from educational_offerings import courses_recommendation
 
 EU_COUNTRIES = [
     "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", 
@@ -528,7 +529,7 @@ async def forecast_gap_courses(
     # List of recommended courses for the missing skills
     # Role type will be a factor in course recommendation, for now we will consider just the missing skills, 
     # assuming "Mechanical Engineer" and similar role as default role type
-    recommended_courses = crud_skill_models.recommend_courses_for_skill_gap(all_missing_skills)
+    recommended_courses = courses_recommendation(all_missing_skills)
 
     return templates.TemplateResponse("user/user_profile.html", {
         "request": request,

@@ -57,6 +57,13 @@ class Organization(BaseModel):
 class Course(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
-    ects: int
-    description: Optional[str] = None
+    description: str
+    ects: Optional[int] = None
+    format: Optional[str] = None
+    link: Optional[str] = None
+    duration_weeks: Optional[int] = None
+    start_date: Optional[datetime] = None
+    medium_of_instruction: Optional[str] = None
+    cost: Optional[float] = 0.0
+    location: Optional[str] = None
     skills_covered: List[Skill] = []
