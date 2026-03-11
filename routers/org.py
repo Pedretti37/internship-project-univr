@@ -1,11 +1,9 @@
 import codecs
 import csv
-
 from fastapi import APIRouter, File, Query, Request, Form, UploadFile, status, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
 from typing import Optional
-
 import urllib
 from crud import crud_skill_models, crud_user, crud_org
 from service import cedefop_service

@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-
 from service.config import templates
 from routers import user, org, guest
 
@@ -26,16 +25,16 @@ async def lifespan(app: FastAPI):
         try:
             with open(f"{BASE_DIR}{filename}", "r", encoding='utf-8') as f:
                 app.state.cedefop[key] = json.load(f)
-            #print(f" ✅ {filename} caricato correttamente.")
+            #print(f"{filename} caricato correttamente.")
         except FileNotFoundError:
-            print(f" ❌ Errore: Il file {filename} non esiste in {BASE_DIR}")
+            print(f"Errore: Il file {filename} non esiste in {BASE_DIR}")
         except Exception as e:
-            print(f" ❌ Errore critico durante il caricamento di {filename}: {e}")
+            print(f"Errore critico durante il caricamento di {filename}: {e}")
 
     yield  # App is READY   
 
     # --- SHUTDOWN ---
-    #print("🛑 Spegnimento: Svuotamento database in memoria...")
+    #print("Spegnimento: Svuotamento database in memoria...")
     app.state.cedefop.clear()
 
 # --- APP Initialization ---

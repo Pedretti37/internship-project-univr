@@ -4,14 +4,12 @@ from fastapi import APIRouter, Query, Request, Form, UploadFile, File, status, D
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import EmailStr
 from typing import Optional
-
 import urllib
 from crud import crud_user, crud_org, crud_skill_models
 from service import cedefop_service
 from service.dependencies import get_current_user
 import csv
 import io
-
 from service.config import templates, pwd_context
 from esco import escoAPI
 from models import Role, Skill, User
