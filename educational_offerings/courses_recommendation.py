@@ -1,8 +1,6 @@
 from typing import Dict, List
 from models import Course, Organization
 
-ED_COURSES_MEC_ENGINEER = "educational_offerings/courses/educational_offerings_esco_tagged.json"
-
 # Recommend courses for skill gap
 def recommend_courses_for_skill_gap(
     missing_skills_uri: Dict[str, str], 

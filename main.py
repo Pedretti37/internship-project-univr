@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI):
         try:
             with open(f"{BASE_DIR}{filename}", "r", encoding='utf-8') as f:
                 app.state.cedefop[key] = json.load(f)
-            #print(f"{filename} caricato correttamente.")
+            #print(f"{filename} uploaded correctly.")
         except FileNotFoundError:
             print(f"Errore: Il file {filename} non esiste in {BASE_DIR}")
         except Exception as e:
@@ -34,7 +34,6 @@ async def lifespan(app: FastAPI):
     yield  # App is READY   
 
     # --- SHUTDOWN ---
-    #print("Spegnimento: Svuotamento database in memoria...")
     app.state.cedefop.clear()
 
 # --- APP Initialization ---

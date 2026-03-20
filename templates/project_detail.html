@@ -251,13 +251,13 @@
                     </div>
                 {% endif %}
             </section>
-        {% endif %}
 
-        <section class="card">
-            {% if user.skill_gap or recommended_courses%}
-                <button onclick="downloadPDF()" class="btn btn-primary">📄 Export PDF</button>
-            {% endif %}
-        </section>
+            <section class="card">
+                {% if user.skill_gap or recommended_courses%}
+                    <button onclick="downloadPDF()" class="btn btn-primary">📄 Export PDF</button>
+                {% endif %}
+            </section>
+        {% endif %}
 
         <div id="report-content">
             <section class="card" translate="no">
