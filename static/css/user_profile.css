@@ -62,7 +62,7 @@ body {
     margin-top: 30px;
 }
 
-/* Form di Selezione */
+/* Selection Form */
 .analysis-controls {
     background: #fdfdfd;
     padding: 20px;
@@ -83,7 +83,7 @@ body {
     margin-top: 5px;
 }
 
-/* --- CARD & SEZIONI --- */
+/* --- CARD & SECTIONS --- */
 .card, .forecast-card {
     background: #ffffff;
     border: 1px solid #e0e6ed;
@@ -113,7 +113,7 @@ body {
 .badge-danger { background-color: #c0392b; }
 .badge-info { background-color: #2980b9; }
 
-/* --- TABELLE E SCROLL --- */
+/* --- TABLES --- */
 .info-box {
     background: #f8f9fa;
     border: 1px solid #e9ecef;
@@ -177,8 +177,7 @@ summary {
 }
 summary:hover { background: #e8ecef; }
 
-
-/* Stile universale per i bottoni blu */
+/* Primary btn */
 .btn-primary {
     background-color: #2c3e50;
     color: white;

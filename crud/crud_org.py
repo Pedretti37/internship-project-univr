@@ -19,7 +19,7 @@ def get_inv_json_path(id: str) -> str:
 ### --- CRUD: Create --- ###
 def create_organization(org: Organization):
     if os.path.exists(get_json_path(org.orgname)):
-        raise ValueError("Organization identifier already exists")
+        raise ValueError("Organization already exists")
 
     file_path = get_json_path(org.orgname)
     with open(file_path, "w", encoding="utf-8") as f:
@@ -76,14 +76,12 @@ def get_org_by_orgname(orgname: str) -> Organization | None:
 def get_all_orgs() -> List[Organization]:
     all_organizations = []
     
-    # Verifichiamo che la directory esista
     if not os.path.exists(DATA_DIR_ORGS):
         return []
 
-    # Scansioniamo tutti i file nella cartella
     for filename in os.listdir(DATA_DIR_ORGS):
         if filename.endswith(".json"):
-            orgname = filename[:-5]  # Rimuoviamo ".json" per ottenere l'orgname
+            orgname = filename[:-5] # removing .json for orgname
             org = get_org_by_orgname(orgname)
             if org:
                 all_organizations.append(org)

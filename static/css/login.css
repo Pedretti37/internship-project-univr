@@ -5,7 +5,7 @@ body {
     background-color: #f4f4f9; 
 }
 
-/* Stile del contenitore principale */
+/*main container */
 .page-container {
     display: flex;
     justify-content: center;
@@ -42,14 +42,13 @@ body {
     margin: 0.5rem 0;
 }
 
-/* Stile del Form e Input */
+/* Form style */
 .auth-form {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Allinea etichette a sinistra */
+    align-items: flex-start; 
 }
 
-/* Stile per gli Input */
 input[type="text"],
 input[type="password"] {
     width: 100%;
@@ -62,7 +61,7 @@ input[type="password"] {
     transition: border-color 0.3s;
 }
 
-/* Bottone Login */
+/* Login btn */
 .auth-form button {
     width: 100%;             
     padding: 12px 0;         
@@ -78,7 +77,6 @@ input[type="password"] {
     font-family: inherit;
 }
 
-/* Effetto quando clicchi sull'input */
 input:focus {
     border-color: #2c3e50;
     outline: none;
@@ -91,15 +89,15 @@ input:focus {
 }
 
 .register a {
-    text-decoration: none;     /* Via la sottolineatura */
-    text-align: center;        /* Testo al centro */
+    text-decoration: none;    
+    text-align: center;     
     font-weight: 600;
     color: #555;
 }
 
 .back-link a {
-    text-decoration: none;     /* Via la sottolineatura */
-    text-align: center;        /* Testo al centro */
+    text-decoration: none;    
+    text-align: center;     
     font-weight: 600;
     color: #555;
 }

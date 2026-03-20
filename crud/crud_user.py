@@ -60,7 +60,6 @@ def update_user(user: User):
 
 ### --- Get USER --- ###
 def get_user_by_username(username: str) -> User | None:
-    """Recupera l'utente direttamente tramite Username (veloce)"""
     path = os.path.join(DATA_DIR_USERS, f"{username}.json")
     if not os.path.exists(path):
         return None
@@ -78,10 +77,10 @@ def get_users_by_usernames(usernames_list: list[str]) -> list[User]:
             if user is not None:
                 found_users.append(user)
             else:
-                print(f"File fisico mancante per {username}")
+                print(f"❌ Error with user '{username}'")
                 
         except ValueError as e:
-            print(f"❌ Errore di validazione per l'utente {username}: {e}")
+            print(f"❌ Error with user '{username}': {e}")
             continue
             
     return found_users
@@ -106,7 +105,7 @@ def get_pending_invitations_for_user(username: str) -> list[Invitation]:
                         invitations.append(invitation_obj)
                         
             except (json.JSONDecodeError, ValidationError) as e:
-                print(f"Errore nella lettura del file {filename}: {e}")
+                print(f"Error trying to read {filename}: {e}")
                 continue
                 
     return invitations

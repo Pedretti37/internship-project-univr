@@ -10,18 +10,6 @@ HEADERS = {
 BASE_URL = "https://ec.europa.eu/esco/api"
 
 ### API function to get details
-import requests
-import time
-from models import Role
-
-# Configuration
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0',
-    'Accept': 'application/json'
-}
-BASE_URL = "https://ec.europa.eu/esco/api"
-
-### API function to get details
 def get_single_role_details(uri: str, language: str) -> Role | None:
     if not uri:
         return None
@@ -126,10 +114,6 @@ def get_esco_occupations_list(keyword, language, limit=10):
 
 ### API function to get skill URI by name 
 def get_esco_skill_uri_by_name(skill_name: str, language: str = 'en') -> str | None:
-    """
-    Cerca una skill per nome sull'API di ESCO e restituisce il suo URI.
-    Prende il primo risultato (il più rilevante).
-    """
     search_params = {
         'text': skill_name, 
         'type': 'skill',      
@@ -147,7 +131,7 @@ def get_esco_skill_uri_by_name(skill_name: str, language: str = 'en') -> str | N
             return results[0].get('uri')
             
     except Exception as e:
-        print(f"Errore durante la ricerca della skill '{skill_name}': {e}")
+        print(f"Error while searching for '{skill_name}': {e}")
         
     return None 
 

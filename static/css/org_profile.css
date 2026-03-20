@@ -60,7 +60,7 @@ body {
     margin-right: auto;
 }
 
-/* Stile universale per i bottoni blu */
+/* Primary btn */
 .btn-primary {
     background-color: #2c3e50;
     color: white;
@@ -95,7 +95,6 @@ body {
     color: #666;
 }
 
-/* Allinea il form di invito (input + bottone) */
 .add-form {
     display: flex;
     gap: 10px;
@@ -109,7 +108,7 @@ body {
     border-radius: 6px;
 }
 
-/* --- CARD & SEZIONI --- */
+/* --- Card & section --- */
 .card {
     background: #ffffff;
     border: 1px solid #e0e6ed;

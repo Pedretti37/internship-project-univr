@@ -102,7 +102,7 @@ body {
     cursor: pointer;
 }
 
-/* Stile universale per i bottoni blu */
+/* Primary btn */
 .btn-primary {
     background-color: #2c3e50;
     color: white;
