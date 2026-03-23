@@ -39,7 +39,8 @@ The primary goal of this project is to bridge the gap between employee/organizat
 ## Project Structure
 
 ```text
-intership-project-univr
+intership-project-univr/
+|
 ├── app/
 |    ├── main.py                     # Application entry point
 |    ├── service/                    # Main configuration settings
