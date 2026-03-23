@@ -24,8 +24,11 @@ async def role_list_guest(request: Request, search: str = Form(...)):
     language = "en"
     role_list = escoAPI.get_esco_occupations_list(role, language=language, limit=10)
 
-    return templates.TemplateResponse("guest_home.html", {
-        "request": request,
-        "results": role_list,
-        "last_search": search
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="guest_home.html", 
+        context={
+            "results": role_list,
+            "last_search": search
+        }
+    )

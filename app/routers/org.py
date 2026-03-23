@@ -50,10 +50,13 @@ CEDEFOP_SECTORS = [
 @router.get("/org_login", response_class=HTMLResponse)
 async def org_login(request: Request):
     error_message = request.cookies.get("flash_error")
-    response = templates.TemplateResponse("org/org_login.html", {
-        "request": request,
-        "error": error_message
-    })
+    response = templates.TemplateResponse(
+        request=request,
+        name="org/org_login.html", 
+        context={
+            "error": error_message
+        }
+    )
     if error_message:
         response.delete_cookie("flash_error")
     
@@ -96,21 +99,38 @@ async def org_home(
     if not org:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    return templates.TemplateResponse("org/org_home.html", {
-        "request": request, 
-        "org": org,
-        "projects": org.projects
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="org/org_home.html", 
+        context={
+            "org": org,
+            "projects": org.projects
+        }
+    )
 
 ### --- Organization Registration GET --- ###
 @router.get("/org_register", response_class=HTMLResponse)
-async def org_register(request: Request):
-    return templates.TemplateResponse("org/org_register.html", {"request": request})
+async def org_register(
+    request: Request,
+    error: Optional[str] = Query(None),
+    success: Optional[str] = Query(None),
+    warning: Optional[str] = Query(None)
+):
+    toast_msg = success or error or warning
+    toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
+
+    return templates.TemplateResponse(
+        request=request,
+        name="org/org_register.html",
+        context={
+            "toast_msg": toast_msg,
+            "toast_type": toast_type
+        }
+    )
 
 ### --- Organization Registration POST --- ###
-@router.post("/org_register", response_class=HTMLResponse)
+@router.post("/org_register", response_class=RedirectResponse)
 async def register_org(
-    request: Request, 
     name: str = Form(...),
     orgname: str = Form(...),
     password: str = Form(...)
@@ -121,10 +141,8 @@ async def register_org(
         crud_org.create_organization(new_org)
         return RedirectResponse(url="/org_login", status_code=status.HTTP_303_SEE_OTHER)
     except ValueError:
-        return templates.TemplateResponse("org/org_register.html", {
-            "request": request,
-            "error": "Organization already exists. Please choose another."
-        })
+        msg = urllib.parse.quote("Orgname already exists. Please choose another.")
+        return RedirectResponse(url=f"/org_register?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
     
 ### --- Organization Profile --- ###
 @router.get("/org_profile", response_class=HTMLResponse)
@@ -189,21 +207,24 @@ async def org_profile(
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
 
-    return templates.TemplateResponse("org/org_profile.html", {
-        "request": request, 
-        "org": org,
-        "members": crud_user.get_users_by_usernames(org.members.keys()),
-        "available_users": crud_user.get_all_users(),
-        "skill_list": skill_list,
-        "skill_search": skill_search,
-        "active_course_id": course_id,
-        "global_gap": global_gap,
-        "hr_recommendations": hr_recommendations,
-        "analysis_active": analyze,
-        "course_to_edit": course_to_edit,
-        "toast_msg": toast_msg,
-        "toast_type": toast_type
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="org/org_profile.html", 
+        context={
+            "org": org,
+            "members": crud_user.get_users_by_usernames(org.members.keys()),
+            "available_users": crud_user.get_all_users(),
+            "skill_list": skill_list,
+            "skill_search": skill_search,
+            "active_course_id": course_id,
+            "global_gap": global_gap,
+            "hr_recommendations": hr_recommendations,
+            "analysis_active": analyze,
+            "course_to_edit": course_to_edit,
+            "toast_msg": toast_msg,
+            "toast_type": toast_type
+        }
+    )
 
 ### --- Password Change --- ###
 @router.post("/change_password_org", response_class=RedirectResponse)
@@ -321,24 +342,27 @@ async def view_project(
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
 
-    return templates.TemplateResponse("project_detail.html", {
-        "request": request,
-        "org": org,
-        "is_manager": False,
-        "current_project": current_project,
-        "role_list": role_list,
-        "role_search": role_search,
-        "team": team,
-        "countries_list": EU_COUNTRIES,
-        "sectors_list": CEDEFOP_SECTORS,
-        "recommended_courses": None,
-        "forecast_results": None,
-        "country": None,
-        "sector": None,
-        "current_year": datetime.now().year,
-        "toast_msg": toast_msg,
-        "toast_type": toast_type
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="project_detail.html", 
+        context={
+            "org": org,
+            "is_manager": False,
+            "current_project": current_project,
+            "role_list": role_list,
+            "role_search": role_search,
+            "team": team,
+            "countries_list": EU_COUNTRIES,
+            "sectors_list": CEDEFOP_SECTORS,
+            "recommended_courses": None,
+            "forecast_results": None,
+            "country": None,
+            "sector": None,
+            "current_year": datetime.now().year,
+            "toast_msg": toast_msg,
+            "toast_type": toast_type
+        }
+    )
 
 ### --- Upload Skills CSV for Organization --- ###
 @router.post("/upload_employee_skills_csv", response_class=HTMLResponse)
@@ -426,14 +450,18 @@ async def upload_employee_skills_csv(
         query_params = f"warning={urllib.parse.quote(msg)}"
         return RedirectResponse(url=f"/org_profile?{query_params}", status_code=303)
 
-    return templates.TemplateResponse("org/review_employee_skills.html", {
-        "request": request,
-        "org": org,
-        "skills_to_review": skills_to_review,
-        "skills_not_found": skills_not_found,
-        "toast_msg": msg,
-        "toast_type": msg_type
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="org/review_employee_skills.html", 
+        context={
+            "request": request,
+            "org": org,
+            "skills_to_review": skills_to_review,
+            "skills_not_found": skills_not_found,
+            "toast_msg": msg,
+            "toast_type": msg_type
+        }
+    )
 
 @router.post("/org/confirm_employee_skills", response_class=RedirectResponse)
 async def confirm_employee_skills(

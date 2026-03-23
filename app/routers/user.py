@@ -51,17 +51,20 @@ router = APIRouter()
 @router.get("/user_login", response_class=HTMLResponse)
 async def user_login(request: Request):
     error_message = request.cookies.get("flash_error")
-    response = templates.TemplateResponse("user/user_login.html", {
-        "request": request,
-        "error": error_message
-    })
+    response = templates.TemplateResponse(
+        request=request,
+        name="user/user_login.html",
+        context={
+            "error": error_message
+        }
+    )
     if error_message:
         response.delete_cookie("flash_error")
     
     return response
 
 ### --- User POST Login --- ###
-@router.post("/user_login", response_class=HTMLResponse)
+@router.post("/user_login", response_class=RedirectResponse)
 async def user_login(username: str = Form(...), password: str = Form(...)):
     user = crud_user.get_user_by_username(username)
 
@@ -127,27 +130,44 @@ async def user_home(
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
 
-    return templates.TemplateResponse("user/user_home.html", {
-        "request": request,
-        "user": user,
-        "role_list": role_list,
-        "role_search": role_search,
-        "skill_list": skill_list,
-        "skill_search": skill_search,
-        "managed_projects": managed_projects,
-        "toast_msg": toast_msg,
-        "toast_type": toast_type
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="user/user_home.html",
+        context={
+            "user": user,
+            "role_list": role_list,
+            "role_search": role_search,
+            "skill_list": skill_list,
+            "skill_search": skill_search,
+            "managed_projects": managed_projects,
+            "toast_msg": toast_msg,
+            "toast_type": toast_type
+        }
+    )
 
 ### --- User GET Registration --- ###
 @router.get("/user_register", response_class=HTMLResponse)
-async def register(request: Request):
-    return templates.TemplateResponse("user/user_register.html", {"request": request})
+async def register(
+    request: Request,
+    error: Optional[str] = Query(None),
+    success: Optional[str] = Query(None),
+    warning: Optional[str] = Query(None)
+):
+    toast_msg = success or error or warning
+    toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
+
+    return templates.TemplateResponse(
+        request=request,
+        name="user/user_register.html",
+        context={
+            "toast_msg": toast_msg,
+            "toast_type": toast_type
+        }
+    )
 
 ### --- User POST Registration --- ###
-@router.post("/user_register", response_class=HTMLResponse)
+@router.post("/user_register", response_class=RedirectResponse)
 async def register_user(
-    request: Request, 
     name: str = Form(...),
     surname: str = Form(...),
     username: str = Form(...), 
@@ -159,10 +179,8 @@ async def register_user(
         crud_user.create_user(new_user)
         return RedirectResponse(url="/user_login", status_code=status.HTTP_303_SEE_OTHER)
     except ValueError:
-        return templates.TemplateResponse("user/user_register.html", {
-            "request": request,
-            "error": "Username already exists. Please choose another."
-        })
+        msg = urllib.parse.quote("Username already exists. Please choose another.")
+        return RedirectResponse(url=f"/user_register?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
     
 ### --- User Profile --- ###
 @router.get("/user_profile", response_class=HTMLResponse)
@@ -184,21 +202,24 @@ async def user_profile(
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
     
-    return templates.TemplateResponse("user/user_profile.html", {
-        "request": request, 
-        "user": user, 
-        "countries_list": EU_COUNTRIES,
-        "sectors_list": CEDEFOP_SECTORS,
-        "invitations": invitations,
-        "org": org,
-        "toast_msg": toast_msg,
-        "toast_type": toast_type,
-        "current_year": datetime.now().year,
-        "forecast_results": None,
-        "recommended_courses": None,
-        "country": None,
-        "sector": None
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="user/user_profile.html",
+        context={
+            "user": user, 
+            "countries_list": EU_COUNTRIES,
+            "sectors_list": CEDEFOP_SECTORS,
+            "invitations": invitations,
+            "org": org,
+            "toast_msg": toast_msg,
+            "toast_type": toast_type,
+            "current_year": datetime.now().year,
+            "forecast_results": None,
+            "recommended_courses": None,
+            "country": None,
+            "sector": None
+        }
+    )
 
 ### --- Set User Target Roles --- ###
 @router.post("/add_to_user_target_roles", response_class=RedirectResponse)
@@ -432,13 +453,16 @@ async def details_page(
     toast_msg = success or warning or error
     toast_type = "success" if success else ("warning" if warning else ("error" if error else None))
 
-    return templates.TemplateResponse("details.html", {
-        "request": request,
-        "is_user": True,
-        "role": selected_role,
-        "toast_msg": toast_msg,
-        "toast_type": toast_type
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="details.html",
+        context={
+            "is_user": True,
+            "role": selected_role,
+            "toast_msg": toast_msg,
+            "toast_type": toast_type
+        }
+    )
     
 ### --- Delete Target Role from User --- ###    
 @router.post("/delete_target_role", response_class=RedirectResponse)
@@ -537,17 +561,20 @@ async def forecast_gap_courses(
     # List of recommended courses for the missing skills
     recommended_courses = recommend_courses_for_skill_gap(all_missing_skills, 'individual', user.organization, crud_org.get_all_orgs())
 
-    return templates.TemplateResponse("user/user_profile.html", {
-        "request": request,
-        "user": updated_user,
-        "forecast_results": forecast_results, 
-        "recommended_courses": recommended_courses,
-        "country": country,
-        "sector": sector,
-        "countries_list": EU_COUNTRIES,
-        "sectors_list": CEDEFOP_SECTORS,
-        "current_year": datetime.now().year
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="user/user_profile.html",
+        context={
+            "user": updated_user,
+            "forecast_results": forecast_results, 
+            "recommended_courses": recommended_courses,
+            "country": country,
+            "sector": sector,
+            "countries_list": EU_COUNTRIES,
+            "sectors_list": CEDEFOP_SECTORS,
+            "current_year": datetime.now().year
+        }
+    )
 
 ### --- Accept Invitation --- ###
 @router.post("/accept_invitation", response_class=RedirectResponse)
@@ -698,12 +725,15 @@ async def upload_skills_csv(
         else:
             skills_not_found.append(skill_name)
 
-    return templates.TemplateResponse("user/review_skills.html", {
-        "request": request,
-        "user": user,
-        "skills_to_review": skills_to_review,
-        "skills_not_found": skills_not_found
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="user/review_skills.html", 
+        context={
+            "user": user,
+            "skills_to_review": skills_to_review,
+            "skills_not_found": skills_not_found
+        }
+    )
 
 ### --- Confirm and Save CSV Skills --- ###
 @router.post("/confirm_skills_csv", response_class=RedirectResponse)
@@ -778,11 +808,14 @@ async def create_project_form(
     # member list for assignment with checkboxes
     members = crud_user.get_users_by_usernames(org.members)
 
-    return templates.TemplateResponse("user/create_project.html", {
-        "request": request,
-        "user": user,
-        "members": members
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="user/create_project.html", 
+        context={
+            "user": user,
+            "members": members
+        }
+    )
 
 ### --- Create Project POST --- ###
 @router.post("/manager/create_project", response_class=RedirectResponse)
@@ -851,25 +884,28 @@ async def view_project(
     toast_msg = success or error or warning
     toast_type = "success" if success else ("error" if error else ("warning" if warning else None))
 
-    return templates.TemplateResponse("project_detail.html", {
-        "request": request,
-        "user": user,
-        "org": org,
-        "is_manager": True,
-        "current_project": current_project,
-        "role_list": role_list,
-        "role_search": role_search,
-        "team": team,
-        "countries_list": EU_COUNTRIES,
-        "sectors_list": CEDEFOP_SECTORS,
-        "recommended_courses": None,
-        "forecast_results": None,
-        "country": None,
-        "sector": None,
-        "current_year": datetime.now().year,
-        "toast_msg": toast_msg,
-        "toast_type": toast_type
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="project_detail.html", 
+            context={
+            "user": user,
+            "org": org,
+            "is_manager": True,
+            "current_project": current_project,
+            "role_list": role_list,
+            "role_search": role_search,
+            "team": team,
+            "countries_list": EU_COUNTRIES,
+            "sectors_list": CEDEFOP_SECTORS,
+            "recommended_courses": None,
+            "forecast_results": None,
+            "country": None,
+            "sector": None,
+            "current_year": datetime.now().year,
+            "toast_msg": toast_msg,
+            "toast_type": toast_type
+        }
+    )
 
 ### --- Role details for projects --- ###
 @router.get("/role_details_for_project", response_class=HTMLResponse)
@@ -901,14 +937,17 @@ async def details_page(
     toast_msg = success or warning or error
     toast_type = "success" if success else ("warning" if warning else ("error" if error else None))
 
-    return templates.TemplateResponse("details.html", {
-        "request": request,
-        "is_user": False,
-        "role": selected_role,
-        "project_id": project_id,
-        "toast_msg": toast_msg,
-        "toast_type": toast_type
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="details.html", 
+        context={
+            "is_user": False,
+            "role": selected_role,
+            "project_id": project_id,
+            "toast_msg": toast_msg,
+            "toast_type": toast_type
+        }
+    )
 
 ### --- Project Add Role POST --- ###
 @router.post("/add_to_project_target_roles", response_class=RedirectResponse) 
@@ -1135,18 +1174,21 @@ async def project_forecast_gap_courses(
     # List of recommended courses for the missing skills
     recommended_courses = recommend_courses_for_skill_gap(all_missing_skills, "manager", user.organization, crud_org.get_all_orgs())
 
-    return templates.TemplateResponse("project_detail.html", {
-        "request": request,
-        "user": user,
-        "org": org,
-        "is_manager": True,
-        "forecast_results": forecast_results, 
-        "recommended_courses": recommended_courses,
-        "country": country,
-        "sector": sector,
-        "countries_list": EU_COUNTRIES,
-        "sectors_list": CEDEFOP_SECTORS,
-        "current_project": updated_project,
-        "team": assigned_members,
-        "current_year": datetime.now().year
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="project_detail.html", 
+        context={
+            "user": user,
+            "org": org,
+            "is_manager": True,
+            "forecast_results": forecast_results, 
+            "recommended_courses": recommended_courses,
+            "country": country,
+            "sector": sector,
+            "countries_list": EU_COUNTRIES,
+            "sectors_list": CEDEFOP_SECTORS,
+            "current_project": updated_project,
+            "team": assigned_members,
+            "current_year": datetime.now().year
+        }
+    )

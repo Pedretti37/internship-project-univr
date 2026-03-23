@@ -30,7 +30,7 @@ class User(BaseModel):
     target_roles: List[Role] = []
     individual_skills: List[Skill] = []
     skill_gap: List[Dict[str, Any]] = []
-    organization: Optional[str]
+    organization: Optional[str] = None
 
 class Invitation(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
