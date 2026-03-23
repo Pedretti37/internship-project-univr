@@ -39,19 +39,26 @@ The primary goal of this project is to bridge the gap between employee/organizat
 ## Project Structure
 
 ```text
-├── service/                    # Main configuration settings
-├── main.py                     # Application entry point
-├── requirements.txt            # Python dependencies
-│
-├── crud/                       # JSON I/O operations (Database layer)
-├── data/                       # JSON Storage (Users, Orgs, Projects) and CEDEFOP database
-├── educational_offerings/      # Educational Courses recommendation
-├── esco/                       # ESCO API integration logic
-├── models.py                   # Pydantic data models
-├── routers/                    # Endpoints (User, Org, etc.)
-│
-├── static/                     # CSS and static assets (.csv template)
-└── templates/                  # HTML Jinja2 templates
+├── app/
+|    ├── main.py                     # Application entry point
+|    ├── service/                    # Main configuration settings
+|    ├── crud/                       # JSON I/O operations (Database layer)
+|    ├── educational_offerings/      # Educational Courses recommendation
+|    ├── esco/                       # ESCO API integration logic
+|    ├── models.py                   # Pydantic data models
+|    ├── routers/                    # Endpoints (User, Org, etc.)
+|    ├── static/                     # CSS and static assets (.csv template)
+|    └── templates/                  # HTML Jinja2 templates
+|
+├── data/                            # JSON Storage (Users, Orgs, Projects)
+|    ├── cedefop/                    # CEDEFOP database
+|    ├── invitations/                
+|    ├── organizations/                   
+|    └── users/                   
+|
+└── requirements.txt                 # Python dependencies
+
+
 ```
 
 ## How to Run
