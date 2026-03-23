@@ -58,6 +58,9 @@ intership-project-univr/
 |    ├── organizations/                   
 |    └── users/                   
 |
+├── tests/                           # Test files
+├── pytest.ini                       # Configuration file for tests 
+|
 └── requirements.txt                 # Python dependencies
 
 
