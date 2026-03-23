@@ -88,4 +88,8 @@ intership-project-univr/
     ```bash
     uvicorn app.main:app --reload
     ```
+    **ONLY FOR TESTS**
+    ```bash
+    pytest -v
+    ```
 5.  Open browser at `http://127.0.0.1:8000`
