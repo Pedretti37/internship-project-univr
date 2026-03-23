@@ -88,7 +88,7 @@ intership-project-univr/
     ```bash
     uvicorn app.main:app --reload
     ```
-    **ONLY FOR TESTS**
+    **For tests run this instead of starting the server:**
     ```bash
     pytest -v
     ```
