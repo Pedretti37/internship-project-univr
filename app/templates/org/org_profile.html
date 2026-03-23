@@ -21,9 +21,6 @@
         <div class="card">
             <h2>Organization information</h2>
             <p><strong>Name</strong>: {{ org.name }}</p>
-            <p><strong>Address</strong>: {{ org.address }}</p>
-            <p><strong>Email</strong>: {{ org.email }}</p>
-            <p><strong>Phone Number</strong>: {{ org.phone }}</p>
             
             <details {% if wrong_pw or failed or success %}open{% endif %}>
     
@@ -105,6 +102,22 @@
                     <input type="text" name="username_to_invite" placeholder="Username" required>
                     <button type="submit" class="btn-primary">Invite</button>
                 </form>
+
+                <details>
+                    <summary class="summary">
+                        Click here to available users
+                    </summary>
+                    
+                    <div style="padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+                        {% if available_users %}
+                            {% for user in available_users %}
+                                <span>{{ user.name }} {{ user.surname }} <small>@{{ user.username }}</small></span>
+                            {% endfor %}
+                        {% else %}
+                            <p>No available users.</p>
+                        {% endif %}
+                    </div>
+                </details>
             </div>
         </div>
 

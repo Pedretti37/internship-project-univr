@@ -4,15 +4,15 @@ from fastapi import APIRouter, Query, Request, Form, UploadFile, File, status, D
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional
 import urllib
-from crud import crud_user, crud_org, crud_skill_models
-from service import cedefop_service
-from service.dependencies import get_current_user
+from app.crud import crud_user, crud_org, crud_skill_models
+from app.service import cedefop_service
+from app.service.dependencies import get_current_user
 import csv
 import io
-from service.config import templates, pwd_context
-from esco import escoAPI
-from models import Role, Skill, User, Project
-from educational_offerings.courses_recommendation import recommend_courses_for_skill_gap
+from app.service.config import templates, pwd_context
+from app.esco import escoAPI
+from app.models import Role, Skill, User, Project
+from app.educational_offerings.courses_recommendation import recommend_courses_for_skill_gap
 
 EU_COUNTRIES = [
     "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", 
@@ -559,12 +559,17 @@ async def accept_invitation(
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     
-    user.organization = orgname
-    crud_user.update_user(user)
-
     org = crud_org.get_org_by_orgname(orgname)
     if not org:
-        return RedirectResponse(url="/user_profile?error=Organization+not+found", status_code=303)
+        msg = urllib.parse.quote(f"Organization not found!")
+        return RedirectResponse(url=f"/user_profile?error={msg}", status_code=303)
+    
+    if not user.organization:
+        user.organization = orgname
+        crud_user.update_user(user)
+    else:
+        msg = urllib.parse.quote(f"You are already in an organization!")
+        return RedirectResponse(url=f"/user_profile?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
     if org.members is None: 
         org.members = {}
@@ -603,6 +608,44 @@ async def decline_invitation(
         crud_org.update_invitation(inv)
 
     return RedirectResponse(url="/user_profile", status_code=status.HTTP_303_SEE_OTHER)
+
+### --- Leave ORG --- ###
+@router.post("/leave_org", response_class=RedirectResponse)
+async def leave_org(
+    user: User = Depends(get_current_user),
+    orgname: str = Form(...)
+):
+    if not user:
+        msg = urllib.parse.quote("Not authorized")
+        return RedirectResponse(url=f"/user_profile?error={msg}", status_code=status.HTTP_403_FORBIDDEN)
+    
+    org = crud_org.get_org_by_orgname(orgname)
+    if not org:
+        msg = urllib.parse.quote("Organization not found")
+        return RedirectResponse(url=f"/user_profile?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+    
+    user.organization = None
+    crud_user.update_user(user)
+
+    if org.members and user.username in org.members:
+        del org.members[user.username]
+    
+    if hasattr(org, 'pending_members') and org.pending_members and user.username in org.pending_members:
+        del org.pending_members[user.username]
+
+    if hasattr(org, 'projects') and org.projects:
+        for project in org.projects:
+            if user.username in project.assigned_members:
+                project.assigned_members.remove(user.username)
+
+            # To be managed, in org home may be possible to re-assigned projects
+            if project.manager == user.username:
+                project.manager = "Unassigned"
+
+    crud_org.update_org(org)
+
+    msg = urllib.parse.quote(f"You left '{org.name}'")
+    return RedirectResponse(url=f"/user_profile?success={msg}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Upload Skill via CSV ---###
 @router.post("/upload_skills_csv", response_class=HTMLResponse)

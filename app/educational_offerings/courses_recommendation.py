@@ -1,5 +1,5 @@
 from typing import Dict, List
-from models import Course, Organization
+from app.models import Course, Organization
 
 # Recommend courses for skill gap
 def recommend_courses_for_skill_gap(

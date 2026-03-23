@@ -4,14 +4,14 @@ from fastapi import APIRouter, File, Query, Request, Form, UploadFile, status, D
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional
 import urllib
-from crud import crud_user, crud_org
-from service.dependencies import get_current_org
-from esco import escoAPI 
+from app.crud import crud_user, crud_org
+from app.service.dependencies import get_current_org
+from app.esco import escoAPI 
 from datetime import datetime
-from service.config import templates, pwd_context
-from models import Organization, Project, Skill, Course, UserLevel
+from app.service.config import templates, pwd_context
+from app.models import Organization, Project, Skill, Course, UserLevel
 from pydantic import ValidationError
-from educational_offerings.courses_recommendation import recommend_courses_for_skill_gap
+from app.educational_offerings.courses_recommendation import recommend_courses_for_skill_gap
 
 router = APIRouter()
 
@@ -193,6 +193,7 @@ async def org_profile(
         "request": request, 
         "org": org,
         "members": crud_user.get_users_by_usernames(org.members.keys()),
+        "available_users": crud_user.get_all_users(),
         "skill_list": skill_list,
         "skill_search": skill_search,
         "active_course_id": course_id,

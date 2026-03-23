@@ -1,5 +1,5 @@
 from typing import Dict, List
-from models import Project, Skill, User, Role
+from app.models import Project, Skill, User, Role
 
 # Skill gap analysis for a user
 def skill_gap_user(user: User, role_list: List[Role]) -> User:

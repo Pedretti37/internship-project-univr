@@ -1,6 +1,5 @@
 import requests
-import time
-from models import Role, Skill
+from app.models import Role, Skill
 
 # Configuration
 HEADERS = {

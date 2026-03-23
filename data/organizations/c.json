@@ -1,0 +1,11 @@
+{
+    "name": "Samsung",
+    "orgname": "c",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$8R7DGMN4jzFmTOkdo9R6rw$b7gF+CXImnhsz3Hiw86nVzz4qUXx6Hs5JYG5FfVOIsM",
+    "members": {
+        "b": []
+    },
+    "pending_members": {},
+    "projects": [],
+    "courses": []
+}

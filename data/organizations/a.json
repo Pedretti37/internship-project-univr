@@ -1,0 +1,9 @@
+{
+    "name": "Università degli Studi di Verona",
+    "orgname": "a",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$dy6FsFbK+T/HeG8tZcyZcw$hlxStKcNtru3Z2ea+iQmqf/M1Wria6qG3wtz0KN98yY",
+    "members": {},
+    "pending_members": {},
+    "projects": [],
+    "courses": []
+}

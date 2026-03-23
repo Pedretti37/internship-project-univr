@@ -1,5 +1,5 @@
 from fastapi import Request
-from crud import crud_org, crud_user
+from app.crud import crud_org, crud_user
 
 # get current user
 async def get_current_user(request: Request):

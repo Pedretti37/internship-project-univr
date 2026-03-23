@@ -136,6 +136,18 @@
                         {% endif %}
                     </div>
                 {% endif %}
+
+                <div>
+                    <hr>
+                    <form action="/leave_org" method="post">
+                        <input type="hidden" name="orgname" value="{{ org.orgname }}">
+                        <button type="submit" 
+                                onclick="return confirm('You are leaving &quot;{{ org.name }}&quot;. Are you sure? This action cannot be undone.');"
+                                class="btn-cancel">
+                            Leave <strong>{{ org.name}}</strong>
+                        </button>
+                    </form>
+                </div>
             </section>
         {% endif %}
 

@@ -1,6 +1,6 @@
 import json
 import os
-from models import Organization, Invitation
+from app.models import Organization, Invitation
 from typing import List
 
 DATA_DIR_ORGS = "data/organizations"

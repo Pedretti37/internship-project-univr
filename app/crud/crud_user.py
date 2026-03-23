@@ -2,7 +2,8 @@ import json
 import os
 
 from pydantic_core import ValidationError
-from models import User, Invitation
+from app.models import User, Invitation
+from typing import List
 
 DATA_DIR_USERS = "data/users"
 os.makedirs(DATA_DIR_USERS, exist_ok=True)
@@ -84,6 +85,22 @@ def get_users_by_usernames(usernames_list: list[str]) -> list[User]:
             continue
             
     return found_users
+
+### --- CRUD: Get All --- ###
+def get_all_users() -> List[User]:
+    all_users = []
+    
+    if not os.path.exists(DATA_DIR_USERS):
+        return []
+
+    for filename in os.listdir(DATA_DIR_USERS):
+        if filename.endswith(".json"):
+            username = filename[:-5] # removing .json for username
+            org = get_user_by_username(username)
+            if org:
+                all_users.append(org)
+                
+    return all_users
 
 ### --- Get Pending Invitations for User --- ###
 def get_pending_invitations_for_user(username: str) -> list[Invitation]:
