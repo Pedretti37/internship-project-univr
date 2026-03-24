@@ -114,7 +114,7 @@
                                     <div class="role-card">
                                         <h3>
                                             <!-- Link to role details page, urlencode for special characters -->
-                                            <a href="/role_details_for_project?uri={{ role.uri | urlencode }}&project_id={{ current_project.id }}" class="role-title" style="text-decoration: none;">
+                                            <a href="/role_details_for_project?uri={{ role.uri | urlencode }}&project_id={{ current_project.id }}&role_search={{ role_search | urlencode }}" class="role-title" style="text-decoration: none;">
                                                 {{ role.title | title }}
                                             </a>
                                         </h3>

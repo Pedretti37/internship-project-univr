@@ -13,10 +13,18 @@
 
         <div class="nav-right">
             {% if is_user%}
-                <a href="javascript:history.back()" class="nav-link">← Back to Search</a>
+                {% if is_manager %}
+                    <a href="/manager/project/{{ project_id }}?{% if role_search %}role_search={{ role_search | urlencode }}{% endif %}" class="nav-link">
+                        ← Back to Project
+                    </a>
+                {% else %}
+                    <a href="/user_home?{% if role_search %}role_search={{ role_search | urlencode }}{% endif %}" class="nav-link">
+                        ← Back to Search
+                    </a>
+                {% endif %}
                 <a href="/user_logout" class="nav-link logout-btn">Logout</a>
             {% else %}
-                <a href="javascript:history.back()" class="nav-link">← Back to Project</a>
+                <a href="/org_home" class="nav-link">← Back to Project</a>
                 <a href="/org_logout" class="nav-link logout-btn">Logout</a>
             {% endif %}
         </div>
@@ -40,12 +48,13 @@
             {% endif %}
         </div>
 
-        {% if is_user %}
+        {% if not is_manager %}
             <div class="details-box mt-4">
                 <h2>Tasks & Responsibilities</h2>
                 <h3>Essential Skills:</h3>
                 
                 <form action="/add_to_user_target_roles" method="post">
+                    <input type="hidden" name="role_search" value="{{ role_search }}">
                     <input type="hidden" name="role_id" value="{{ role.id }}">
                     <input type="hidden" name="title" value="{{ role.title }}">
                     <input type="hidden" name="description" value="{{ role.description }}">
@@ -93,6 +102,7 @@
                 <h3>Essential Skills:</h3>
 
                 <form action="/add_to_project_target_roles" method="post">
+                    <input type="hidden" name="role_search" value="{{ role_search }}">
                     <input type="hidden" name="project_id" value="{{ project_id }}">
                     <input type="hidden" name="role_id" value="{{ role.id }}">
                     <input type="hidden" name="title" value="{{ role.title }}">
@@ -126,7 +136,7 @@
 
                     <div>
                         <button type="submit" class="btn btn-primary">
-                            Add to my Target Roles
+                            Add to Project's Target Roles
                         </button>
                     </div>
                 </form>

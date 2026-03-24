@@ -226,6 +226,7 @@ async def user_profile(
 async def add_to_user_target_roles(
     request: Request,
     user: User = Depends(get_current_user),
+    role_search: Optional[str] = Form(None),
     role_id: str = Form(...),
     title: str = Form(...),
     description: Optional[str] = Form(None),
@@ -240,6 +241,12 @@ async def add_to_user_target_roles(
     skills_list = []
     encoded_uri = urllib.parse.quote(uri, safe='')
 
+    redirect_url = f"/details?uri={encoded_uri}"
+    
+    if role_search:
+        encoded_search = urllib.parse.quote(role_search, safe='')
+        redirect_url += f"&role_search={encoded_search}"
+
     # Manual conversion from string to list[Skill]
     if essential_skills:
         try:
@@ -249,14 +256,17 @@ async def add_to_user_target_roles(
                 skills_list = skills_list
             else:
                 msg = urllib.parse.quote(f"Parsed_data not a valid list. Found type: {type(skills_list)}")
-                return RedirectResponse(url=f"/details?uri={encoded_uri}&error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+                redirect_url += f"&error={msg}"
+                return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
             
         except (ValueError, SyntaxError) as e:
             msg = urllib.parse.quote(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
-            return RedirectResponse(url=f"/details?uri={encoded_uri}&error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+            redirect_url += f"&error={msg}"
+            return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     else:
         msg = urllib.parse.quote("No essential skills data provided for this role.")
-        return RedirectResponse(url=f"/details?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
+        redirect_url += f"&warning={msg}"
+        return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
     final_skills_list = []
@@ -287,16 +297,19 @@ async def add_to_user_target_roles(
         user.target_roles.append(role_object)
         crud_user.update_user(user)
         msg = urllib.parse.quote("Target role added successfully!")
-        return RedirectResponse(url=f"/details?uri={encoded_uri}&success={msg}", status_code=status.HTTP_303_SEE_OTHER)
+        redirect_url += f"&success={msg}"
+        return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     else:
         msg = urllib.parse.quote("This role is already in your target list.")
-        return RedirectResponse(url=f"/details?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
+        redirect_url += f"&warning={msg}"
+        return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Add User Skills --- ###
 @router.post("/add_to_user_skills", response_class=RedirectResponse)
 async def add_to_user_skills(
     request: Request,
     user: User = Depends(get_current_user),
+    role_search: Optional[str] = Form(None),
     essential_skills: str = Form(...),
     uri: str = Form(...)
 ):
@@ -346,14 +359,21 @@ async def add_to_user_skills(
                 updated_skill = True
 
     encoded_uri = urllib.parse.quote(uri, safe='')
+    redirect_url = f"/details?uri={encoded_uri}"
+    
+    if role_search:
+        encoded_search = urllib.parse.quote(role_search, safe='')
+        redirect_url += f"&role_search={encoded_search}"
 
     if updated_skill:
         crud_user.update_user(user)
         msg = urllib.parse.quote("Role skills successfully added or updated in your profile!")
-        return RedirectResponse(url=f"/details?uri={encoded_uri}&success={msg}", status_code=status.HTTP_303_SEE_OTHER)
+        redirect_url += f"&success={msg}"
+        return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     else:
         msg = urllib.parse.quote("No changes were made. Skills are already at the selected levels or no level was selected.")
-        return RedirectResponse(url=f"/details?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
+        redirect_url += f"&warning={msg}"
+        return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Add Single Skill to User --- ###
 @router.post("/add_single_skill", response_class=RedirectResponse)
@@ -437,6 +457,7 @@ async def details_page(
     request: Request, 
     uri: str = Query(...),
     user: User = Depends(get_current_user),
+    role_search: str = Query(...),
     success: Optional[str] = Query(None),
     warning: Optional[str] = Query(None),
     error: Optional[str] = Query(None)
@@ -459,6 +480,7 @@ async def details_page(
         context={
             "is_user": True,
             "role": selected_role,
+            "role_search": role_search,
             "toast_msg": toast_msg,
             "toast_type": toast_type
         }
@@ -914,6 +936,7 @@ async def details_page(
     uri: str = Query(...),
     project_id: str = Query(...),
     user: User = Depends(get_current_user),
+    role_search: str = Query(...),
     success: Optional[str] = Query(None),
     error: Optional[str] = Query(None),
     warning: Optional[str] = Query(None)
@@ -941,8 +964,10 @@ async def details_page(
         request=request,
         name="details.html", 
         context={
-            "is_user": False,
+            "is_user": True,
+            "is_manager": True,
             "role": selected_role,
+            "role_search": role_search,
             "project_id": project_id,
             "toast_msg": toast_msg,
             "toast_type": toast_type
@@ -953,6 +978,7 @@ async def details_page(
 @router.post("/add_to_project_target_roles", response_class=RedirectResponse) 
 async def project_add_role(
     request: Request,
+    role_search: Optional[str] = Form(None),
     project_id: str = Form(...),
     role_id: str = Form(...),
     title: str = Form(...),
@@ -972,6 +998,12 @@ async def project_add_role(
     skills_list = []
     encoded_uri = urllib.parse.quote(uri, safe='')
 
+    redirect_url = f"/role_details_for_project?uri={encoded_uri}"
+    
+    if role_search:
+        encoded_search = urllib.parse.quote(role_search, safe='')
+        redirect_url += f"&role_search={encoded_search}"
+
     # Manual conversion from string to list[Skill]
     if essential_skills:
         try:
@@ -981,14 +1013,17 @@ async def project_add_role(
                 skills_list = skills_list
             else:
                 msg = urllib.parse.quote(f"Parsed_data not a valid list. Found type: {type(skills_list)}")
-                return RedirectResponse(url=f"/role_details_for_project?uri={encoded_uri}&error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+                redirect_url += f"&error={msg}"
+                return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
             
         except (ValueError, SyntaxError) as e:
             msg = urllib.parse.quote(f"Error parsing essential_skills: {essential_skills} - Error: {e}")
-            return RedirectResponse(url=f"/role_details_for_project?uri={encoded_uri}&error={msg}", status_code=status.HTTP_303_SEE_OTHER)
+            redirect_url += f"&error={msg}"
+            return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     else:
         msg = urllib.parse.quote("No essential skills data provided for this role.")
-        return RedirectResponse(url=f"/role_details_for_project?uri={encoded_uri}&warning={msg}", status_code=status.HTTP_303_SEE_OTHER)
+        redirect_url += f"&warning={msg}"
+        return RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
 
 
     final_skills_list = []
@@ -1044,7 +1079,7 @@ async def project_add_role(
         crud_org.update_org(org)
 
     encoded_msg = urllib.parse.quote(toast_msg)
-    return RedirectResponse(url=f"/manager/project/{project_id}?{toast_type}={encoded_msg}", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url=f"/manager/project/{project_id}?{toast_type}={encoded_msg}&role_search={encoded_search}", status_code=status.HTTP_303_SEE_OTHER)
 
 ### --- Delete Target Role from Project --- ###    
 @router.post("/delete_project_target_role", response_class=RedirectResponse)
