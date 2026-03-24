@@ -1,4 +1,20 @@
-from app.crud import crud_user
+from app.crud import crud_user, crud_org
+from app.models import Skill, Role, Organization
+from unittest.mock import patch
+import os
+import json
+
+# Helper function
+def setup_logged_in_user(client, username="mario_test"):
+    form_data = {
+        "name": "Mario",
+        "surname": "Rossi",
+        "username": username,
+        "password": "Password123!"
+    }
+    client.post("/user_register", data=form_data, follow_redirects=False)
+    client.cookies.set("session_token", username)
+    return username, form_data
 
 def test_register_user_success(client):
     form_data = {
@@ -97,3 +113,238 @@ def test_logout(client):
     
     cookie_value = response.cookies.get("session_token", "").strip('"')
     assert cookie_value == ""
+
+def test_user_home_unauthorized(client):
+    # without login
+    response = client.get("/user_home", follow_redirects=False)
+    
+    assert response.status_code == 303
+    assert response.headers["location"] == "/"
+
+def test_user_profile_filters_invitations_correctly(client):
+    username, _ = setup_logged_in_user(client)
+    
+    invito_mario = {
+        "id": "invito_123",
+        "orgname": "Azienda di Mario SPA",
+        "username": username,  
+        "status": "pending",
+        "created_at": "2026-03-24T10:29:21.500756Z"
+    }
+    
+    invito_luigi = {
+        "id": "invito_456",
+        "orgname": "Azienda di Luigi SRL",
+        "username": "luigi_test",  # Another user
+        "status": "pending",
+        "created_at": "2026-03-24T10:29:21.500756Z"
+    }
+    
+    # writing on fake DB
+    with open(os.path.join(crud_user.DATA_INV_DIR, "invito_123.json"), "w") as f:
+        json.dump(invito_mario, f)
+        
+    with open(os.path.join(crud_user.DATA_INV_DIR, "invito_456.json"), "w") as f:
+        json.dump(invito_luigi, f)
+        
+    response = client.get("/user_profile")
+    
+    assert response.status_code == 200
+    assert "Azienda di Mario SPA" in response.text
+    assert "Azienda di Luigi SRL" not in response.text
+
+def test_add_to_user_target_roles(client):
+    username, _ = setup_logged_in_user(client)
+    
+    fake_skills_str = str([{"uri": "http://skill_1", "name": "Python"}])
+    
+    # From HTTP
+    form_data = {
+        "role_search": "Developer",
+        "role_id": "isco_123",
+        "title": "Software Engineer",
+        "description": "Scrive codice",
+        "id_full": "123.4",
+        "uri": "http://role_1",
+        "essential_skills": fake_skills_str,
+        # adding await data
+        "level_http://skill_1": "4" 
+    }
+
+    response = client.post("/add_to_user_target_roles", data=form_data, follow_redirects=False)
+    
+    assert response.status_code == 303
+    
+    location = response.headers["location"]
+    assert "/details?uri=" in location
+    assert "role_search=Developer" in location
+    assert "success=" in location
+    
+    # Checking database
+    user_in_db = crud_user.get_user_by_username(username)
+    assert len(user_in_db.target_roles) == 1
+    assert user_in_db.target_roles[0].title == "Software Engineer"
+    assert user_in_db.target_roles[0].essential_skills[0].level == 4
+
+def test_add_to_user_skills(client):
+    username, _ = setup_logged_in_user(client, "luigi_test")
+    
+    fake_skills_str = str([
+        {"uri": "http://skill_A", "name": "Java"},
+        {"uri": "http://skill_B", "name": "SQL"}
+    ])
+    
+    form_data = {
+        "uri": "http://role_xyz",
+        "role_search": "Backend",
+        "essential_skills": fake_skills_str,
+        # adding await data
+        "level_http://skill_A": "5",
+        "level_http://skill_B": "3"
+    }
+
+    response = client.post("/add_to_user_skills", data=form_data, follow_redirects=False)
+    
+    assert response.status_code == 303
+    assert "success=" in response.headers["location"]
+    
+    # Check DB
+    user_in_db = crud_user.get_user_by_username(username)
+    assert len(user_in_db.individual_skills) == 2
+    
+    # check for level
+    java_skill = next(s for s in user_in_db.individual_skills if s.name == "Java")
+    assert java_skill.level == 5
+
+def test_add_single_skill(client):
+    username, _ = setup_logged_in_user(client, "giulia_test")
+    
+    form_data = {
+        "uri": "http://skill_single",
+        "name": "Project Management",
+        "skill_search": "Manager",
+        # await data
+        "level_http://skill_single": "4"
+    }
+
+    response = client.post("/add_single_skill", data=form_data, follow_redirects=False)
+    
+    assert response.status_code == 303
+    location = response.headers["location"]
+    assert "/user_home?" in location
+    assert "skill_search=Manager" in location
+    assert "success=" in location
+    
+    # Check DB
+    user_in_db = crud_user.get_user_by_username(username)
+    assert len(user_in_db.individual_skills) == 1
+    assert user_in_db.individual_skills[0].name == "Project Management"
+    assert user_in_db.individual_skills[0].level == 4
+
+def test_upload_skills_csv_invalid_file(client):
+    _, _ = setup_logged_in_user(client)
+    
+    # b for byte
+    fake_file = {"file": ("prova.txt", b"testo a caso", "text/plain")}
+    
+    response = client.post("/upload_skills_csv", files=fake_file, follow_redirects=False)
+    
+    assert response.status_code == 303
+    assert "error=" in response.headers["location"]
+
+@patch("app.routers.user.escoAPI.get_esco_skills_list")
+def test_upload_skills_csv_success(mock_esco_api, client):
+    _, _ = setup_logged_in_user(client)
+    
+    csv_content = b"skill_name,level\nPython,5\nfakeSkill,3\n"
+    fake_file = {"file": ("skills.csv", csv_content, "text/csv")}
+    
+    def mock_api_behavior(skill_name, **kwargs):
+        if skill_name == "Python":
+            return [Skill(uri="http://esco/python", name="Python Programming", level=0)]
+        return [] # No result for fakeSkill
+        
+    mock_esco_api.side_effect = mock_api_behavior
+    
+    response = client.post("/upload_skills_csv", files=fake_file)
+    
+    assert response.status_code == 200 
+    assert mock_esco_api.call_count == 2
+    
+    assert "Python Programming" in response.text
+    assert "fakeSkill" in response.text 
+
+def test_confirm_skills_csv(client):
+    username, _ = setup_logged_in_user(client)
+    
+    form_data = {
+        "total_rows": "2",
+        # Skill to save
+        "uri_name_1": "http://esco/java|||Java Developer", 
+        "level_1": "4",
+        # Skill to skip
+        "uri_name_2": "SKIP",
+        "level_2": "7"
+    }
+    
+    response = client.post("/confirm_skills_csv", data=form_data, follow_redirects=False)
+    
+    assert response.status_code == 303
+    assert response.headers["location"] == "/user_profile"
+    
+    user_in_db = crud_user.get_user_by_username(username)
+    assert len(user_in_db.individual_skills) == 1
+    assert user_in_db.individual_skills[0].name == "Java Developer"
+    assert user_in_db.individual_skills[0].uri == "http://esco/java"
+    assert user_in_db.individual_skills[0].level == 4
+
+def test_forecast_gap_courses_too_many_roles(client):
+    username, _ = setup_logged_in_user(client, "avido_test")
+    user_in_db = crud_user.get_user_by_username(username)
+    
+    # 6 target roles
+    for i in range(6):
+        user_in_db.target_roles.append(Role(id=str(i), title=f"Role {i}", uri=f"http://role/{i}"))
+    crud_user.update_user(user_in_db)
+    
+    form_data = {"country": "Italy", "sector": "ICT"}
+    response = client.post("/forecast_gap_courses", data=form_data, follow_redirects=False)
+    
+    assert response.status_code == 303
+    assert "error=" in response.headers["location"]
+    assert "up to 5" in response.headers["location"].replace("%20", " ")
+
+def test_create_project_post(client):
+    username, _ = setup_logged_in_user(client, "manager_test")
+    
+    user = crud_user.get_user_by_username(username)
+    user.organization = "a"
+    crud_user.update_user(user)
+    
+    org = Organization(name="TechCorp", orgname="a", hashed_password="fake_password", members={username: [], "dev_luigi": []})
+    crud_org.create_organization(org)
+    
+    form_data = {
+        "name": "Progetto Apollo",
+        "description": "Sbarco sulla luna entro fine anno",
+        "members_list": ["dev_luigi", username] 
+    }
+    
+    response = client.post("/manager/create_project", data=form_data, follow_redirects=False)
+
+    assert response.status_code == 303
+    location = response.headers["location"]
+    assert "/user_home" in location
+    assert "success=" in location 
+    
+    # Check database
+    org_in_db = crud_org.get_org_by_orgname(org.orgname)
+    
+    assert len(org_in_db.projects) == 1
+    project = org_in_db.projects[0]
+    
+    assert project.name == "Progetto Apollo"
+    assert project.manager == username
+    assert "dev_luigi" in project.assigned_members
+    assert len(project.assigned_members) == 2
+    

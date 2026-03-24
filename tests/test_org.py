@@ -81,3 +81,4 @@ def test_login_user_error(client):
 
     assert "flash_error" in response.cookies
     assert response.cookies["flash_error"] == '"Invalid credentials. Please try again."'
+
