@@ -6,7 +6,7 @@ from typing import List
 DATA_DIR_ORGS = "data/organizations"
 os.makedirs(DATA_DIR_ORGS, exist_ok=True)
 
-DATA_INV_DIR = "data//invitations"
+DATA_INV_DIR = "data/invitations"
 os.makedirs(DATA_INV_DIR, exist_ok=True)
 
 ### --- Helper: Path --- ###

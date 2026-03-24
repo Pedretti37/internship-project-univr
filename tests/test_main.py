@@ -9,7 +9,7 @@ def test_read_root(client):
     # Verify that it returns html file
     assert "text/html" in response.headers["content-type"]
 
-def test_lifespan_loads_cedefop_data(client):
+def test_lifespan_loads_cedefop_data():
     # Checking if app.state has cedefop database
     assert hasattr(app.state, "cedefop")
     
