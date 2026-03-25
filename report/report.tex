@@ -1,6 +1,7 @@
 \documentclass{article}
 
 \usepackage[hidelinks]{hyperref}
+\usepackage[italian, main=english]{babel}
 
 \title{Internship Project - UniVR \break
 Skill Gap Evaluation and Course Recommendations}
@@ -16,30 +17,165 @@ Skill Gap Evaluation and Course Recommendations}
 \newpage
 
 \section{Introduction}
-Hello, world! This is my first time using LaTeX in VS Code. 
-Here is a simple inline equation: $E = mc^2$.
+This report details the work carried out during my internal internship at 
+\foreignlanguage{italian}{\textit{Università degli Studi di Verona}}. 
+The primary objective of this project was the design and development of a web-based 
+platform tailored for skill management, competence tracking, and course recommendation.
 
-\section{Individual User}
+From a technical perspective, the application follows a standard client-server 
+architecture, with a clear separation of concerns between the frontend and the backend. 
+The backend system, hosted on the server to handle the core business logic and data 
+management, was developed in Python utilizing the \textbf{FastAPI} framework. 
+It heavily relies on the \textbf{JSON} format for efficient data structuring 
+and API communication. 
+The frontend system, on the client side, was implemented using standard web 
+technologies, specifically \textbf{HTML} and \textbf{CSS}. This ensures 
+a clean, responsive, and accessible experience for both individual users and 
+organizational profiles interacting with the system.
+
+The following sections will provide a detailed overview of the specific features implemented for the 
+different types of users, detailing the browsing capabilities, profile management, 
+and the skill gap evaluation mechanisms. Furthermore, the report will explore 
+the underlying technical components that power these functionalities: 
+final chapters will discuss the integration of the \textbf{ESCO API} for standardized 
+competence mapping, the strategies adopted for data management, the frontend design 
+principles utilizing HTML and CSS, and finally, the testing procedures conducted to 
+ensure the reliability and robustness of the system.
+
+\newpage
+
+\section{Individual User Features}
+This section outlines the functionalities available to individual users interacting 
+with the platform. Within this system, a user can hold one of two distinct roles: 
+a standard Employee or a Manager. While an Employee utilizes the platform primarily 
+for personal skill tracking and career development, a Manager is a user who has been 
+elevated to this status by their affiliated organization. Managers inherit all standard 
+employee capabilities but are additionally granted administrative privileges to 
+oversee projects and coordinate team members within their company.
 
 \subsection{Home}
-\subsubsection{Browsing for Roles}
-\subsubsection{Browsing for Skills}
+The Home dashboard serves as the primary entry point for users, offering intuitive 
+search and management tools depending on their assigned role.
+
+\subsubsection{Browsing for Roles and Skills}
+Users can explore various professional profiles through the role browsing feature. 
+This search mechanism integrates the ESCO API, ensuring that role definitions, 
+responsibilities, and terminologies are standardized and perfectly aligned with 
+the European labor market classifications.
+
+Similarly to the role search, users can browse for individual competencies. 
+By querying the ESCO API, the system retrieves a list of macthing skills. 
+This allows users to accurately identify specific 
+abilities.
+
 \subsubsection{Project Manager}
+This dedicated area is exclusively accessible to users with Manager privileges. 
+Here, managers can create, organize, and oversee various internal projects. 
+They have the authority to assign team members to these projects, provided those 
+individuals belong to the same organization. Furthermore, managers can select specific 
+target roles for a project to calculate Cedefop-based employment forecasts and 
+generate preliminary course recommendations for the team. A more comprehensive 
+explanation of the forecasting and recommendation mechanisms is detailed in the 
+Profile section below.
 
 \subsection{Profile}
-\subsubsection{Target Roles and Skills Management}
-\subsubsection{Cedefop Forecast and Skill Gap Evaluation}
-\subsubsection{Course Recommendation}
+The Profile section acts as the personal hub for the user, centralizing account 
+settings, competence tracking, and career development tools.
 
-\section{Organization}
+\subsubsection{Target Roles and Skills Management}
+Both employees and managers can access this area to view their personal data and 
+securely change their passwords. More importantly, users can manage their professional 
+portfolio by viewing, adding, or removing their personal skills and desired target roles. 
+If a user is currently affiliated with an organization, a dedicated subsection 
+displays their ``organizational skills''---competencies that are directly assigned 
+and managed by the company. Through this interface, users also retain the autonomy 
+to officially leave their current organization if needed.
+
+\subsubsection{Cedefop Forecast and Skill Gap Evaluation}
+Once a user has defined their current skill set and selected one or more target roles, 
+the platform can perform a comprehensive skill gap analysis. The system compares the 
+user's existing competencies against the specific requirements of the desired roles,
+highlighting areas for improvement. Additionally, the application retrieves Cedefop 
+forecast data related to these target roles, offering the user valuable insights 
+into future labor market trends, job demand, and employment projections.
+
+\subsubsection{Course Recommendation}
+Based on the exact skill gaps identified in the previous step, the platform provides 
+customized educational suggestions. This recommendation engine---which is the same core 
+logic utilized in the Project Manager dashboard---analyzes the missing competencies 
+and cross-references them with available training resources. By doing so, the system 
+generates a highly personalized learning path, proposing the most relevant courses to 
+help the user efficiently bridge the gap between their current capabilities and their 
+professional goals.
+
+\newpage
+
+\section{Organization Features}
+This section details the functionalities available to Organization accounts. 
+Unlike individual users who focus on personal career development, an Organization 
+profile represents the company as a whole. Its primary purpose is to oversee the 
+workforce, manage internal training resources, and analyze competence gaps at a macro 
+level, providing an administrative overview of the company's human resources.
 
 \subsection{Home}
+The Home dashboard for an organization is designed to provide a high-level summary 
+of ongoing activities, focusing primarily on project monitoring.
+
 \subsubsection{Projects}
+Through this interface, the organization can access a comprehensive list of all 
+active projects currently overseen by its internal Managers. It is important to note 
+that this is a strictly read-only view: the organization can monitor the status, but 
+the direct management, creation, and modification of the projects remain the sole 
+responsibility of the delegated Managers.
 
 \subsection{Profile}
-\subsubsection{Team members}
+The Profile area serves as the central administrative hub for the organization, 
+allowing the management of account credentials, personnel, and proprietary training 
+materials. As with individual users, this section also includes basic settings to 
+view corporate data and securely update the account password.
+
+\subsubsection{Team Members}
+The organization can view its current workforce between employees and managers. 
+To expand the team, the organization can send an official invitation by 
+entering a specific username into the recruitment form, facilitated by a 
+list of all registered platform users. The invited user then retains the autonomy 
+to accept or decline the request. 
+Furthermore, the organization holds the authority to adjust user privileges within 
+the company, allowing them to promote standard employees to the Manager role or demote 
+them as organizational needs dictate.
+
 \subsubsection{Global Skill Gap Evaluation}
+Provided the organization has active projects, it can perform a macroscopic 
+\mbox{analysis} of its workforce capabilities. Instead of evaluating a single 
+user, this feature calculates a global skill gap by comparing the aggregated 
+competencies of the current employees against the collective requirements of 
+the ongoing projects. Based on these company-wide deficiencies, the platform suggests 
+HR-oriented courses. These specific recommendations are designed for strategic 
+corporate upskilling and human resource planning, rather than individual learning paths.
+
 \subsubsection{Courses Management}
+The platform allows organizations to act as educational providers by creating 
+and distributing their own training modules. Through this interface, the company 
+can view a complete catalog of its authored courses, seamlessly create new ones, 
+and edit or delete existing materials. A critical feature of this management tool 
+is the visibility toggle: courses can be published as ``public'' to be accessible 
+by any user on the platform, or set to ``private,'' ensuring that only the 
+organization's officially affiliated employees can view and benefit from them.
+
+\section{Guest Features}
+The platform also accommodates unregistered users by providing a restricted ``Guest'' 
+access mode. For individuals who prefer not to create a formal account, the system 
+offers a streamlined interface to explore the core competency catalog. Through this 
+guest portal, users can perform basic searches for professional roles and individual 
+skills, which are directly powered by the ESCO API. 
+
+However, compared to registered employees or organizations, this browsing experience 
+is intentionally synthesized and limited in scope. Guests can view roles 
+of the queried terms, but they cannot access 
+advanced, stateful features such as profile creation, skill gap evaluation, or 
+personalized course recommendations. This approach allows external users to evaluate 
+the platform's core search capabilities while maintaining data privacy and 
+encouraging formal registration for full access.
 
 \section{Esco API}
 
