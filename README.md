@@ -23,7 +23,7 @@ The primary goal of this project is to bridge the gap between employee/organizat
 - **Global HR Analytics:** HR managers can run an aggregated analysis across all active projects to identify the most frequent skill shortages within the organization.
 - **Strategic Corporate Training:** Based on the global gap, the system suggests "Broad Plans" (e.g., Seminars, Hands-on Sessions, Industrial Training) to upskill larger parts of the workforce simultaneously.
 - **Export PDF:** HR can download the aggregated organizational forecast and strategic training recommendations as a PDF report.
-- **Educational Data Management (CRUD):** Organizations can act as course providers. They can Create, Read, Update, and Delete internal or external educational offerings, mapping them to specific ESCO skills and toggling Public/Private access.
+- **Educational Data Management:** Organizations can act as course providers. They can create, update, and delete internal educational offerings, mapping them to specific ESCO skills and toggling Public/Private access.
 
 ## Tech Stack
 
