@@ -124,34 +124,34 @@ def test_user_home_unauthorized(client):
 def test_user_profile_filters_invitations_correctly(client):
     username, _ = setup_logged_in_user(client)
     
-    invito_mario = {
-        "id": "invito_123",
-        "orgname": "Azienda di Mario SPA",
+    invite_1 = {
+        "id": "123",
+        "orgname": "ORG_1",
         "username": username,  
         "status": "pending",
         "created_at": "2026-03-24T10:29:21.500756Z"
     }
     
-    invito_luigi = {
-        "id": "invito_456",
-        "orgname": "Azienda di Luigi SRL",
+    invite_2 = {
+        "id": "456",
+        "orgname": "ORG_2",
         "username": "luigi_test",  # Another user
         "status": "pending",
         "created_at": "2026-03-24T10:29:21.500756Z"
     }
     
     # writing on fake DB
-    with open(os.path.join(crud_user.DATA_INV_DIR, "invito_123.json"), "w") as f:
-        json.dump(invito_mario, f)
+    with open(os.path.join(crud_user.DATA_INV_DIR, "123.json"), "w") as f:
+        json.dump(invite_1, f)
         
-    with open(os.path.join(crud_user.DATA_INV_DIR, "invito_456.json"), "w") as f:
-        json.dump(invito_luigi, f)
+    with open(os.path.join(crud_user.DATA_INV_DIR, "456.json"), "w") as f:
+        json.dump(invite_2, f)
         
     response = client.get("/user_profile")
     
     assert response.status_code == 200
-    assert "Azienda di Mario SPA" in response.text
-    assert "Azienda di Luigi SRL" not in response.text
+    assert "ORG_1" in response.text
+    assert "ORG_2" not in response.text
 
 def test_add_to_user_target_roles(client):
     username, _ = setup_logged_in_user(client)
@@ -163,7 +163,7 @@ def test_add_to_user_target_roles(client):
         "role_search": "Developer",
         "role_id": "isco_123",
         "title": "Software Engineer",
-        "description": "Scrive codice",
+        "description": "...",
         "id_full": "123.4",
         "uri": "http://role_1",
         "essential_skills": fake_skills_str,
@@ -299,7 +299,7 @@ def test_confirm_skills_csv(client):
     assert user_in_db.individual_skills[0].level == 4
 
 def test_forecast_gap_courses_too_many_roles(client):
-    username, _ = setup_logged_in_user(client, "avido_test")
+    username, _ = setup_logged_in_user(client, "too_many_test")
     user_in_db = crud_user.get_user_by_username(username)
     
     # 6 target roles
@@ -325,8 +325,8 @@ def test_create_project_post(client):
     crud_org.create_organization(org)
     
     form_data = {
-        "name": "Progetto Apollo",
-        "description": "Sbarco sulla luna entro fine anno",
+        "name": "Project_1",
+        "description": "...",
         "members_list": ["dev_luigi", username] 
     }
     
@@ -343,7 +343,7 @@ def test_create_project_post(client):
     assert len(org_in_db.projects) == 1
     project = org_in_db.projects[0]
     
-    assert project.name == "Progetto Apollo"
+    assert project.name == "Project_1"
     assert project.manager == username
     assert "dev_luigi" in project.assigned_members
     assert len(project.assigned_members) == 2

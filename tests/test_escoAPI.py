@@ -70,6 +70,7 @@ def test_get_esco_skills_list(mock_get):
     assert result[0].name == "Python Programming"
     assert result[0].level == 0
 
+
 @patch("app.esco.escoAPI.requests.get")
 def test_get_esco_skill_uri_by_name_success(mock_get):
 
@@ -111,7 +112,6 @@ def test_get_esco_skill_uri_by_name_not_found(mock_get):
     assert result is None
 
 
-# --- TEST 3: Errore di connessione o HTTP Error ---
 @patch("app.esco.escoAPI.requests.get")
 def test_get_esco_skill_uri_by_name_error(mock_get):
 
