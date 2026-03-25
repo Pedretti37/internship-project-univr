@@ -205,3 +205,41 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# =========================
+# LaTeX stuff
+# =========================
+# File ausiliari principali
+*.aux
+*.bbl
+*.blg
+*.idx
+*.ind
+*.lof
+*.lot
+*.out
+*.toc
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+
+# File generati da latexmk (il tuo compilatore attuale)
+*.fdb_latexmk
+*.fls
+
+# File generati da SyncTeX (per saltare dal PDF al codice)
+*.synctex.gz
+*.synctex.gz(busy)
+*.synctex(busy)
+
+# File di biber / biblatex (per la bibliografia)
+*.bcf
+*.run.xml
+
+# File di log
+*.log
