@@ -39,7 +39,7 @@ The primary goal of this project is to bridge the gap between employee/organizat
 ## Project Structure
 
 ```text
-intership-project-univr/
+internship-project-univr/
 |
 ├── app/
 |    ├── main.py                     # Application entry point
@@ -90,6 +90,6 @@ intership-project-univr/
     ```
     **For tests run this instead of starting the server:**
     ```bash
-    pytest -v
+    pytest tests -v
     ```
 5.  Open browser at `http://127.0.0.1:8000`
