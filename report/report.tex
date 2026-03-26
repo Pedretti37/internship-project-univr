@@ -5,15 +5,53 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{microtype}
+\usepackage{graphicx}
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
 
-\title{Internship Project - UniVR \break
-Skill Gap Evaluation and Course Recommendations}
-\author{Simone Pedretti}
-\date{\today}
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{green!50!black},
+    commentstyle=\color{gray}\itshape,
+    numberstyle=\tiny\color{gray},
+    numbers=left,
+    stepnumber=1,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    captionpos=b,
+    tabsize=4
+}
 
 \begin{document}
 
-\maketitle
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    \includegraphics[width=0.4\textwidth]{images/logo_univr.png}\par\vspace{1cm}
+
+    {\scshape\LARGE Università degli Studi di Verona \par}
+    \vspace{0.5cm}
+    {\scshape\Large Department of Computer Science \par} 
+    \vspace{2cm}
+
+    {\Large Internal Internship Project Report\par}
+    \vspace{0.5cm}
+    
+    {\huge\bfseries Skill Gap Evaluation\\[0.3cm] and Course Recommendations \par}
+    
+    \vspace{2.5cm}
+
+    {\Large\textbf{Author:}\\ Simone Pedretti \\ VR500040 \par}
+    
+    \vspace{1cm}
+
+    \vfill
+
+    {\large Academic Year 2025/2026 \par} 
+\end{titlepage}
 
 \tableofcontents
 
@@ -71,6 +109,12 @@ By querying the ESCO API, the system retrieves a list of macthing skills.
 This allows users to accurately identify specific 
 abilities.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/sequence_diagram_user_esco_api.png}
+    \caption{Sequence Diagram: User - Esco API}
+\end{figure}
+
 \subsubsection{Project Manager}
 This dedicated area is exclusively accessible to users with Manager privileges. 
 Here, managers can create, organize, and oversee various internal projects. 
@@ -80,6 +124,12 @@ target roles for a project to calculate Cedefop-based employment forecasts and
 generate preliminary course recommendations for the team. A more comprehensive 
 explanation of the forecasting and recommendation mechanisms is detailed in the 
 Profile section below.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/sequence_diagram_project_creation.png}
+    \caption{Sequence Diagram: Project Creation}
+\end{figure}
 
 \subsection{Profile}
 The Profile section acts as the personal hub for the user, centralizing account 
@@ -111,8 +161,8 @@ into future labor market trends, job demand, and employment projections.
 
 \subsubsection{Course Recommendation}
 Based on the exact skill gaps identified in the previous step, the platform provides 
-customized educational suggestions. This recommendation engine---which is the same c
-ore logic utilized in the Project Manager dashboard---analyzes the missing 
+customized educational suggestions. This recommendation engine---which is the same core 
+logic utilized in the Project Manager dashboard---analyzes the missing 
 competencies and cross-references them with available training resources. 
 By doing so, the system generates a highly personalized learning path, proposing 
 the most relevant courses to help the user efficiently bridge the gap between their 
@@ -121,6 +171,12 @@ current capabilities and their professional goals.
 To facilitate offline review and long-term career planning, users can 
 conveniently export the complete analysis---including the skill 
 gap results and course recommendations---into a consolidated PDF report.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/sequence_diagram_forecast_gap_course.png}
+    \caption{Sequence Diagram: Cedefop's Forecast, Skill Gap and Course Recommendation}
+\end{figure}
 
 \newpage
 
@@ -162,6 +218,12 @@ This allows the organization to design a comprehensive skill model for
 its workforce and seamlessly integrate these profiles into the system via 
 a bulk CSV import.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.52\linewidth]{images/activity_diagram_org_upload_confirm_skills.png}
+    \caption{Activity Diagram: CSV Upload and Skill confirmation}
+\end{figure}
+
 \subsubsection{Global Skill Gap Evaluation}
 Provided the organization has active projects, it can perform a macroscopic 
 \mbox{analysis} of its workforce capabilities. Instead of evaluating a single 
@@ -183,6 +245,12 @@ and edit or delete existing materials. A critical feature of this management too
 is the visibility toggle: courses can be published as ``public'' to be accessible 
 by any user on the platform, or set to ``private,'' ensuring that only the 
 organization's officially affiliated employees can view and benefit from them.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/sequence_diagram_org_create_course.png}
+    \caption{Sequence Diagram: Course Creation}
+\end{figure}
 
 \section{Guest Features}
 The platform also accommodates unregistered users by providing a restricted ``Guest'' 
@@ -245,5 +313,39 @@ generation of temporary, isolated JSON directories for users, organizations,
 and invitations during the testing phase, which are automatically 
 discarded upon completion. 
 
+The following snippet illustrates the configuration of the unified mocking database 
+used across the test suite:
+
+\begin{lstlisting}[caption={Pytest configuration with TestClient and temporary mock databases}]
+import pytest
+from fastapi.testclient import TestClient
+from app.main import app
+from app.crud import crud_user, crud_org
+
+@pytest.fixture(scope="module")
+def client():
+    with TestClient(app) as c:
+        yield c
+
+@pytest.fixture(autouse=True)
+def mock_database(tmp_path, monkeypatch):
+    # Create temporary directories
+    temp_users_dir = tmp_path / "test_users"
+    temp_orgs_dir = tmp_path / "test_orgs"
+    temp_inv_dir = tmp_path / "test_invitations"
+    
+    temp_users_dir.mkdir(exist_ok=True)
+    temp_orgs_dir.mkdir(exist_ok=True)
+    temp_inv_dir.mkdir(exist_ok=True)
+
+    # Forcing code to use new tmp dirs
+    monkeypatch.setattr(crud_user, "DATA_DIR_USERS", str(temp_users_dir))
+    monkeypatch.setattr(crud_user, "DATA_INV_DIR", str(temp_inv_dir))
+
+    monkeypatch.setattr(crud_org, "DATA_DIR_ORGS", str(temp_orgs_dir))
+    monkeypatch.setattr(crud_org, "DATA_INV_DIR", str(temp_inv_dir))
+
+    yield
+\end{lstlisting}
 
 \end{document}
