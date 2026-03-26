@@ -6,22 +6,6 @@
 \usepackage{xcolor}
 \usepackage{microtype}
 
-\lstset{
-    language=Python,
-    basicstyle=\ttfamily\small,
-    keywordstyle=\color{blue}\bfseries,
-    stringstyle=\color{green!50!black},
-    commentstyle=\color{gray}\itshape,
-    numberstyle=\tiny\color{gray},
-    numbers=left,
-    stepnumber=1,
-    showstringspaces=false,
-    breaklines=true,
-    frame=single,
-    captionpos=b,
-    tabsize=4
-}
-
 \title{Internship Project - UniVR \break
 Skill Gap Evaluation and Course Recommendations}
 \author{Simone Pedretti}
@@ -104,7 +88,14 @@ settings, competence tracking, and career development tools.
 \subsubsection{Target Roles and Skills Management}
 Both employees and managers can access this area to view their personal data and 
 securely change their passwords. More importantly, users can manage their professional 
-portfolio by viewing, adding, or removing their personal skills and desired target roles. 
+portfolio by viewing, adding, or removing their personal skills and desired target 
+roles. To streamline the data entry process, the platform supports bulk operations: 
+users can download a standardized CSV template directly from the profile interface, 
+enabling the simultaneous upload of multiple skills. Furthermore, the dashboard 
+provides a direct link to the external \textit{MuchSkills} platform, serving as an 
+auxiliary tool to help users intuitively map and build their personal competence 
+profile before importing it into the system.
+
 If a user is currently affiliated with an organization, a dedicated subsection 
 displays their ``organizational skills''---competencies that are directly assigned 
 and managed by the company. Through this interface, users also retain the autonomy 
@@ -120,12 +111,16 @@ into future labor market trends, job demand, and employment projections.
 
 \subsubsection{Course Recommendation}
 Based on the exact skill gaps identified in the previous step, the platform provides 
-customized educational suggestions. This recommendation engine---which is the same core 
-logic utilized in the Project Manager dashboard---analyzes the missing competencies 
-and cross-references them with available training resources. By doing so, the system 
-generates a highly personalized learning path, proposing the most relevant courses to 
-help the user efficiently bridge the gap between their current capabilities and their 
-professional goals.
+customized educational suggestions. This recommendation engine---which is the same c
+ore logic utilized in the Project Manager dashboard---analyzes the missing 
+competencies and cross-references them with available training resources. 
+By doing so, the system generates a highly personalized learning path, proposing 
+the most relevant courses to help the user efficiently bridge the gap between their 
+current capabilities and their professional goals. 
+
+To facilitate offline review and long-term career planning, users can 
+conveniently export the complete analysis---including the skill 
+gap results and course recommendations---into a consolidated PDF report.
 
 \newpage
 
@@ -154,23 +149,31 @@ materials. As with individual users, this section also includes basic settings t
 view corporate data and securely update the account password.
 
 \subsubsection{Team Members}
-The organization can view its current workforce between employees and managers. 
-To expand the team, the organization can send an official invitation by 
-entering a specific username into the recruitment form, facilitated by a 
-list of all registered platform users. The invited user then retains the autonomy 
-to accept or decline the request. 
-Furthermore, the organization holds the authority to adjust user privileges within 
-the company, allowing them to promote standard employees to the Manager role or demote 
-them as organizational needs dictate.
+The organization can view its current workforce, distinguishing between standard 
+employees and managers. To expand the team, the organization can send an official 
+invitation by entering a specific username into the recruitment form, facilitated 
+by a comprehensive list of all registered platform users. The invited user then 
+retains the autonomy to accept or decline the request. Furthermore, the organization 
+holds the authority to adjust user privileges within the company, allowing them to 
+promote standard employees to the Manager role or demote them as organizational 
+needs dictate. In addition, the platform provides a 
+direct link to the external \textit{MuchSkills} platform. 
+This allows the organization to design a comprehensive skill model for 
+its workforce and seamlessly integrate these profiles into the system via 
+a bulk CSV import.
 
 \subsubsection{Global Skill Gap Evaluation}
 Provided the organization has active projects, it can perform a macroscopic 
 \mbox{analysis} of its workforce capabilities. Instead of evaluating a single 
 user, this feature calculates a global skill gap by comparing the aggregated 
 competencies of the current employees against the collective requirements of 
-the ongoing projects. Based on these company-wide deficiencies, the platform suggests 
-HR-oriented courses. These specific recommendations are designed for strategic 
-corporate upskilling and human resource planning, rather than individual learning paths.
+the ongoing projects. Based on these company-wide deficiencies, the platform 
+suggests HR-oriented courses. These specific recommendations are designed for 
+strategic corporate upskilling and human resource planning, rather than individual 
+learning paths. Similar to the functionality available to individual users, 
+organizations can export this comprehensive evaluation into a consolidated PDF 
+report, facilitating offline review and strategic decision-making 
+at the management level.
 
 \subsubsection{Courses Management}
 The platform allows organizations to act as educational providers by creating 
@@ -241,41 +244,6 @@ and prevent the corruption of actual production data, the system employs the
 generation of temporary, isolated JSON directories for users, organizations, 
 and invitations during the testing phase, which are automatically 
 discarded upon completion. 
-
-The following snippet illustrates the configuration of the unified mocking database 
-used across the test suite:
-
-\begin{lstlisting}[caption={Pytest configuration with TestClient and temporary mock databases}]
-import pytest
-from fastapi.testclient import TestClient
-from app.main import app
-from app.crud import crud_user, crud_org
-
-@pytest.fixture(scope="module")
-def client():
-    with TestClient(app) as c:
-        yield c
-
-@pytest.fixture(autouse=True)
-def mock_database(tmp_path, monkeypatch):
-    # Create temporary directories
-    temp_users_dir = tmp_path / "test_users"
-    temp_orgs_dir = tmp_path / "test_orgs"
-    temp_inv_dir = tmp_path / "test_invitations"
-    
-    temp_users_dir.mkdir(exist_ok=True)
-    temp_orgs_dir.mkdir(exist_ok=True)
-    temp_inv_dir.mkdir(exist_ok=True)
-
-    # Forcing code to use new tmp dirs
-    monkeypatch.setattr(crud_user, "DATA_DIR_USERS", str(temp_users_dir))
-    monkeypatch.setattr(crud_user, "DATA_INV_DIR", str(temp_inv_dir))
-
-    monkeypatch.setattr(crud_org, "DATA_DIR_ORGS", str(temp_orgs_dir))
-    monkeypatch.setattr(crud_org, "DATA_INV_DIR", str(temp_inv_dir))
-
-    yield
-\end{lstlisting}
 
 
 \end{document}

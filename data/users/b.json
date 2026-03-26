@@ -147,6 +147,139 @@
             "level": 4
         }
     ],
-    "skill_gap": [],
+    "skill_gap": [
+        {
+            "role_id": "2512",
+            "role_title": "software developer",
+            "match_score": 6,
+            "total_required": 23,
+            "matching_skills": [],
+            "partially_matching_skills": [
+                {
+                    "skill": {
+                        "uri": "http://data.europa.eu/esco/skill/2522a6ce-3202-4ac8-9f5b-b9cb5a3a83a1",
+                        "name": "debug software",
+                        "level": 5
+                    },
+                    "user_level": 4
+                },
+                {
+                    "skill": {
+                        "uri": "http://data.europa.eu/esco/skill/0e0c9c11-b39e-43cf-ba95-2fe646f5de64",
+                        "name": "identify customer requirements",
+                        "level": 5
+                    },
+                    "user_level": 4
+                }
+            ],
+            "missing_skills": [
+                {
+                    "uri": "http://data.europa.eu/esco/skill/be48353d-25c7-4f86-bea9-7b9e248fbc6e",
+                    "name": "interpret technical requirements",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/f28617ad-afdd-4041-814c-216153a38998",
+                    "name": "analyse software specifications",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/21d2f96d-35f7-4e3f-9745-c533d2dd6e97",
+                    "name": "computer programming",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/6014921e-1d25-4039-adc2-04852d61880e",
+                    "name": "ICT debugging tools",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/9d2e926f-53d9-41f5-98f3-19dfaa687f3f",
+                    "name": "tools for software configuration management",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/d9e5349e-8791-49c2-8ba4-839fdd1606c2",
+                    "name": "define technical requirements",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/0b0335f3-0aa1-491e-895e-81fc8774a300",
+                    "name": "develop automated migration methods",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/797a4416-0b8d-44f3-8fcd-eb10bd0be6b4",
+                    "name": "develop software prototype",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/172020d1-e151-445b-8173-e2a5fb16fe51",
+                    "name": "utilise computer-aided software engineering tools",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
+                    "name": "perform scientific research",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/925463a7-d51f-4d5b-9f79-4d28cf30acde",
+                    "name": "integrated development environment software",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532",
+                    "name": "technical drawings",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/7111b95d-0ce3-441a-9d92-4c75d05c4388",
+                    "name": "project management",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/8b94aa1e-89c9-459d-b3b4-1dfab8dec2df",
+                    "name": "use software libraries",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/04dfd9fb-e0cf-40f6-96c6-9d2280c4347e",
+                    "name": "provide technical documentation",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/6a899482-8bcf-40ca-ae67-579a1cc467ab",
+                    "name": "manage engineering project",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/901105f8-3a08-453e-b1dc-23619e317fd3",
+                    "name": "create flowchart diagram",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462",
+                    "name": "use technical drawing software",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/2b7a79e5-84d8-4880-be66-3d9bb05bea17",
+                    "name": "use software design patterns",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919",
+                    "name": "engineering processes",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
+                    "name": "engineering principles",
+                    "level": 5
+                }
+            ]
+        }
+    ],
     "organization": "c"
 }
