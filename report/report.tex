@@ -350,9 +350,12 @@ The principal query mechanisms and algorithmic logic utilized by the system incl
     \texttt{crud\_user.py} and \texttt{crud\_org.py} manage persistent 
     storage by mapping objects to physical JSON files. Unique identifiers, 
     such as the \texttt{username} or \texttt{orgname}, act as primary keys 
-    to construct file paths (e.g., \texttt{data/users/\{username\}.json}). 
-    Updates are performed securely by serializing the Pydantic models back 
-    into the file system using \texttt{model\_dump\_json()}.
+    to construct file paths (e.g., \texttt{data/users/\{username\}.json}).
+    Furthermore, whenever an entity's internal state is modified (such as after 
+    recalculating a \texttt{skill\_gap}) the system ensures data consistency by 
+    invoking the \texttt{update\_user} or \texttt{update\_org} functions. 
+    These methods securely serialize the updated Pydantic models back into the 
+    file system using \texttt{model\_dump()} or \texttt{model\_dump\_json()}.
     
     \item \textbf{Relational Mapping and Aggregation:} To emulate SQL 
     \texttt{JOIN} operations, the system uses aggregation functions. 
