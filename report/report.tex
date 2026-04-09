@@ -7,6 +7,8 @@
 \usepackage{microtype}
 \usepackage{graphicx}
 \usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 
 \lstset{
     language=Python,
@@ -296,6 +298,90 @@ skill gaps and request forecast data, allowing the application to respond to the
 computationally heavy requests almost instantaneously. User and organization data, 
 as well as active invitations, are also managed via JSON-based local databases, 
 allowing for a lightweight and easily deployable architecture.
+
+\subsection{Database Schema}
+While the platform does not use a traditional relational database, its 
+schema is explicitly defined 
+and validated using Python \texttt{Pydantic} models. This approach ensures strict 
+typing, data validation, and rapid serialization/deserialization when interacting 
+with the JSON files. 
+The complete database schema is centrally defined within the \texttt{app/models.py} 
+file of the project's source code. The primary entities structuring the platform are:
+
+\begin{itemize}
+    \item \textbf{Skill and Role:} These are the foundational building blocks of 
+    the platform, designed to perfectly mirror the data structure retrieved from 
+    the external ESCO API. 
+    \item \textbf{User Model:} Stores individual credentials, assigned roles 
+    (defined by the \texttt{UserLevel} Enum), and organizational affiliation. 
+    It relies heavily on nested data, storing the user's personal portfolio 
+    in the \texttt{individual\_skills} array, alongside the selected 
+    \texttt{target\_roles} and the dynamically calculated \texttt{skill\_gap} 
+    objects.
+    \item \textbf{Organization Model:} Represents corporate entities. It 
+    contains the organization's credentials and dynamically embeds comprehensive 
+    lists of authored \texttt{courses} and internal \texttt{projects}. 
+    Workforce mapping is ingeniously handled via dictionaries (\texttt{members} 
+    and \texttt{pending\_members}), mapping string usernames directly to their 
+    respective arrays of \texttt{Skill} objects.
+    \item \textbf{Project and Course Models:} Embedded within the Organization 
+    model, the \texttt{Project} tracks the \texttt{manager}, 
+    \texttt{assigned\_members}, and specific \texttt{target\_roles}. 
+    The \texttt{Course} model tracks detailed metadata (e.g., \texttt{ects}, 
+    \texttt{category}, \texttt{cost}) and the \texttt{skills\_covered} required 
+    for the recommendation engine. The generation of unique identifiers is 
+    automated using the \texttt{uuid4} standard.
+    \item \textbf{Invitation Model:} An independent structure that manages 
+    the asynchronous flow of adding users to organizations, tracking the 
+    \texttt{orgname}, \texttt{username}, and the \texttt{status} (pending, 
+    accepted, declined) of the request.
+\end{itemize}
+
+\subsection{Main Queries and Data Processing Logic}
+Given this file-based and in-memory architecture, data retrieval does not rely 
+on standard SQL statements. 
+Instead, ``queries'' are implemented as optimized Python CRUD (Create, Read, 
+Update, Delete) operations that interact with the in-memory data structures or 
+JSON files.
+The principal query mechanisms and algorithmic logic utilized by the system include:
+
+\begin{itemize}
+    \item \textbf{Direct File I/O (CRUD Operations):} Modules like 
+    \texttt{crud\_user.py} and \texttt{crud\_org.py} manage persistent 
+    storage by mapping objects to physical JSON files. Unique identifiers, 
+    such as the \texttt{username} or \texttt{orgname}, act as primary keys 
+    to construct file paths (e.g., \texttt{data/users/\{username\}.json}). 
+    Updates are performed securely by serializing the Pydantic models back 
+    into the file system using \texttt{model\_dump\_json()}.
+    
+    \item \textbf{Relational Mapping and Aggregation:} To emulate SQL 
+    \texttt{JOIN} operations, the system uses aggregation functions. 
+    For instance, \texttt{get\_users\_by\_usernames} iteratively queries 
+    the file system to resolve an array of string usernames into a fully 
+    populated list of \texttt{User} objects. This is vital for the Project 
+    Manager dashboard to visualize team members.
+    
+    \item \textbf{Skill Gap Algorithmic Queries:} The \texttt{crud\_skill\_models.py} 
+    module executes the most computationally intensive ``queries''.  To optimize 
+    performance, the algorithm first flattens the user's current competencies into 
+    a hash map (\texttt{user\_skills\_dict}), enabling O(1) time complexity lookups 
+    via the skill URI. The mathematical engine then evaluates the gap: a fully 
+    possessed skill grants $1.0$ point, whereas partially matched skills calculate 
+    a fractional score based on the ratio of the user's level versus the required 
+    level (\texttt{user\_level / req\_level}). The output categorizes skills into 
+    \texttt{matching}, \texttt{partially\_matching}, and \texttt{missing} arrays.
+    
+    \item \textbf{In-Memory Navigation (Cedefop Data):} The \texttt{cedefop\_read.py} 
+    module handles data extraction from the Cedefop JSON loaded entirely into the 
+    server's RAM during startup. Instead of disk reads, it utilizes nested 
+    dictionary \texttt{.get()} methods chained together. The module features 
+    smart parsing logic: it dynamically slices the incoming ISCO code string 
+    to navigate the correct hierarchical depth of the dataset, such as extracting 
+    the first two digits (\texttt{isco\_clean[:2]}) to query sector employment 
+    details or qualifications.
+\end{itemize}
+
+\newpage
 
 \section{Testing and Quality Assurance}
 To guarantee the stability and reliability of both the backend calculations and the 

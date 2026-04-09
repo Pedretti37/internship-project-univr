@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional
 import urllib
 from app.crud import crud_user, crud_org, crud_skill_models
-from app.service import cedefop_service
+from app.crud import cedefop_read
 from app.service.dependencies import get_current_user
 import csv
 import io
@@ -551,10 +551,10 @@ async def forecast_gap_courses(
         role_id_str = str(role.id).strip()
             
         # CEDEFOP
-        occ_data = cedefop_service.read_emp_occupation(db, country, role_id_str)
-        sec_data = cedefop_service.read_emp_sector_occupation(db, country, sector, role_id_str)
-        qual_data = cedefop_service.read_qualifications(db, country, role_id_str)
-        job_data = cedefop_service.read_job_openings(db, country, role_id_str)
+        occ_data = cedefop_read.read_emp_occupation(db, country, role_id_str)
+        sec_data = cedefop_read.read_emp_sector_occupation(db, country, sector, role_id_str)
+        qual_data = cedefop_read.read_qualifications(db, country, role_id_str)
+        job_data = cedefop_read.read_job_openings(db, country, role_id_str)
         
         forecast_results.append({
             "title": role.title,  
@@ -1177,10 +1177,10 @@ async def project_forecast_gap_courses(
         role_id_str = str(role.id).strip()
             
         # CEDEFOP
-        occ_data = cedefop_service.read_emp_occupation(db, country, role_id_str)
-        sec_data = cedefop_service.read_emp_sector_occupation(db, country, sector, role_id_str)
-        qual_data = cedefop_service.read_qualifications(db, country, role_id_str)
-        job_data = cedefop_service.read_job_openings(db, country, role_id_str)
+        occ_data = cedefop_read.read_emp_occupation(db, country, role_id_str)
+        sec_data = cedefop_read.read_emp_sector_occupation(db, country, sector, role_id_str)
+        qual_data = cedefop_read.read_qualifications(db, country, role_id_str)
+        job_data = cedefop_read.read_job_openings(db, country, role_id_str)
 
         forecast_results.append({
             "title": role.title,  
