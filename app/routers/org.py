@@ -166,6 +166,11 @@ async def org_profile(
     if analyze:
         for project in org.projects:
             gaps = project.get("skill_gap", []) if isinstance(project, dict) else project.skill_gap
+            project_name = project.get("name") if isinstance(project, dict) else project.name
+            
+            # Usiamo un set locale al progetto per evitare duplicati nello stesso progetto
+            skills_found_in_this_project = set()
+
             for gap_entry in gaps:
                 missing = gap_entry.get("missing_skills", [])
                 partial = [p["skill"] for p in gap_entry.get("partially_matching_skills", [])]
@@ -174,13 +179,25 @@ async def org_profile(
                 for skill in all_needed:
                     uri = skill["uri"] if isinstance(skill, dict) else skill.uri
                     name = skill["name"] if isinstance(skill, dict) else skill.name
+                    
+                    # Registriamo la skill per questo progetto
                     if uri not in global_gap:
-                        global_gap[uri] = {"name": name, "count": 0}
-                    global_gap[uri]["count"] += 1
+                        global_gap[uri] = {
+                            "name": name, 
+                            "count": 0, 
+                            "projects": [] # Lista per i nomi dei progetti
+                        }
+                    
+                    # Se non abbiamo ancora contato questa skill per QUESTO progetto...
+                    if uri not in skills_found_in_this_project:
+                        global_gap[uri]["count"] += 1
+                        global_gap[uri]["projects"].append(project_name)
+                        # La segniamo come "già contata" per non duplicarla se appare in un altro gap_entry
+                        skills_found_in_this_project.add(uri)
 
-        # Sorting for count
+        # Sorting finale per count
         global_gap = dict(sorted(global_gap.items(), key=lambda item: item[1]['count'], reverse=True))
-
+                
         # Recommendation for orgs
         if global_gap:
             skills_to_recommend = {uri: data["name"] for uri, data in global_gap.items()}

@@ -1,0 +1,11 @@
+{
+    "name": "Luca",
+    "surname": "Gialli",
+    "username": "luca.gialli",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$jXFurZXynlPK+b+XslYqJQ$CZmAXCF4S2fKSS3BlvSSrc8NE37t0WcsapOiVHD5p3Y",
+    "level": "manager",
+    "target_roles": [],
+    "individual_skills": [],
+    "skill_gap": [],
+    "organization": "univr"
+}

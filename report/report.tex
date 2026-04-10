@@ -436,4 +436,327 @@ def mock_database(tmp_path, monkeypatch):
     yield
 \end{lstlisting}
 
+\newpage
+
+\section{User Interface and Navigation Walkthrough}
+To provide a comprehensive understanding of the platform's user experience and 
+to illustrate the practical implementation of the technical architecture discussed 
+in previous chapters, this section offers a visual walkthrough of the primary 
+interfaces. The navigation flow is designed to be intuitive, guiding different 
+user types through their specific features.
+
+\subsection{Access and Guest Browsing}
+The user journey begins at the main landing page, which serves as the 
+authentication gateway. From here, registered individuals and organizations 
+can securely log in. For unregistered users, the platform offers a "Guest" 
+access route. Navigating to the Guest dashboard---by clicking 
+\texttt{Continue as a Guest} button---allows visitors to test the 
+core ESCO API integration by searching for professional roles without 
+needing to create a persistent profile.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/walkthrough/starting_page.png}
+    \caption{The main landing page with options for login and guest access.}
+    \label{fig:login_page}
+\end{figure}
+
+\subsubsection{Login and Registration}
+Registered users can access the login form by clicking the \texttt{Individual User} button. 
+This form requires the user to input their username and password, which are
+stored securely in the database.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.4\linewidth]{images/walkthrough/user_login.png}
+    \caption{The login form for registered users.}
+    \label{fig:login_form}
+\end{figure}
+
+\newpage
+
+If a user does not have an account, they can click the \texttt{Don't have an account? 
+Register here} link, which directs them to a registration form. 
+Here, they can create a new account by 
+providing a unique username, a secure password and their name.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/walkthrough/user_registration.png}
+    \caption{The registration form for new users.}
+    \label{fig:registration_form}
+\end{figure}
+
+It is important to note that this login and registration flow can be accessed by both 
+individual users and organizational accounts. 
+The system differentiates between these two types of users based on 
+the credentials provided during registration and the subsequent authentication process.
+
+\newpage
+
+\subsection{The Individual User Journey (Employee and Manager)}
+Once authenticated, standard employees and managers are directed to the Home dashboard. 
+The interface is intentionally clean, focusing on a central search bar used to explore 
+the ESCO catalog. 
+
+If the authenticated user holds Manager privileges, the navigation options expand,
+revealing the Project Management section. Here, 
+managers can view a summary of active projects and navigate to a dedicated form 
+to create new ones, selecting team members dynamically populated 
+from the organization's roster.
+
+In the top right corner of the dashboard, a navigation bar provides quick access 
+to the user's profile settings and a logout option, ensuring 
+that users can easily manage their accounts and securely exit the
+platform when needed.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/walkthrough/user_home.png}
+    \caption{Employee and Manager User Home dashboard displaying the ESCO search tool}
+    \label{fig:user_home}
+\end{figure}
+
+\hrule
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/walkthrough/manager_section.png}
+    \caption{Manager User Home dashboard displaying the active projects.}
+    \label{fig:manager_home}
+\end{figure}
+
+\subsubsection{ESCO Search tool}
+The ESCO search tool is a central feature of the Home dashboard. It allows users to
+query the ESCO database for specific roles or skills. The search results are displayed
+in a structured format, showing the relevant information retrieved from the API, such
+as the role's ISCO code, required skills, and related occupations. This tool serves as
+a gateway for users to explore the standardized classifications of jobs and skills,
+which is essential for the subsequent skill gap analysis and career planning features.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/walkthrough/esco_roles.png}
+    \caption{ESCO Search Results}
+    \label{fig:esco_roles}
+
+    \vspace{1em}
+    \hrule 
+    \vspace{1em}
+
+    \includegraphics[width=1\linewidth]{images/walkthrough/role_details.png}
+    \caption{ESCO Role Details}
+    \label{fig:esco_role_details}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/walkthrough/esco_skills.png}
+    \caption{ESCO Skills}
+    \label{fig:esco_skills}
+\end{figure}
+
+\newpage
+
+\subsubsection{Project Manager}
+The Project Manager section is exclusively accessible to users with managerial privileges. 
+Here, managers can create new projects by selecting a project name, assigning team
+members from the organization's roster, and defining target roles for the project. 
+Once a project is created, the manager can view a summary of the project details,
+including the assigned team members and the selected target roles. This section allows
+managers to oversee the progress of their projects and ensure that the team is aligned
+with the defined objectives. Once the project is set up, the market analysis and skill 
+gap evaluation features works as explained in the next section,
+but instead of evaluating a single user, it calculates a global skill gap by comparing
+the aggregated competencies of the assigned team members against the 
+collective requirements of the selected target roles for the project. 
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/walkthrough/project_creation.png}
+    \caption{Project Creation Form.}
+    \label{fig:manager_projects}
+\end{figure}
+
+\subsubsection{Profile Configuration and Skill Gap Evaluation}
+The core value of the application is unlocked in the Profile section. 
+Users navigate here to build their professional portfolio. The interface 
+allows users to add current skills, declare target roles, and manage their 
+organizational affiliation. Note that the language of the file selection button for importing skills depends on the 
+user's browser settings.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/walkthrough/user_skills.png}
+    \caption{Managing current skills.}
+    \label{fig:user_skills}
+\end{figure}
+
+\hrule
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{images/walkthrough/upload_skills.png}
+    \caption{Uploading skills via CSV.}
+    \label{fig:upload_skills}
+\end{figure}
+
+\hrule
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.4\linewidth]{images/walkthrough/user_target_roles.png}
+    \caption{Managing target roles.}
+    \label{fig:user_target_roles}
+\end{figure}
+
+After configuring their profile, the user can trigger the skill gap evaluation. 
+The platform transitions to a comprehensive analytics dashboard. This view is 
+divided into three logical steps:
+\begin{enumerate}
+    \item \textbf{Market Trends:} Charts displaying the Cedefop 
+    employment forecasts and job opening projections.
+    \item \textbf{Gap Visualization:} A clear breakdown of matching, partially 
+    matching, and missing skills required for the selected target roles.
+    \item \textbf{Actionable Output:} The course recommendation engine presents 
+    a tailored list of training modules to bridge the identified gaps.
+\end{enumerate}
+From this screen, an "Export to PDF" option allows the user to download the full report.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/walkthrough/market_analisys.png}
+    \caption{The analytics dashboard showing the Cedefop forecasts.}
+    \label{fig:market_analysis}
+\end{figure}
+
+\hrule
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/walkthrough/skill_gap.png}
+    \caption{The analytics dashboard showing the skill gap analysis.}
+    \label{fig:skill_gap}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.4\linewidth]{images/walkthrough/course_recommendation.png}
+    \caption{The analytics dashboard showing course recommendations.}
+    \label{fig:course_recommendation}
+\end{figure}
+
+\newpage
+
+If a user is currently affiliated with an organization, a dedicated subsection 
+displays their ``organizational skills''---competencies that are directly assigned
+and managed by the company. Through this interface, users also retain the autonomy
+to officially leave their current organization if needed. This feature ensures that
+users have control over their organizational affiliations and can manage 
+their career paths
+independently, even when they are part of a larger corporate structure.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.4\linewidth]{images/walkthrough/org_skill_leave.png}
+    \caption{The interface for viewing organizational skills and leaving the current organization.}
+    \label{fig:org_skill_leave}
+\end{figure}
+
+\newpage
+
+\subsection{The Organization Journey}
+The organizational user experience is designed to facilitate workforce management 
+and strategic planning. It begins with a home dashboard that provides an overview 
+of active projects, allowing the organization to monitor the progress of 
+initiatives led by its managers.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/walkthrough/active_projects.png}
+    \caption{The interface for viewing active projects.}
+    \label{fig:active_projects}
+\end{figure}
+
+\subsubsection{Profile Configuration and Skill Gap Evaluation}
+For corporate users, the navigation prioritizes workforce management. 
+The Organization Profile dashboard acts as an administrative control panel. 
+The most prominent feature is the Team Members section, where the organization 
+can invite new employees or adjust user privileges (e.g., promoting an employee to 
+a manager).
+
+To streamline onboarding, the organization can navigate to the CSV Bulk Upload tool. 
+When a file is uploaded, the interface shifts to a validation screen (very similar to the one 
+shown in Figure~\ref{fig:upload_skills}). 
+This screen highlights any competencies that the system could not automatically 
+map to the ESCO database, prompting the administrator to manually review and 
+confirm the assignments before finalizing the data import. If a user in the upload file
+is not currently affiliated with the organization, the system will 
+automatically send them an invitation to join, which they can accept or 
+decline at their discretion.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/walkthrough/team_org.png}
+    \caption{The interface for viewing and managing team members.}
+    \label{fig:team_org}
+\end{figure}
+
+The organization can also perform a global skill gap evaluation for its workforce.
+This feature aggregates the competencies of all employees and compares them against
+the requirements of the active projects. 
+The resulting analysis identifies company-wide skill deficiencies and 
+generates strategic course recommendations for corporate upskilling 
+initiatives. Similar to individual users, organizations can export 
+this comprehensive evaluation into a consolidated PDF report for 
+offline review and strategic decision-making at the management level.
+Additionally, a selection of recommended courses is suggested to address 
+the identified skill gaps, allowing the organization 
+to plan targeted training programs for its employees.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/walkthrough/org_skills_gap.png}
+    \caption{Skill gaps identified across the organization.}
+    \label{fig:org_skills_gap}
+
+    \vspace{1em}
+    \hrule 
+    \vspace{1em}
+
+    \centering
+    \includegraphics[width=0.6\linewidth]{images/walkthrough/course_recommendation_hr.png}
+    \caption{HR-level course recommendations for addressing skill gaps.}
+    \label{fig:course_recommendation_hr}
+\end{figure}
+
+\newpage
+
+\subsubsection{Educational Offerings Creation}
+Organizations can also create and manage their own educational offerings.
+Through a dedicated interface, corporate users can author new courses by providing
+detailed metadata, including the course name, description, ECTS credits, category,
+cost, and the specific skills covered. 
+These courses can be published as either public or private. 
+Public courses are accessible to all users on the platform,
+while private courses are restricted to employees and managers affiliated with the organization.
+This feature allows companies to contribute their own training resources to the ecosystem,
+tailoring educational content to the specific needs of their workforce and ensuring that
+employees have access to relevant learning opportunities that align with the identified skill gaps.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/walkthrough/course_creation.png}
+    \caption{The interface for creating new educational offerings.}
+    \label{fig:course_creation}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{images/walkthrough/courses_list.png}
+    \caption{The interface for viewing and managing educational offerings.}
+    \label{fig:courses_list}
+\end{figure}
+
 \end{document}
