@@ -135,6 +135,11 @@
             "uri": "http://data.europa.eu/esco/skill/156f8c5b-894a-4ccc-a70e-37a2726f3f00",
             "name": "work ergonomically",
             "level": 6
+        },
+        {
+            "uri": "http://data.europa.eu/esco/skill/68b6ef08-d823-489d-a95c-752ae6f6e6a7",
+            "name": "read standard blueprints",
+            "level": 7
         }
     ],
     "skill_gap": [
