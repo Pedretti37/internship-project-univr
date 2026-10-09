@@ -84,9 +84,18 @@ internship-project-univr/
     ```bash
     pip install -r requirements.txt
     ```
+    If it does not work
+    ```bash
+    python -m pip install -r requirements.txt
+    ```
+
 4.  **Start the server:**
     ```bash
     uvicorn app.main:app --reload
+    ```
+    if it does not work
+    ```bash
+    python -m uvicorn app.main:app --reload
     ```
     **For tests run this instead of starting the server:**
     ```bash

@@ -2,8 +2,23 @@
     "name": "UniVR",
     "orgname": "b",
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$YmzNGQNACIHQOuc8xxgDIA$09jLgbOscOvjdveeLf5WZtiIjp/8dZNNIRcKaTecotQ",
-    "members": {},
+    "members": {
+        "a": []
+    },
     "pending_members": {},
-    "projects": [],
+    "projects": [
+        {
+            "id": "19007b63-d8c7-4cfe-a85f-a9be7f462644",
+            "name": "Project1",
+            "description": "prova",
+            "manager": "a",
+            "assigned_members": [
+                "a"
+            ],
+            "target_roles": [],
+            "skill_gap": [],
+            "created_at": "2026-10-09T05:38:35.051407Z"
+        }
+    ],
     "courses": []
 }
