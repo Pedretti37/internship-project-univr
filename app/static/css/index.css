@@ -5,15 +5,6 @@ body {
     background-color: #f4f4f9; 
 }
 
-/* main container */
-.page-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh; 
-    width: 100%;
-}
-
 /* central box */
 .start-box {
     background-color: white;
@@ -84,29 +75,4 @@ body {
     height: 1px;
     background: #e0e0e0;
     margin: 0.5rem 0;
-}
-
-.esco-conditions {
-    text-align: center;
-    padding: 1rem;
-    font-size: 0.85rem;
-    color: #777;
-}
-
-.partners.logos {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2.5rem;
-    margin-bottom: 0.75rem;
-}
-
-.logo-cedefop {
-    height: 32px;
-    width: auto;
-}
-
-.logo-datagems {
-    height: 40px;
-    width: auto;
 }

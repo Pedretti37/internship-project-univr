@@ -26,6 +26,8 @@ body {
 }
 
 .nav-left {
+    margin-left: auto;
+    margin-right: 2rem;
     font-size: 1.1rem;
 }
 
@@ -50,6 +52,25 @@ body {
 }
 .logout-btn:hover {
     color: #ff6b6b;
+}
+
+.nav-logos {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: white;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+}
+
+.logo-cedefop {
+    height: 24px; 
+    width: auto;  
+}
+
+.logo-datagems {
+    height: 28px; 
+    width: auto;  
 }
 
 .main-container {

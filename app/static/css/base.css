@@ -35,3 +35,34 @@
     font-weight: 500;
     font-size: 0.95rem;
 }
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* footer: identical on every page that uses it */
+.esco-conditions {
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.esco-conditions p {
+    margin: 0;                /* removes the default <p> margins */
+}
+
+.partners.logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.logo-cedefop  { height: 24px; width: auto; }
+.logo-datagems { height: 30px; width: auto; }

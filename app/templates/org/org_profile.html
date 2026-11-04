@@ -7,8 +7,13 @@
 
 {% block content %}
     <nav class="navbar">
+        <div class="nav-logos">
+            <img src="/static/img/CEDEFOP_logo.png" alt="CEDEFOP Logo" class="logo-cedefop">
+            <img src="/static/img/DataGEMS_logo.png" alt="DataGEMS Logo" class="logo-datagems">
+        </div>
+
         <div class="nav-left">
-            <span class="name">Business Profile, <strong>{{ org.name }}</strong></span>
+            <span class="name">Hello, <strong>{{ org.name }}</strong></span>
         </div>
 
         <div class="nav-right">
