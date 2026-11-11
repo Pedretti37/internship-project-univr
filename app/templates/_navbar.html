@@ -1,0 +1,36 @@
+{% set on_profile = request.url.path.startswith('/user_profile')
+                    or request.url.path.startswith('/org_profile') %}
+
+<nav class="navbar">
+    <div class="nav-logos">
+        <img src="/static/img/CEDEFOP_logo.png" alt="CEDEFOP Logo" class="logo-cedefop">
+        <img src="/static/img/DataGEMS_logo.png" alt="DataGEMS Logo" class="logo-datagems">
+        <img src="/static/img/European_Commission_logo.png" alt="European Commission Logo" class="logo-european-commission">
+    </div>
+
+    <div class="nav-left">
+        {% if user %}
+            <span class="name">Hello, <strong>{{ user.name }}</strong></span>
+        {% elif org %}
+            <span class="name">Hello, <strong>{{ org.name }}</strong></span>
+        {% else %}
+            <span class="name">Hello, <strong>Guest</strong></span>
+        {% endif %}
+    </div>
+
+    <div class="nav-right">
+        {% if user %}
+            <a href="{{ '/user_home' if on_profile else '/user_profile' }}" class="nav-link">
+                {{ 'Home' if on_profile else 'Profile' }}
+            </a>
+            <a href="/user_logout" class="nav-link logout-btn">Logout</a>
+        {% elif org %}
+            <a href="{{ '/org_home' if on_profile else '/org_profile' }}" class="nav-link">
+                {{ 'Home' if on_profile else 'Profile' }}
+            </a>
+            <a href="/org_logout" class="nav-link logout-btn">Logout</a>
+        {% else %}
+            <a href="/guest_logout" class="nav-link logout-btn">Logout</a>
+        {% endif %}
+    </div>
+</nav>

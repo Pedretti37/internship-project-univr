@@ -1,0 +1,22 @@
+.esco-conditions {
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.esco-conditions p {
+    margin: 0;                /* removes the default <p> margins */
+}
+
+.partners.logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.logo-cedefop  { height: 24px; width: auto; }
+.logo-datagems { height: 32px; width: auto; }
+.logo-european-commission { height: 50px; width: auto; position: relative; bottom: 4px; }

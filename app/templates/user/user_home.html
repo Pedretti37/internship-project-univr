@@ -3,24 +3,11 @@
 {% block css %}
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/user_home.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
 {% endblock %}
 
 {% block content %}
-    <nav class="navbar">
-        <div class="nav-logos">
-            <img src="/static/img/CEDEFOP_logo.png" alt="CEDEFOP Logo" class="logo-cedefop">
-            <img src="/static/img/DataGEMS_logo.png" alt="DataGEMS Logo" class="logo-datagems">
-        </div>
-
-        <div class="nav-left">
-            <span class="name">Hello, <strong>{{ user.name }}</strong></span>
-        </div>
-
-        <div class="nav-right">
-            <a href="/user_profile" class="nav-link">Profile</a>
-            <a href="/user_logout" class="nav-link logout-btn">Logout</a>
-        </div>
-    </nav>
+    {% include "_navbar.html" %}
 
     <div class="main-container">
         <section class="card">

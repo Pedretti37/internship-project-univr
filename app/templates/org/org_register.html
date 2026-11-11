@@ -3,23 +3,12 @@
 {% block css %}
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/register.css">
+    <link rel="stylesheet" href="/static/css/footer.css">
 {% endblock %}
 
 {% block content %}
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-left">
-            <span class="name">Create your <strong>Business Account</strong></span>
-        </div>
-
-        <div class="nav-right">
-            <a href="/" class="nav-link">Back</a>
-        </div>
-    </nav>
-
-    <!-- Main container -->
-    <div class="main-container">
-        <div class="register-container">
+    <div class="page-container">
+        <div class="card">
             {% if error %}
                 <div class="error-banner" style="background-color: #ffdddd; color: red; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
                     {{ error }}
@@ -40,7 +29,13 @@
 
                 <button type="submit">Register</button>
             </form>
+
+            <div class="back-link">
+                <small><a href="/org_login">← Back to Login Page</a></small>
+            </div>
         </div>
+
+        {% include "_footer.html" %}
     </div>
 
     <script>

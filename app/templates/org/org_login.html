@@ -3,6 +3,7 @@
 {% block css %}
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/login.css">
+    <link rel="stylesheet" href="/static/css/footer.css">
 {% endblock %}
 
 {% block content %}
@@ -36,6 +37,8 @@
                 <small><a href="/">← Back to Welcome Page</a></small>
             </div>
         </div>
+
+        {% include "_footer.html" %}
     </div>
 
     <script>
