@@ -3,9 +3,12 @@
 {% block css %}
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/review_skills.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
 {% endblock %}
 
 {% block content %}
+    {% include "_navbar.html" %}
+
     <div class="main-container">
         <p>Review the skills extracted for your team.</p>
 

@@ -28,6 +28,9 @@
             </a>
             <a href="/user_logout" class="nav-link logout-btn">Logout</a>            
         {% elif org %}
+            {% if on_project_org %}
+                <a href="/org_home" class="nav-link">Home</a>
+            {% endif %}
             <a href="{{ '/org_home' if on_profile else '/org_profile' }}" class="nav-link">
                 {{ 'Home' if on_profile else 'Profile' }}
             </a>
