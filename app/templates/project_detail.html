@@ -3,31 +3,17 @@
 {% block css %}
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/project_detail.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
 {% endblock %}
 
 {% block content %}
-    <nav class="navbar">
-        <div class="nav-left">
-            <span class="name">Project <strong>{{ current_project.name }}</strong></span>
-        </div>
-
-        <div class="nav-right">
-            {% if is_manager %}
-                <a href="/user_home" class="nav-link">Home</a>
-                <a href="/user_profile" class="nav-link">Profile</a>
-                <a href="/user_logout" class="nav-link logout-btn">Logout</a>
-            {% else %}
-                <a href="/org_home" class="nav-link">Home</a>
-                <a href="/org_profile" class="nav-link">Profile</a>
-                <a href="/org_logout" class="nav-link logout-btn">Logout</a>
-            {% endif %}
-        </div>
-    </nav>
+    {% include "_navbar.html" %}
 
     <div class="main-container">
         
         <div class="card">
-            <h2>Description</h2>
+            <h2>Project: {{ current_project.name }}</h2>
+            <h3>Description</h3>
             <p>{{ current_project.description }}</p>
         </div>
 

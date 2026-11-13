@@ -1,9 +1,24 @@
 {
-    "name": "Universit\u00e0 degli Studi di Verona",
+    "name": "Università degli Studi di Verona",
     "orgname": "univr",
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$ao3R+j9nbE3JmZOSEkLIuQ$TPeB3BBccFmAzQSveQxnNmJMsYP2HEfs3EYczMjAwKw",
-    "members": {},
+    "members": {
+        "simo": []
+    },
     "pending_members": {},
-    "projects": [],
+    "projects": [
+        {
+            "id": "a371cda8-6f81-4a72-8768-e9f37b431b7a",
+            "name": "Ciao",
+            "description": "Ciao",
+            "manager": "simo",
+            "assigned_members": [
+                "simo"
+            ],
+            "target_roles": [],
+            "skill_gap": [],
+            "created_at": "2026-11-13T10:17:37.812415Z"
+        }
+    ],
     "courses": []
 }

@@ -3,36 +3,16 @@
 {% block css %}
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/details.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
 {% endblock %}
 
 {% block content %}
-    <nav class="navbar">
-        <div class="nav-left">
-            <span><strong>{{ role.title | title }}</strong></span>
-        </div>
-
-        <div class="nav-right">
-            {% if is_user%}
-                {% if is_manager %}
-                    <a href="/manager/project/{{ project_id }}?{% if role_search %}role_search={{ role_search | urlencode }}{% endif %}" class="nav-link">
-                        ← Back to Project
-                    </a>
-                {% else %}
-                    <a href="/user_home?{% if role_search %}role_search={{ role_search | urlencode }}{% endif %}" class="nav-link">
-                        ← Back to Search
-                    </a>
-                {% endif %}
-                <a href="/user_logout" class="nav-link logout-btn">Logout</a>
-            {% else %}
-                <a href="/org_home" class="nav-link">← Back to Project</a>
-                <a href="/org_logout" class="nav-link logout-btn">Logout</a>
-            {% endif %}
-        </div>
-    </nav>
+    {% include "_navbar.html" %}
 
     <div class="main-container">
         <div class="details-box">
-            <div class="meta-badges">
+            <div>
+                <h1>{{ role.title | title }}</h1>
                 <span class="badge" title="Used for CEDEFOP Forecasts">ISCO ID: {{ role.id }}</span>
                 <span class="badge" title="Specific ESCO Code">Full ID: {{ role.id_full }}</span>
             </div>

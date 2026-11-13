@@ -3,26 +3,16 @@
 {% block css %}
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/create_project.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
 {% endblock %}
 
 {% block content %}
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-left">
-            <span class="name">Create a <strong>Project</strong></span>
-        </div>
-
-        <div class="nav-right">
-            <a href="/user_home" class="nav-link">Home</a>
-            <a href="/user_profile" class="nav-link">Profile</a>
-            <a href="/user_logout" class="nav-link logout-btn">Logout</a>
-        </div>
-    </nav>
+    {% include "_navbar.html" %}
 
     <!-- Main content -->
     <div class="main-container">
         <div class="card">
-            <h1>Create New Project</h1>
+            <h1>Create a new Project</h1>
 
             <hr class="hr">
 

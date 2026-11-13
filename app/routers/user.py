@@ -482,7 +482,8 @@ async def details_page(
             "role": selected_role,
             "role_search": role_search,
             "toast_msg": toast_msg,
-            "toast_type": toast_type
+            "toast_type": toast_type,
+            "user": user
         }
     )
     
@@ -970,7 +971,8 @@ async def details_page(
             "role_search": role_search,
             "project_id": project_id,
             "toast_msg": toast_msg,
-            "toast_type": toast_type
+            "toast_type": toast_type,
+            "user": user
         }
     )
 

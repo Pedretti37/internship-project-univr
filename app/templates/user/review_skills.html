@@ -3,22 +3,13 @@
 {% block css %}
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/review_skills.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
 {% endblock %}
 
 {% block content %}
-    <nav class="navbar">
-        <div class="nav-left">
-            <span>Review Your <strong>Imported Skills</strong></span>
-        </div>
-
-        <div class="nav-right">
-            <a href="/user_home" class="nav-link">Home</a>
-        </div>
-    </nav>
+    {% include "_navbar.html" %}
 
     <div class="main-container">
-        <p>We found some matches for your CSV data. Please review them and select the most accurate ESCO terminology before saving.</p>
-
         {% if skills_not_found %}
             <div class="alert alert-warning">
                 <strong>Not Found:</strong> We couldn't find matches for the following skills:
@@ -31,6 +22,9 @@
         {% endif %}
 
         <div class="details-box">
+            <h2>Review Your Skills</h2>
+            <p>We found some matches for your CSV data. Please review them and select the most accurate ESCO terminology before saving.</p>
+            <hr class="hr">
             <form action="/confirm_skills_csv" method="post">
                 <table class="table table-striped align-middle">
                     <thead>
