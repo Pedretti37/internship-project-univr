@@ -43,10 +43,10 @@
                                 <strong>{{ item.username }}</strong>
                                 <input type="hidden" name="username_{{ loop.index }}" value="{{ item.username }}">
                             </td>
-                            <td><span style="color: #666;">{{ item.raw_name }}</span></td>
+                            <td><span class="skill-raw">{{ item.raw_name }}</span></td>
                             
                             <td>
-                                <span class="badge bg-secondary">{{ item.level }}</span>
+                                <span class="badge">{{ item.level }}</span>
                                 <input type="hidden" name="level_{{ loop.index }}" value="{{ item.level }}">
                             </td>
                             
@@ -67,9 +67,9 @@
 
                 <input type="hidden" name="total_rows" value="{{ skills_to_review|length }}">
 
-                <div class="d-flex justify-content-end gap-3 mt-4">
-                    <a href="/org_profile" class="btn btn-outline-danger">Cancel Import</a>
-                    <button type="submit" class="btn btn-success">Confirm and Assign to Project</button>
+                <div class="btns">
+                    <a href="/org_profile" class="btn btn-cancel">Cancel Import</a>
+                    <button type="submit" class="btn btn-primary">Confirm and Assign to Project</button>
                 </div>
             </form>
         </div>

@@ -37,10 +37,10 @@
                     <tbody>
                         {% for item in skills_to_review %}
                         <tr>
-                            <td><span style="color: #666;">{{ item.raw_name }}</span></td>
+                            <td><span class="skill-raw">{{ item.raw_name }}</span></td>
                             
                             <td>
-                                <span>{{ item.level }}</span>
+                                <span class="badge">{{ item.level }}</span>
                                 <input type="hidden" name="level_{{ loop.index }}" value="{{ item.level }}">
                             </td>
                             
@@ -62,8 +62,8 @@
                 <input type="hidden" name="total_rows" value="{{ skills_to_review|length }}">
 
                 <div class="btns">
-                    <a href="/user_profile" class="btn-cancel">Cancel Import</a>
-                    <button type="submit" class="btn-primary">Confirm and Save to Profile</button>
+                    <a href="/user_profile" class="btn btn-cancel">Cancel Import</a>
+                    <button type="submit" class="btn btn-primary">Confirm and Save to Profile</button>
                 </div>
             </form>
         </div>

@@ -3,8 +3,20 @@
     "orgname": "univr",
     "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$ao3R+j9nbE3JmZOSEkLIuQ$TPeB3BBccFmAzQSveQxnNmJMsYP2HEfs3EYczMjAwKw",
     "members": {
-        "simo": [],
-        "mario": []
+        "simo": [
+            {
+                "uri": "http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d",
+                "name": "Python (computer programming)",
+                "level": 5
+            }
+        ],
+        "mario": [
+            {
+                "uri": "http://data.europa.eu/esco/skill/19a8293b-8e95-4de3-983f-77484079c389",
+                "name": "Java (computer programming)",
+                "level": 6
+            }
+        ]
     },
     "pending_members": {},
     "projects": [
