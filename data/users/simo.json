@@ -6,128 +6,198 @@
     "level": "manager",
     "target_roles": [
         {
-            "id": "2512",
-            "title": "software developer",
-            "description": "Software developers implement or program all kinds of software systems based on specifications and designs by using programming languages, tools, and platforms.",
+            "id": "7233",
+            "title": "marine mechanic",
+            "description": "Marine mechanics are in charge of the engines and mechanical parts of the vessel and replace defective equipment and parts. They communicate with other crew members on the operational level. Marine mechanics maintain and repair the engines and the other machinery of vessels such as boilers, generators and electrical equipment.",
             "essential_skills": [
                 {
-                    "uri": "http://data.europa.eu/esco/skill/be48353d-25c7-4f86-bea9-7b9e248fbc6e",
-                    "name": "interpret technical requirements",
+                    "uri": "http://data.europa.eu/esco/skill/68b6ef08-d823-489d-a95c-752ae6f6e6a7",
+                    "name": "read standard blueprints",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/f28617ad-afdd-4041-814c-216153a38998",
-                    "name": "analyse software specifications",
+                    "uri": "http://data.europa.eu/esco/skill/541c8568-1b37-4903-8655-222cc25f8158",
+                    "name": "apply vessel engine regulations",
+                    "level": 6
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/db3c8181-31b4-4950-bf0b-de01f93c372b",
+                    "name": "disassemble engines",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/21d2f96d-35f7-4e3f-9745-c533d2dd6e97",
-                    "name": "computer programming",
+                    "uri": "http://data.europa.eu/esco/skill/cffc3e97-e942-4b13-a2f3-0bf4910c06d3",
+                    "name": "use technical documentation",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/6014921e-1d25-4039-adc2-04852d61880e",
-                    "name": "ICT debugging tools",
+                    "uri": "http://data.europa.eu/esco/skill/9328d71d-e46c-47ff-b48a-af0da294d4f4",
+                    "name": "european classification of inland waterways",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/9d2e926f-53d9-41f5-98f3-19dfaa687f3f",
-                    "name": "tools for software configuration management",
+                    "uri": "http://data.europa.eu/esco/skill/c6a0e8f4-ac0d-40b7-a594-86bf33c3e8dc",
+                    "name": "distinguish various types of ships",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/d9e5349e-8791-49c2-8ba4-839fdd1606c2",
-                    "name": "define technical requirements",
+                    "uri": "http://data.europa.eu/esco/skill/d30dac77-a21f-45e7-a9a1-36cc1529d287",
+                    "name": "unmoor vessels",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/2522a6ce-3202-4ac8-9f5b-b9cb5a3a83a1",
-                    "name": "debug software",
+                    "uri": "http://data.europa.eu/esco/skill/53e864a7-c8ec-4193-a5d9-595c144330f1",
+                    "name": "clean parts of vessels",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/0b0335f3-0aa1-491e-895e-81fc8774a300",
-                    "name": "develop automated migration methods",
+                    "uri": "http://data.europa.eu/esco/skill/ed938748-60ae-4964-a657-ff2685ecc0d0",
+                    "name": "evaluate engine performance",
+                    "level": 3
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/16f22744-64f4-4798-8666-aea6d7d201fc",
+                    "name": "international waterways",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/797a4416-0b8d-44f3-8fcd-eb10bd0be6b4",
-                    "name": "develop software prototype",
+                    "uri": "http://data.europa.eu/esco/skill/1bc7c69b-4292-4592-b854-f48165a06082",
+                    "name": "repair engines",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/172020d1-e151-445b-8173-e2a5fb16fe51",
-                    "name": "utilise computer-aided software engineering tools",
+                    "uri": "http://data.europa.eu/esco/skill/c78456d8-9633-4639-ad36-5755628f596d",
+                    "name": "adhere to traffic regulations on inland waterways",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
-                    "name": "perform scientific research",
+                    "uri": "http://data.europa.eu/esco/skill/d84ff2a1-aa27-44a8-8af0-317db8d3001b",
+                    "name": "national waterways",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/925463a7-d51f-4d5b-9f79-4d28cf30acde",
-                    "name": "integrated development environment software",
+                    "uri": "http://data.europa.eu/esco/skill/755dd3c3-824a-4f39-9935-6f036a8e62b9",
+                    "name": "manage vessel control systems",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/0e0c9c11-b39e-43cf-ba95-2fe646f5de64",
-                    "name": "identify customer requirements",
+                    "uri": "http://data.europa.eu/esco/skill/6d330bed-8206-43b3-a34b-a41da15c8d73",
+                    "name": "repair vessel mechanical systems",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/59ea80e1-463a-4dba-82c6-d0b6d577d532",
-                    "name": "technical drawings",
+                    "uri": "http://data.europa.eu/esco/skill/09dcef82-f470-49b0-9fa7-795443c79a9d",
+                    "name": "prepare main engines for navigation operations",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/7111b95d-0ce3-441a-9d92-4c75d05c4388",
-                    "name": "project management",
+                    "uri": "http://data.europa.eu/esco/skill/9a26b8b7-ec0f-46f8-a698-1f07cef1c5e3",
+                    "name": "ensure vessel compliance with regulations",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/8b94aa1e-89c9-459d-b3b4-1dfab8dec2df",
-                    "name": "use software libraries",
+                    "uri": "http://data.europa.eu/esco/skill/a833fceb-c552-4a5c-a5cf-4163313995c9",
+                    "name": "prepare equipment for navigation operations",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/04dfd9fb-e0cf-40f6-96c6-9d2280c4347e",
-                    "name": "provide technical documentation",
+                    "uri": "http://data.europa.eu/esco/skill/2bf28253-cf4a-4654-903f-170f3a350e03",
+                    "name": "execute safety assurance exercises",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/6a899482-8bcf-40ca-ae67-579a1cc467ab",
-                    "name": "manage engineering project",
+                    "uri": "http://data.europa.eu/esco/skill/4a806285-13a0-495b-b383-c3990f8f7d4a",
+                    "name": "ensure integrity of hull",
+                    "level": 6
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/6122d586-5978-431f-8e7a-96e61fc1f3fc",
+                    "name": "wear appropriate protective gear",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/901105f8-3a08-453e-b1dc-23619e317fd3",
-                    "name": "create flowchart diagram",
+                    "uri": "http://data.europa.eu/esco/skill/49026711-0f2d-42b3-8912-2b897ad05117",
+                    "name": "moor vessels",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/541561bc-510c-4a99-881c-2d8bf5a85462",
-                    "name": "use technical drawing software",
+                    "uri": "http://data.europa.eu/esco/skill/554a5829-7383-47cc-9cad-5f9f69de4a79",
+                    "name": "apply regulations on cargo transport operations",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/2b7a79e5-84d8-4880-be66-3d9bb05bea17",
-                    "name": "use software design patterns",
+                    "uri": "http://data.europa.eu/esco/skill/dd945f44-3f30-4a42-81b4-785b6c42401b",
+                    "name": "prevent damage to electrical devices on board",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/72a74f69-5cf1-43c5-99b9-62a444578919",
-                    "name": "engineering processes",
+                    "uri": "http://data.europa.eu/esco/skill/182915aa-3470-433a-9b12-347511befcde",
+                    "name": "maintain records of maintenance interventions",
                     "level": 5
                 },
                 {
-                    "uri": "http://data.europa.eu/esco/skill/209a5498-3449-4689-8ed9-bd08cab4fd78",
-                    "name": "engineering principles",
+                    "uri": "http://data.europa.eu/esco/skill/7d4d1dae-bcba-47e8-9409-ea52b02ce246",
+                    "name": "detect malfunctions in engines",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/5383a985-85f6-45ac-bb5a-1e4b48bb6e76",
+                    "name": "operate vessel engine room",
+                    "level": 6
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/d7ec90bb-487c-4318-911c-5c0b3e233619",
+                    "name": "distinguish ship construction methods",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/40d243e3-436d-4acc-9481-5d3acaf07665",
+                    "name": "vessel fuels",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/53a1a19b-8b61-481a-9791-70345fb6a335",
+                    "name": "communicate reports provided by passengers",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/e0b04224-52b4-44c4-9fae-26e9272dfe04",
+                    "name": "maintain vessel engine room",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/1a1a04b7-1d4c-414d-a791-7499ddb90a7f",
+                    "name": "functions of vessel deck equipment",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/962c3758-7fc8-4ee1-95b2-73b5efcd4684",
+                    "name": "inland waterway ship building",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/2ee670aa-c687-4ff7-92eb-0abc9b57e5f2",
+                    "name": "mechanics of vessels",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/5088c536-13fb-4b6b-85e7-4053578e1451",
+                    "name": "electrical systems used in transportation",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/f5fa2654-52cc-45d2-ac92-ac979dee5d12",
+                    "name": "engine components",
+                    "level": 5
+                },
+                {
+                    "uri": "http://data.europa.eu/esco/skill/efa141df-f382-418f-9121-bd88fd735669",
+                    "name": "mechanics",
                     "level": 5
                 }
             ],
-            "id_full": "2512.3",
-            "uri": "http://data.europa.eu/esco/occupation/f2b15a0e-e65a-438a-affb-29b9d50b77d1"
+            "id_full": "7233.9",
+            "uri": "http://data.europa.eu/esco/occupation/88589d68-b870-440e-8444-32e9935cbbbc"
         }
     ],
     "individual_skills": [

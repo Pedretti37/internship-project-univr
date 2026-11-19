@@ -2,7 +2,7 @@
                     or request.url.path.startswith('/org_profile') %}
               
 {% set on_details = request.url.path.startswith('/details') %}
-{% set on_project_manager = request.url.path.startswith('/manager/project/') %}
+{% set on_project_user = request.url.path.startswith('/view_project/') %}
 {% set on_project_org = request.url.path.startswith('/org/project/') %}
 {% set on_details_for_project = request.url.path.startswith('/role_details_for_project') %}
 
@@ -17,7 +17,7 @@
         {% if user %}
             {% if role_search and on_details %}
                 <a href="/user_home?role_search={{ role_search | urlencode }}" class="nav-link">← Back to Search</a>
-            {% elif on_project_manager %}
+            {% elif on_project_user %}
                 <a href="/user_home" class="nav-link">Home</a>
             {% elif role_search and on_details_for_project %}
                 <a href="/manager/project/{{ project_id }}?role_search={{ role_search | urlencode }}" class="nav-link">← Back to Project</a>

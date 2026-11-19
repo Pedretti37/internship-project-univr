@@ -63,6 +63,7 @@
                             </li>
                             {% endfor %}
                         </ul>
+                        <p>If no level is selected, the default level will be used: 5 - Intermediate</p>
                     {% endif %}
 
                     <div>
@@ -98,7 +99,7 @@
                                 <span>{{ skill.name | capitalize }}</span>
                                 
                                 <select name="level_{{ skill.uri }}" class="form-select form-select-sm" style="width: auto;">
-                                    <option value="">-- Select your level --</option>
+                                    <option value="">-- Select target level --</option>
                                     <option value="1">1 - Beginner</option>
                                     <option value="2">2 - Basic</option>
                                     <option value="3">3 - Pre-Intermediate</option>
@@ -112,6 +113,7 @@
                             </li>
                             {% endfor %}
                         </ul>
+                        <p>If no level is selected, the default level will be used: 5 - Intermediate</p>
                     {% endif %}
 
                     <div>

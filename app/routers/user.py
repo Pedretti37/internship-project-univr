@@ -141,7 +141,8 @@ async def user_home(
             "skill_search": skill_search,
             "managed_projects": managed_projects,
             "toast_msg": toast_msg,
-            "toast_type": toast_type
+            "toast_type": toast_type,
+            "org": crud_org.get_org_by_orgname(user.organization) if user.organization else None
         }
     )
 
@@ -876,7 +877,7 @@ async def create_project_submit(
         return RedirectResponse(url=f"/user_home?error={msg}", status_code=status.HTTP_303_SEE_OTHER)
     
 ### --- View Project GET --- ###
-@router.get("/manager/project/{project_id}", response_class=HTMLResponse)
+@router.get("/view_project/{project_id}", response_class=HTMLResponse)
 async def view_project(
     request: Request, 
     project_id: str, 
@@ -913,7 +914,7 @@ async def view_project(
             context={
             "user": user,
             "org": org,
-            "is_manager": True,
+            "is_manager": True if user.level == 'manager' else False,
             "current_project": current_project,
             "role_list": role_list,
             "role_search": role_search,

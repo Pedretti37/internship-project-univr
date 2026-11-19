@@ -99,39 +99,9 @@
                     {% else %}
                         <p class="text-muted">No organizational skills have been uploaded for your profile yet.</p>
                     {% endif %}
-                </div>
-
-                {% if user.level == 'individual' %}
-                    <hr>
-
-                    <h3>Your Active Projects</h3>
-                    <div class="projects-container">
-                        {% set ns = namespace(has_projects=false) %}
-                        
-                        {% for project in org.projects %}
-                            {% if project.assigned_members and user.username in project.assigned_members %}
-                                {% set ns.has_projects = true %}
-                                <div class="project-item">
-                                    <details>
-                                        <summary>
-                                            <span>Project: <strong>{{ project.name }}</strong></span>
-                                        </summary>
-                                        <div style="padding: 10px;">
-                                            <p>{{ project.description }}</p>
-                                        </div>
-                                    </details>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-
-                        {% if not ns.has_projects %}
-                            <p class="text-muted">You are not yet assigned to any active projects in this organization.</p>
-                        {% endif %}
-                    </div>
-                {% endif %}
+                </div>  
 
                 <div>
-                    <hr>
                     <form action="/leave_org" method="post">
                         <input type="hidden" name="orgname" value="{{ org.orgname }}">
                         <button type="submit" 
@@ -275,12 +245,6 @@
             {% endif %}
         </section>   
 
-        <section class="card">
-            {% if user.skill_gap or recommended_courses%}
-                <button onclick="downloadPDF()" class="btn btn-primary">📄 Export PDF</button>
-            {% endif %}
-        </section>
-
         <div id="report-content">
             <section class="card" translate="no">
                 <h2>Skill gap Assessment</h2>
@@ -365,6 +329,12 @@
                     <p>---</p>
                 {% endif %}
             </section>
+
+            {% if user.skill_gap or recommended_courses%}
+                <section class="card">
+                    <button onclick="downloadPDF()" class="btn btn-primary">📄 Export PDF</button>
+                </section>
+            {% endif %}
         </div>
     </div>
 

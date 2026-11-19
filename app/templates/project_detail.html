@@ -301,36 +301,35 @@
                 </div>
             </section>
 
-            {% if is_manager %}
-                <section class="card">
-                    <h2>Recommended Educational Courses</h2>
-                    {% if recommended_courses %}
-                        <div>
-                            {% for course in recommended_courses %}
-                            <div class="info-box">
-                                <h4>{{ course.title | title }}</h4>
-                                <p>{{ course.description }}</p>
-                                <p>Category: {{ course.category }}</p>
-                                <p>Format: {{ course. format }}</p>
-                                <p>Start date: {{ course.start_date }}</p>
-                                <p>Duration (weeks): {{ course.duration_weeks }}</p>
-                                <small>ECTS: {{ course.ects }}</small>
-                                <p>Location: {{ course.location }}</p>
-                                <p>Link: {{ course.link }} </p>
-                                <p><small>Skills covered:</small></p>
-                                <ul>
-                                    {% for skill in course.skills_covered %}
-                                        <li>{{ skill.name | capitalize }} <a href="{{ skill.uri }}" target="_blank">↗</a></li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endfor %}
+            
+            <section class="card">
+                <h2>Recommended Educational Courses</h2>
+                {% if recommended_courses %}
+                    <div>
+                        {% for course in recommended_courses %}
+                        <div class="info-box">
+                            <h4>{{ course.title | title }}</h4>
+                            <p>{{ course.description }}</p>
+                            <p>Category: {{ course.category }}</p>
+                            <p>Format: {{ course. format }}</p>
+                            <p>Start date: {{ course.start_date }}</p>
+                            <p>Duration (weeks): {{ course.duration_weeks }}</p>
+                            <small>ECTS: {{ course.ects }}</small>
+                            <p>Location: {{ course.location }}</p>
+                            <p>Link: {{ course.link }} </p>
+                            <p><small>Skills covered:</small></p>
+                            <ul>
+                                {% for skill in course.skills_covered %}
+                                    <li>{{ skill.name | capitalize }} <a href="{{ skill.uri }}" target="_blank">↗</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                    {% else %}
-                        <p>---</p>
-                    {% endif %}
-                </section>
-            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>---</p>
+                {% endif %}
+            </section>
         </div>
     </div>
 

@@ -1,0 +1,11 @@
+{
+    "name": "Mario",
+    "surname": "Rossi",
+    "username": "mario",
+    "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$6L23NgagtHYuZQxh7H1P6Q$Z2S1q+DuVQH8SdIMLTqmqVcN/C0btZnwEQjy+eJmQz8",
+    "level": "individual",
+    "target_roles": [],
+    "individual_skills": [],
+    "skill_gap": [],
+    "organization": "univr"
+}

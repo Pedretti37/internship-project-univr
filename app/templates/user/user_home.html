@@ -115,8 +115,8 @@
             </div>
         </section>
 
-        {% if user.level == 'manager' %}
-            <section class="card">
+        <section class="card">
+            {% if user.level == 'manager' %}
                 <h2>Manager Section</h2>
                 <p>Manage your teams, analyze skill gaps, and find training courses for your project members.</p>
                 <div class="project-header">
@@ -133,7 +133,7 @@
                             </p>
                             <div class="project-footer">
                                 <small>Team Size: <strong>{{ proj.assigned_members|length }}</strong></small>
-                                <a href="/manager/project/{{ proj.id }}" class="project-link">View Details →</a>
+                                <a href="/view_project/{{ proj.id }}" class="project-link">View Details →</a>
                             </div>
                         </div>
                         {% endfor %}
@@ -141,7 +141,32 @@
                 {% else %}
                     <p>No active projects!</p>
                 {% endif %}
-            </section>
-        {% endif %}
+            {% elif user.level == 'individual' and org %}
+                <h2>Your Active Projects</h2>
+                <div class="projects-container">
+                    {% set ns = namespace(has_projects=false) %}
+                    
+                    {% for project in org.projects %}
+                        {% if project.assigned_members and user.username in project.assigned_members %}
+                            {% set ns.has_projects = true %}
+                            <div class="project-card">
+                                <h3>{{ project.name }}</h3>
+                                <p class="project-desc">
+                                    {{ project.description | truncate(150, False, '...') }}
+                                </p>
+                                <div class="project-footer">
+                                    <small>Team Size: <strong>{{ project.assigned_members|length }}</strong></small>
+                                    <a href="/view_project/{{ project.id }}" class="project-link">View Details →</a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if not ns.has_projects %}
+                        <p class="text-muted">You are not yet assigned to any active projects in this organization.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
     </div>
 {% endblock %}
