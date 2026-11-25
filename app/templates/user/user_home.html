@@ -36,7 +36,7 @@
                                 <div class="role-card">
                                     <h3>
                                         <!-- Use urlencode to handle special characters in the URI -->
-                                        <a href="/details?uri={{ role.uri | urlencode }}{% if role_search %}&role_search={{ role_search | urlencode }}{% endif %}" class="role-title" style="text-decoration: none;">
+                                        <a href="/details?uri={{ role.uri | urlencode }}{% if role_search %}&role_search={{ role_search | urlencode }}{% endif %}">
                                             {{ role.title | title }}
                                         </a>
                                     </h3>
